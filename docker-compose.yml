@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  postgres_dev:
+    image: postgres:16
+    container_name: pricely_postgres_dev
+    environment:
+      POSTGRES_USER: ${DB_USER}       # Переменная из .env
+      POSTGRES_PASSWORD: ${DB_PASS}   # Переменная из .env
+      POSTGRES_DB: ${DB_NAME}         # Переменная из .env
+    ports:
+      - "5436:5432"   # Порт на хосте (5436) - порт в контейнере (5432)
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data  # Для постоянного хранения данных
+    networks:
+      - pricely_network
+
+volumes:
+  postgres_data_dev:
+    driver: local
+
+networks:
+  pricely_network:
+    driver: bridge
