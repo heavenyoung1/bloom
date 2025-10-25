@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict, root_validator
 
 class Settings(BaseSettings, case_sensitive=True):
     host: str = 'localhost'
@@ -19,4 +19,14 @@ class Settings(BaseSettings, case_sensitive=True):
             f'postgresql+asyncpg://{self.user}:{self.password}'
             f'@{self.host}:{self.port}/{self.db_name}'
             )
+
+    @root_validator(pre=True)
+    def check_required_fields(cls, values):
+        requierd_fields = [
+            field for field, field_info in cls.__annotations__.items() if not values.get(field)
+        ]
+
+        for field in requierd_fields:
+            if not values.get(field):
+                raise ValueError(f'{field} требуется заполнение обязательного поля!')
 
