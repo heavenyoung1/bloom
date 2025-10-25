@@ -6,4 +6,21 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "alembic>=1.17.0",
+    "black>=25.9.0",
+    "mypy>=1.18.2",
+    "pydantic-settings>=2.11.0",
+    "pylint>=4.0.2",
 ]
+
+[tool.black]
+line-length = 88  # Максимальная длина строки
+target-version = ['py313']  # Целевая версия Python
+skip-string-normalization = true  # Не менять кавычки
+
+[tool.pylint.main]
+disable = "C0114,C0115,C0116"  # Отключаем предупреждения по документированию
+max-line-length = 88  # Длина строки для Pylint
+
+[tool.mypy]
+files = "src"  # Папка с вашим кодом
+disallow_untyped_calls = true  # Запрещает вызовы без типов
