@@ -1,14 +1,18 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict, root_validator
 from sqlalchemy.engine import URL
 
-class Settings(BaseSettings, case_sensitive=True):
+class Settings(BaseSettings):
+    '''Конфигурация приложения (читается из .env файла).'''
+
+    # Параметры БД
     host: str = 'localhost'
-    port: str = '5432'
+    port: int = 5432
     user: str
     password: str
     db_name: str
-    driver: str = 'postgresql+asyncpg'
 
+    # SQLAlchemy параметры
+    driver: str = 'postgresql+asyncpg'
     echo: bool = False
     pool_size: int = 5
     max_overflow: int = 10
@@ -19,10 +23,11 @@ class Settings(BaseSettings, case_sensitive=True):
         env_file_encoding='utf-8',
         env_prefix='PG_',
         extra='ignore',
+        case_sensitive=True,
     )
 
     def url(self) -> str:
-        # безопаснее, чем руками собирать строку
+        '''Собрать URL подключения безопасно (защита от SQL injection).'''
         return str(URL.create(
             drivername=self.driver,
             username=self.user,
