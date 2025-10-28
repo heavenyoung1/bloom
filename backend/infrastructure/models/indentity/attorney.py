@@ -10,20 +10,20 @@ if TYPE_CHECKING:
     from backend.infrastructure.models.matter import Case, Document
 
 class Attorney(SQLModel, table=True):
-    'Таблица Юрист'
+    'Таблица Адвокат'
 
     id: int = Field(primary_key=True)
-    first_name: str = Field(max_length=100)
-    last_name: str = Field(max_length=100)
-    patronymic: Optional[str] = Field(max_length=100)
-    email: str = Field(max_length=100, index=True)  # валидацию делаем на уровне Pydantic DTO / сервисов
-    phone: Optional[str] = Field(max_length=50)
+    first_name: str = Field(max_length=50)
+    last_name: str = Field(max_length=50)
+    patronymic: Optional[str] = Field(max_length=50)
+    email: str = Field(max_length=50, index=True)  # валидацию делаем на уровне Pydantic DTO / сервисов
+    phone: Optional[str] = Field(max_length=20)
     password_hash: str = Field(max_length=255)
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
     updated_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
 
-    # relations
+    # Отношения
     clients: List['Client'] = Relationship(back_populates='owner_attorney')
     cases: List['Case'] = Relationship(back_populates='attorney')
     documents: List['Document'] = Relationship(back_populates='attorney')

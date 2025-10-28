@@ -15,13 +15,11 @@ class Document(SQLModel, table=True):
     storage_path: str = Field(max_length=1000)
     checksum: Optional[str] = Field(default=None, max_length=64) # Какая максимальная величина тут должна быть?
 
-    client_id: Optional[int] = Field(default=None, foreign_key='clients.id', index=True)
     case_id: Optional[int] = Field(default=None, foreign_key='cases.id', index=True)
     attorney_id: Optional[int] = Field(default=None, foreign_key='attorneys.id', index=True)
 
     created_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
 
-    # relations
-    client: Optional[Client] = Relationship(back_populates='documents')
+    # Отношения
     case: Optional[Case] = Relationship(back_populates='documents')
     attorney: Optional[Attorney] = Relationship(back_populates='documents')

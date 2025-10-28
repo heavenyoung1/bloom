@@ -5,7 +5,8 @@ from enum import Enum as enum
 
 if TYPE_CHECKING:
 
-    from backend.infrastructure.models.crm import Client
+    from backend.infrastructure.models.indentity import Attorney
+    from backend.infrastructure.models.matter import Case
 
 # Справочник типов событий
 class EventType(str, enum):
@@ -17,12 +18,16 @@ class EventType(str, enum):
 class Event(SQLModel, table=True):
     id: int = Field(primary_key=True)
     name: str = Field(max_length=255)
-    case_id: Optional[int] = Field(default=None, foreign_key='cases.id', index=True)
-    client_id: Optional[int] = Field(default=None, foreign_key='clients.id', index=True)
-    attorney_id: Optional[int] = Field(default=None, foreign_key='attorneys.id', index=True)
-    
-    event_type: EventType = Field(sa_column_kwargs={'nullable': False})
-    event_date: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
-    description: str = Field(max_length=255)
+    description: Optional[str] = Field(default=None, max_length=2000)
+    event_type: str = Field(max_length=50)
+    event_date: datetime
+
+    case_id: int = Field(foreign_key="cases.id", index=True)
+    attorney_id: int = Field(foreign_key="attorneys.id", index=True)
+
+    # relationships
+    case: Optional[Case] = Relationship(back_populates="events")
+    attorney: Optional[Attorney] = Relationship(back_populates="events")
+
 
 
