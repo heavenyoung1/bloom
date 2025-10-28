@@ -4,9 +4,9 @@ from datetime import datetime
 @dataclass
 class Case:
     id: int
+    name: str
     client_id: str
     attorney_id: str
-    name: str
     status: str
     description: str
     created_at: datetime

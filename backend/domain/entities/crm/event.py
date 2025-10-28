@@ -5,10 +5,11 @@ from datetime import datetime
 class Event:
     id: int
     name: str
+    description: str
     case_id: int
     client_id: int
     attorney_id: int
     event_type: str
     event_date: datetime
-    description: str
+
     

@@ -8,5 +8,5 @@ class Contact:
     personal_info: str #ИНН/ПАСПОРТ
     phone: str
     email: str
-    client_id: str
+    case_id: str
     created_at: datetime
