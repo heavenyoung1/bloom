@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 class Contact(SQLModel, table=True):
 
-    id: Optional[int] = Field(primary_key=True)
+    id: int = Field(primary_key=True)
     name: str = Field(max_length=255, description='ФИО полностью')
     personal_info: Optional[str] = Field(default=None, description='Паспорт', max_length=12)
     phone: Optional[str] = Field(default=None, max_length=12)
