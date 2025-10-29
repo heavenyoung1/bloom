@@ -14,5 +14,5 @@ class Subscription(SQLModel, table=True):
     period_start: datetime
     period_end: datetime
 
-    attorney: Attorney = Relationship(back_populates='subscriptions')
+    attorney: 'Attorney' = Relationship(back_populates='subscriptions')
     payments: List['Payment'] = Relationship(back_populates='subscription')

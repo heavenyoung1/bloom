@@ -22,8 +22,8 @@ class Case(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
 
     # Отношения
-    client: Optional[Client] = Relationship(back_populates="cases")
-    attorney: Optional[Attorney] = Relationship(back_populates="cases")
-    contacts: List["Contact"] = Relationship(back_populates="case", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-    documents: List["Document"] = Relationship(back_populates="case")
-    events: List["Event"] = Relationship(back_populates="case")
+    client: Optional['Client'] = Relationship(back_populates='cases')
+    attorney: Optional['Attorney'] = Relationship(back_populates='cases')
+    contacts: List['Contact'] = Relationship(back_populates='case', sa_relationship_kwargs={'cascade': 'all, delete-orphan'})
+    documents: List['Document'] = Relationship(back_populates='case')
+    events: List['Event'] = Relationship(back_populates='case')

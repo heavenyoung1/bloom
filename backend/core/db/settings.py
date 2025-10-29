@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict, root_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL
 
 class Settings(BaseSettings):
@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='.env', 
         env_file_encoding='utf-8',
-        env_prefix='PG_',
+        env_prefix='pg_',
         extra='ignore',
         case_sensitive=True,
     )
@@ -36,13 +36,12 @@ class Settings(BaseSettings):
             port=self.port,
             database=self.db_name,
         ))
-
-    @root_validator(pre=True)
-    def check_required_fields(cls, values):
-        requierd_fields = [
-            field for field, field_info in cls.__annotations__.items() if not values.get(field)
-        ]
-
-        for field in requierd_fields:
-            if not values.get(field):
-                raise ValueError(f'{field} требуется заполнение обязательного поля!')
+    
+settings = Settings()
+print("=== Settings ===")
+print(f"User: '{settings.user}'")
+print(f"Password: '{settings.password}'")
+print(f"DB: '{settings.db_name}'")
+print(f"Host: '{settings.host}'")
+print(f"Port: {settings.port}")
+print(f"URL: {settings.url()}")

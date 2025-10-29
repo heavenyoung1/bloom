@@ -1,7 +1,7 @@
-from backend.infrastructure.models.billing import Payment, Subscription
-from backend.infrastructure.models.crm import Client, Contact
-from backend.infrastructure.models.indentity import Attorney
-from backend.infrastructure.models.matter import Case, Document
+from ..models.billing import Payment, Subscription
+from ..models.crm import Client, Contact
+from ..models.indentity import Attorney
+from ..models.matter import Case, Document
 
 __all__ = [
     'Attorney',

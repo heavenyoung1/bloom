@@ -21,5 +21,5 @@ class Document(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
 
     # Отношения
-    case: Optional[Case] = Relationship(back_populates='documents')
-    attorney: Optional[Attorney] = Relationship(back_populates='documents')
+    case: Optional['Case'] = Relationship(back_populates='documents')
+    attorney: Optional['Attorney'] = Relationship(back_populates='documents')

@@ -22,12 +22,12 @@ class Event(SQLModel, table=True):
     event_type: str = Field(max_length=50)
     event_date: datetime
 
-    case_id: int = Field(foreign_key="cases.id", index=True)
-    attorney_id: int = Field(foreign_key="attorneys.id", index=True)
+    case_id: int = Field(foreign_key='cases.id', index=True)
+    attorney_id: int = Field(foreign_key='attorneys.id', index=True)
 
     # relationships
-    case: Optional[Case] = Relationship(back_populates="events")
-    attorney: Optional[Attorney] = Relationship(back_populates="events")
+    case: Optional['Case'] = Relationship(back_populates='events')
+    attorney: Optional['Attorney'] = Relationship(back_populates='events')
 
 
 

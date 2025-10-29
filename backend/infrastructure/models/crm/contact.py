@@ -17,4 +17,4 @@ class Contact(SQLModel, table=True):
     case_id: int = Field(foreign_key='cases.id', index=True)
 
     # relationships
-    case: Optional[Case] = Relationship(back_populates='contacts')
+    case: Optional['Case'] = Relationship(back_populates='contacts')

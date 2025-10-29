@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
+
 if TYPE_CHECKING:
     from backend.infrastructure.models.billing import Subscription
 
@@ -12,4 +13,4 @@ class Payment(SQLModel, table=True):
     value: int = Field(description='Значение платежа в рублях')
 
     created_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
-    subscription: Subscription = Relationship(back_populates='payments')
+    subscription: 'Subscription' = Relationship(back_populates='payments')

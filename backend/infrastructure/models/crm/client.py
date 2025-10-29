@@ -24,5 +24,5 @@ class Client(SQLModel, table=True):
     owner_attorney_id: Optional[int] = Field(foreign_key="attorneys.id", index=True)
 
     # Отношения
-    owner_attorney: Optional[Attorney] = Relationship(back_populates="clients")
-    cases: List["Case"] = Relationship(back_populates="client")
+    owner_attorney: Optional['Attorney'] = Relationship(back_populates="clients")
+    cases: List['Case'] = Relationship(back_populates="client")
