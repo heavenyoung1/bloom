@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 
@@ -20,8 +20,8 @@ class Attorney(SQLModel, table=True):
     phone: Optional[str] = Field(max_length=20)
     password_hash: str = Field(max_length=255)
     is_active: bool = Field(default=True)
-    created_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
-    updated_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
+    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=datetime.now(timezone.utc))
 
     # Отношения
     clients: List['Client'] = Relationship(back_populates='owner_attorney')

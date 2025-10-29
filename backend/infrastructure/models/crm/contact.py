@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
@@ -12,7 +12,7 @@ class Contact(SQLModel, table=True):
     personal_info: Optional[str] = Field(default=None, description='Паспорт', max_length=20)
     phone: Optional[str] = Field(default=None, max_length=20)
     email: Optional[str] = Field(default=None, max_length=50)
-    created_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
+    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
 
     case_id: int = Field(foreign_key='cases.id', index=True)
 

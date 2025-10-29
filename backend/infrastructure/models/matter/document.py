@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from backend.infrastructure.models.crm import Client
     from backend.infrastructure.models.matter import Case
     from backend.infrastructure.models.indentity import Attorney
 
@@ -18,7 +17,7 @@ class Document(SQLModel, table=True):
     case_id: Optional[int] = Field(default=None, foreign_key='cases.id', index=True)
     attorney_id: Optional[int] = Field(default=None, foreign_key='attorneys.id', index=True)
 
-    created_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
+    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
 
     # Отношения
     case: Optional['Case'] = Relationship(back_populates='documents')

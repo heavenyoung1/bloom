@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
@@ -19,7 +19,7 @@ class Client(SQLModel, table=True):
     address: Optional[str] = Field(default=None, max_length=255)
     messenger_type: Optional[str] = Field(default=None, max_length=30)
     messenger_handle: Optional[str] = Field(max_length=50)
-    created_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
+    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
 
     owner_attorney_id: Optional[int] = Field(foreign_key="attorneys.id", index=True)
 

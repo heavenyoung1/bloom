@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy.dialects.postgresql import BIT
 from typing import Optional, List, TYPE_CHECKING
@@ -19,7 +19,7 @@ class Case(SQLModel, table=True):
     attorney_id: int = Field(default=None, foreign_key='attorneys.id', index=True)
     status: str = Field(max_length=50, description='Статус делопроизводства')
     description: Optional[str] = Field(default=None, max_length=500)
-    created_at: datetime = Field(default_factory=datetime.now(tz=None)) # type: ignore
+    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
 
     # Отношения
     client: Optional['Client'] = Relationship(back_populates='cases')
