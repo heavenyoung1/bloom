@@ -42,15 +42,7 @@ class Settings(BaseSettings):
             database=self.db_name,
         ))
     
-    
     def alembic_url(self) -> str:
         '''Строка для подключения к БД ТОЛЬКО для выполнения Alembic миграций.'''
-        return str(URL.create(
-            drivername=self._sync_driver,
-            username=self.user,
-            password=self.password,
-            host=self.host,
-            port=self.port,
-            database=self.db_name,
-        ))
-    
+        url = f'{self._sync_driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
+        return url

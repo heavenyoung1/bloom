@@ -34,7 +34,7 @@ def get_alembic_url():
     logger.debug(f'📡 - Получен Alembic url для миграций - {settings.alembic_url()}')
     return settings.alembic_url()
 
-config.set_main_option("sqlalchemy.url", get_alembic_url())
+#config.set_main_option("sqlalchemy.url", get_alembic_url())
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -67,7 +67,7 @@ def run_migrations_online():
     # Создаём СИНХРОННЫЙ движок — Alembic не поддерживает async
     # Но URL — тот же, что и в create_async_engine!
     connectable = create_engine(
-        get_alembic_url(),  # ← ТОТ ЖЕ URL!
+        get_alembic_url(),
         poolclass=pool.NullPool,
         echo=True,
     )

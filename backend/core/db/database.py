@@ -61,3 +61,4 @@ class DataBaseConnection:
                 yield sesssion
             finally:
                 await sesssion.close()
+
