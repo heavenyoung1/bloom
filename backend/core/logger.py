@@ -10,7 +10,8 @@ console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(
 
 # Файловый обработчик
 file_handler = logging.FileHandler("app.log")
-file_handler.setLevel(logging.INFO)
+# ПОТОМ ВЫВЕСТИ В INFO
+file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 
 # Добавление обработчиков

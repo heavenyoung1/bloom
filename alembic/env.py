@@ -22,18 +22,19 @@ from backend.infrastructure.models import (
 
 # === Настройка ===
 config = context.config
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+# if config.config_file_name is not None:
+#     fileConfig(config.config_file_name)
+
 
 target_metadata = SQLModel.metadata 
 
 def get_alembic_url():
     """Получить URL из Settings (читает .env)"""
     settings = Settings()  # pydantic сам загрузит .env
-    logger.info(f'📡 - Получен Alembic url для миграций - {settings.alembic_url()}')
+    logger.debug(f'📡 - Получен Alembic url для миграций - {settings.alembic_url()}')
     return settings.alembic_url()
 
-
+config.set_main_option("sqlalchemy.url", get_alembic_url())
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -68,8 +69,7 @@ def run_migrations_online():
     connectable = create_engine(
         get_alembic_url(),  # ← ТОТ ЖЕ URL!
         poolclass=pool.NullPool,
-        # Можно добавить echo, если нужно:
-        # echo=settings.echo,
+        echo=True,
     )
 
     with connectable.connect() as connection:

@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     pool_pre_ping: bool = True
 
     # === Нужен для синхронного движка Alembic миграций. Не использовать! ===
-    _sync_driver: str = 'postgresql://' 
+    _sync_driver: str = 'postgresql' 
     # === === === === === === === === === === === === === ====== === === ====
 
     model_config = SettingsConfigDict(
