@@ -36,12 +36,3 @@ class Settings(BaseSettings):
             port=self.port,
             database=self.db_name,
         ))
-    
-settings = Settings()
-print("=== Settings ===")
-print(f"User: '{settings.user}'")
-print(f"Password: '{settings.password}'")
-print(f"DB: '{settings.db_name}'")
-print(f"Host: '{settings.host}'")
-print(f"Port: {settings.port}")
-print(f"URL: {settings.url()}")
