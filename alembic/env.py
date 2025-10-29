@@ -1,5 +1,6 @@
 from backend.core.db.settings import Settings
 from backend.infrastructure.models import *
+from backend.core.logger import logger
 
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config
@@ -24,12 +25,14 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = SQLModel.metadata
+target_metadata = SQLModel.metadata 
 
-def get_url():
+def get_alembic_url():
     """Получить URL из Settings (читает .env)"""
     settings = Settings()  # pydantic сам загрузит .env
-    return settings.url()
+    logger.info(f'📡 - Получен Alembic url для миграций - {settings.alembic_url()}')
+    return settings.alembic_url()
+
 
 
 def run_migrations_offline() -> None:
@@ -46,12 +49,13 @@ def run_migrations_offline() -> None:
     """
 
     context.configure(
-        url=get_url(),
+        url=get_alembic_url(),
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
         compare_type=True, # Автообнаружение изменений типов колонок
     )
+    logger.debug(f'ALEMBIC_URL = {context.configure()}')
 
     with context.begin_transaction():
         context.run_migrations()
@@ -62,7 +66,7 @@ def run_migrations_online():
     # Создаём СИНХРОННЫЙ движок — Alembic не поддерживает async
     # Но URL — тот же, что и в create_async_engine!
     connectable = create_engine(
-        get_url(),  # ← ТОТ ЖЕ URL!
+        get_alembic_url(),  # ← ТОТ ЖЕ URL!
         poolclass=pool.NullPool,
         # Можно добавить echo, если нужно:
         # echo=settings.echo,

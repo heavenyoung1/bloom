@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL
+from backend.core.logger import logger
 
 class Settings(BaseSettings):
     '''Конфигурация приложения (читается из .env файла).'''
@@ -17,6 +18,10 @@ class Settings(BaseSettings):
     pool_size: int = 5
     max_overflow: int = 10
     pool_pre_ping: bool = True
+
+    # === Нужен для синхронного движка Alembic миграций. Не использовать! ===
+    _sync_driver: str = 'postgresql://' 
+    # === === === === === === === === === === === === === ====== === === ====
 
     model_config = SettingsConfigDict(
         env_file='.env', 
@@ -36,3 +41,16 @@ class Settings(BaseSettings):
             port=self.port,
             database=self.db_name,
         ))
+    
+    
+    def alembic_url(self) -> str:
+        '''Строка для подключения к БД ТОЛЬКО для выполнения Alembic миграций.'''
+        return str(URL.create(
+            drivername=self._sync_driver,
+            username=self.user,
+            password=self.password,
+            host=self.host,
+            port=self.port,
+            database=self.db_name,
+        ))
+    

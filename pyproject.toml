@@ -9,6 +9,7 @@ dependencies = [
     "asyncpg>=0.30.0",
     "black>=25.9.0",
     "mypy>=1.18.2",
+    "psycopg2-binary>=2.9.11",
     "pydantic-settings>=2.11.0",
     "pylint>=4.0.2",
     "sqlalchemy>=2.0.44",
