@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+
 @dataclass
 class Client:
     id: int
@@ -8,7 +9,7 @@ class Client:
     type: bool
     email: str
     phone: str
-    personal_info: str #ИНН/ПАСПОРТ
+    personal_info: str  # ИНН/ПАСПОРТ
     address: str
     messenger_type: str
     messenger_handle: str

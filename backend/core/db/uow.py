@@ -4,10 +4,11 @@ from sqlalchemy import select
 
 from backend.core.logger import logger
 
+
 class AsyncUnitOfWork:
     '''
     Управление транзакцией для async приложения.
-    
+
     Ключевые моменты:
     - Инициализируется с готовой сессией (не создает сама)
     - Управляет коммит/откат транзакции
@@ -23,9 +24,9 @@ class AsyncUnitOfWork:
 
         # Инициализируем репозитории с общей сессией
         # (будут созданы в __aenter__)
-        #self.user_repository = None
-        #self.product_repository = None
-        #self.price_repository = None
+        # self.user_repository = None
+        # self.product_repository = None
+        # self.price_repository = None
 
     async def __aenter__(self):
         '''Вход в async context manager.'''
@@ -34,15 +35,15 @@ class AsyncUnitOfWork:
         #     ProductRepositoryImpl,
         #     PriceRepositoryImpl,
         # )
-        
+
         # Инициализируем репозитории с ОДНОЙ сессией
         # self.user_repository = UserRepositoryImpl(self.session)
         # self.product_repository = ProductRepositoryImpl(self.session)
         # self.price_repository = PriceRepositoryImpl(self.session)
-        
+
         logger.info('🏗️ AsyncUnitOfWork инициализирован')
         return self
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         '''Выход из async context manager.'''
         try:
@@ -56,7 +57,7 @@ class AsyncUnitOfWork:
         finally:
             # Не закрываем сессию! Database отвечает за это
             logger.info('✅ AsyncUnitOfWork завершил работу')
-    
+
     async def commit(self) -> None:
         '''Фиксация изменений.'''
         if self.session:
@@ -66,7 +67,7 @@ class AsyncUnitOfWork:
             except Exception as e:
                 logger.error(f'❌ Ошибка при коммите: {e}')
                 raise
-    
+
     async def rollback(self) -> None:
         '''Откат изменений.'''
         if self.session:

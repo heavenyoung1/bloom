@@ -8,12 +8,14 @@ if TYPE_CHECKING:
     from backend.infrastructure.models import Attorney
     from backend.infrastructure.models import Case
 
+
 # Справочник типов событий
 class EventType(str, enum):
-    meeting = 'Встреча'           
-    task = 'Задача'                
-    deadline = 'Дедлайн'       
-    court_hearing = 'Судебное заседание' 
+    meeting = 'Встреча'
+    task = 'Задача'
+    deadline = 'Дедлайн'
+    court_hearing = 'Судебное заседание'
+
 
 class Event(SQLModel, table=True):
     id: int = Field(primary_key=True)
@@ -28,6 +30,3 @@ class Event(SQLModel, table=True):
     # relationships
     case: Optional['Case'] = Relationship(back_populates='events')
     attorney: Optional['Attorney'] = Relationship(back_populates='events')
-
-
-

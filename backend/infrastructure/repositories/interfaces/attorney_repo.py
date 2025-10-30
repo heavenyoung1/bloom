@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
 
-class ICaseRepository(ABC):
+
+class IAttorneyRepository(ABC):
     pass

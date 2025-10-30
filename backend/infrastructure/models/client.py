@@ -9,10 +9,12 @@ if TYPE_CHECKING:
     from backend.infrastructure.models import Case, Document
     from backend.infrastructure.models import Attorney
 
+
 class Mesenger(str, enum):
     tg = 'Telegram'
     wa = 'WhatsApp'
     ma = 'MAX'
+
 
 class Client(SQLModel, table=True):
 
@@ -21,7 +23,11 @@ class Client(SQLModel, table=True):
     type: bool = Field(description='True: Физ.лицо / False: Юр.лицо')
     email: Optional[str] = Field(max_length=50, index=True)
     phone: str = Field(max_length=20)
-    personal_info: str = Field(default=None, description='ИНН для компании / Серия-Номер паспорта для человека', max_length=20)
+    personal_info: str = Field(
+        default=None,
+        description='ИНН для компании / Серия-Номер паспорта для человека',
+        max_length=20,
+    )
     address: Optional[str] = Field(default=None, max_length=255)
     messenger: Optional[str] = Field(default=None, description='Мессенджер клиента')
     messenger_handle: Optional[str] = Field(max_length=50)

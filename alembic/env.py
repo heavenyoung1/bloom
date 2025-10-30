@@ -8,7 +8,7 @@ from sqlalchemy import pool, create_engine
 from alembic import context
 
 # === Импортируем Settings и модели ===
-from  sqlmodel import SQLModel
+from sqlmodel import SQLModel
 from backend.core.db.settings import Settings
 from backend.infrastructure.models import (
     Attorney,
@@ -16,7 +16,7 @@ from backend.infrastructure.models import (
     Client,
     Contact,
     Document,
-    Payment, 
+    Payment,
     Subscription,
 )
 
@@ -26,7 +26,8 @@ config = context.config
 #     fileConfig(config.config_file_name)
 
 
-target_metadata = SQLModel.metadata 
+target_metadata = SQLModel.metadata
+
 
 def get_alembic_url():
     """Получить URL из Settings (читает .env)"""
@@ -34,7 +35,9 @@ def get_alembic_url():
     logger.debug(f'📡 - Получен Alembic url для миграций - {settings.alembic_url()}')
     return settings.alembic_url()
 
-#config.set_main_option("sqlalchemy.url", get_alembic_url())
+
+# config.set_main_option("sqlalchemy.url", get_alembic_url())
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -54,7 +57,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        compare_type=True, # Автообнаружение изменений типов колонок
+        compare_type=True,  # Автообнаружение изменений типов колонок
     )
     logger.debug(f'ALEMBIC_URL = {context.configure()}')
 
@@ -81,6 +84,7 @@ def run_migrations_online():
         )
         with context.begin_transaction():
             context.run_migrations()
+
 
 # === Запуск ===
 if context.is_offline_mode():

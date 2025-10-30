@@ -1,5 +1,6 @@
 import os
 
+
 def create_project_structure():
     # Define the project structure
     directories = [
@@ -19,13 +20,14 @@ def create_project_structure():
         "frontend/src/store",
         "frontend/src/assets",
         "frontend/src/utils",
-        "docs"
+        "docs",
     ]
-    
+
     # Create each directory
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
         print(f"Created directory: {directory}")
+
 
 if __name__ == "__main__":
     create_project_structure()

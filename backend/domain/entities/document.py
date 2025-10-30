@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+
 @dataclass
 class Document:
     id: int
@@ -11,4 +12,3 @@ class Document:
     case_id: int
     attorney: int
     created_at: datetime
-

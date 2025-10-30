@@ -12,11 +12,15 @@ class Document(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     file_name: str = Field(max_length=300)
     storage_path: str = Field(max_length=1000)
-    checksum: Optional[str] = Field(default=None, max_length=64) # Какая максимальная величина тут должна быть?
+    checksum: Optional[str] = Field(
+        default=None, max_length=64
+    )  # Какая максимальная величина тут должна быть?
 
     case_id: Optional[int] = Field(default=None, foreign_key='cases.id', index=True)
     # Связь Attorney_id нужна, зачем?
-    attorney_id: Optional[int] = Field(default=None, foreign_key='attorneys.id', index=True)
+    attorney_id: Optional[int] = Field(
+        default=None, foreign_key='attorneys.id', index=True
+    )
 
     created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
 

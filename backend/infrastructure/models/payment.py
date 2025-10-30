@@ -6,6 +6,7 @@ from sqlmodel import SQLModel, Field, Relationship
 if TYPE_CHECKING:
     from backend.infrastructure.models import Subscription
 
+
 class Payment(SQLModel, table=True):
 
     id: int = Field(primary_key=True)

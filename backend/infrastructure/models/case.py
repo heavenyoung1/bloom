@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from backend.infrastructure.models import Contact
     from backend.infrastructure.models import Document
     from backend.infrastructure.models import Attorney
-    
+
 
 class Case(SQLModel, table=True):
 
@@ -24,6 +24,8 @@ class Case(SQLModel, table=True):
     # Отношения
     client: Optional['Client'] = Relationship(back_populates='cases')
     attorney: Optional['Attorney'] = Relationship(back_populates='cases')
-    contacts: List['Contact'] = Relationship(back_populates='case', sa_relationship_kwargs={'cascade': 'all, delete-orphan'})
+    contacts: List['Contact'] = Relationship(
+        back_populates='case', sa_relationship_kwargs={'cascade': 'all, delete-orphan'}
+    )
     documents: List['Document'] = Relationship(back_populates='case')
     events: List['Event'] = Relationship(back_populates='case')
