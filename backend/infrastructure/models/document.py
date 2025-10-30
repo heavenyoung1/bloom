@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from backend.infrastructure.models import Attorney
 
 
-class Document(SQLModel, table=True):
+class DocumentORM(SQLModel, table=True):
 
     id: int = Field(default=None, primary_key=True)
     file_name: str = Field(max_length=300)

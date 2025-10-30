@@ -16,7 +16,7 @@ class Mesenger(str, enum):
     ma = 'MAX'
 
 
-class Client(SQLModel, table=True):
+class ClientORM(SQLModel, table=True):
 
     id: int = Field(primary_key=True)
     name: str = Field(max_length=255)

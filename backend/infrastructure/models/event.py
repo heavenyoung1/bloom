@@ -17,7 +17,7 @@ class EventType(str, enum):
     court_hearing = 'Судебное заседание'
 
 
-class Event(SQLModel, table=True):
+class EventORM(SQLModel, table=True):
     id: int = Field(primary_key=True)
     name: str = Field(max_length=255)
     description: Optional[str] = Field(default=None, max_length=2000)

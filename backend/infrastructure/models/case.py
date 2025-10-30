@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from backend.infrastructure.models import Attorney
 
 
-class Case(SQLModel, table=True):
+class CaseORM(SQLModel, table=True):
 
     id: int = Field(primary_key=True)
     name: str = Field(max_length=255)

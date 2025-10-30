@@ -6,7 +6,7 @@ class AttorneyMapper:
     @staticmethod
     def to_domain(orm: Attorney) -> 'Attorney':
         '''Конвертация ORM модели в сущность домена.'''
-        attorney = Attorney(
+        return Attorney(
             id=orm.id,
             first_name=orm.first_name,
             last_name=orm.last_name,
@@ -18,12 +18,11 @@ class AttorneyMapper:
             created_at=orm.created_at,
             updated_at=orm.updated_at,
         )
-        return attorney
 
     @staticmethod
     def to_orm(domain: 'Attorney') -> 'AttorneyORM':
         '''Конвертация сущности домена в ORM модель.'''
-        attorney_orm = AttorneyORM(
+        return AttorneyORM(
             id=domain.id,
             first_name=domain.first_name,
             last_name=domain.last_name,
@@ -35,4 +34,3 @@ class AttorneyMapper:
             created_at=domain.created_at,
             updated_at=domain.updated_at,
         )
-        return attorney_orm

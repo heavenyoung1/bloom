@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from backend.infrastructure.models import Subscription
 
 
-class Payment(SQLModel, table=True):
+class PaymentORM(SQLModel, table=True):
 
     id: int = Field(primary_key=True)
     subscription_id: int = Field(foreign_key='subscriptions.id', index=True)

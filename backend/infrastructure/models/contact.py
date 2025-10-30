@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from backend.infrastructure.models import Case
 
 
-class Contact(SQLModel, table=True):
+class ContactORM(SQLModel, table=True):
 
     id: int = Field(primary_key=True)
     name: str = Field(max_length=100, description='ФИО полностью')

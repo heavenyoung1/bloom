@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from backend.infrastructure.models import Case, Document
 
 
-class Attorney(SQLModel, table=True):
+class AttorneyORM(SQLModel, table=True):
     'Таблица Адвокат'
 
     id: int = Field(primary_key=True)
