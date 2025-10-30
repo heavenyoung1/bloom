@@ -15,11 +15,12 @@ class AttorneyRepository(IAttorneyRepository):
     def __init__(self, session: Session):
         self.session = session
 
-    def save(self, attorney: Attorney) -> bool:
+    async def save(self, attorney: Attorney) -> bool:
         '''Сохранить юриста в базе данных, если он не существует.'''
         try:
             statement = select(Attorney).where(Attorney.id == attorney.id)
-            attorney_searched = self.session.exec(statement).first()
+            result = await self.session.exec(statement)
+            attorney_searched = result.first()
 
             if attorney_searched is None:  # Если юрист не найден, добавляем нового
                 orm_attorney = AttorneyMapper.to_orm(domain=attorney)
@@ -31,11 +32,12 @@ class AttorneyRepository(IAttorneyRepository):
             raise DatabaseErrorException(f'Ошибка при сохранении юриста: {str(e)}')
 
     # Целесообразность наличия данного метода пока не подтверждена
-    def get(self, id: int) -> 'Attorney':
+    async def get(self, id: int) -> 'Attorney':
         '''Получить адвоката по ID.'''
         try:
             statement = select(Attorney).where(Attorney.id == id)
-            attorney = self.session.exec(statement).first()
+            result = await self.session.exec(statement)
+            attorney = result.first()
 
             if not attorney:
                 raise EntityNotFoundException('Юрист не найден')
@@ -45,11 +47,12 @@ class AttorneyRepository(IAttorneyRepository):
             raise DatabaseErrorException(f'Ошибка при получении юриста: {str(e)}')
 
     # Целесообразность наличия данного метода пока не подтверждена
-    def get_all(self) -> List['Attorney']:
+    async def get_all(self) -> List['Attorney']:
         '''Получить всех юристовю.'''
         try:
             statement = select(Attorney)
-            attorneys = self.session.exec(statement).all()
+            result = await self.session.exec(statement)
+            attorneys = result.all()
 
             if not attorneys:
                 raise EntityNotFoundException('Юристы не найдены')
@@ -60,10 +63,11 @@ class AttorneyRepository(IAttorneyRepository):
                 f'Ошибка при получении списка юристов: {str(e)}'
             )
 
-    def update(self, id: int, updated_attorney: Attorney) -> 'Attorney':
+    async def update(self, id: int, updated_attorney: Attorney) -> 'Attorney':
         try:
             statement = select(Attorney).where(Attorney.id == id)
-            attorney = self.session.exec(statement).first()
+            result = await self.session.exec(statement)
+            attorney = result.first()
 
             if not attorney:
                 raise EntityNotFoundException('Юрист не найден')
@@ -85,17 +89,18 @@ class AttorneyRepository(IAttorneyRepository):
                 f'Ошибка при обновлении данных юриста: {str(e)}'
             )
 
-    def delete(self, id: int) -> bool:
+    async def delete(self, id: int) -> bool:
         '''Удалить юриста по ID'''
         try:
             statement = select(Attorney).where(Attorney.id == id)
-            attorney = self.session.exec(statement).first()
+            result = await self.session.exec(statement)
+            attorney = result.first()
 
             if not attorney:
                 raise EntityNotFoundException('Юрист не найден')
                 # Удаляем адвоката
 
-            self.session.delete(attorney)
+            await self.session.delete(attorney)
             return True  # Возвращаем True, если удаление прошло успешно
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при удалении юриста: {str(e)}')
