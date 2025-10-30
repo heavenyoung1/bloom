@@ -3,8 +3,8 @@ from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from backend.infrastructure.models.matter import Case
-    from backend.infrastructure.models.indentity import Attorney
+    from backend.infrastructure.models import Case
+    from backend.infrastructure.models import Attorney
 
 
 class Document(SQLModel, table=True):
@@ -15,6 +15,7 @@ class Document(SQLModel, table=True):
     checksum: Optional[str] = Field(default=None, max_length=64) # Какая максимальная величина тут должна быть?
 
     case_id: Optional[int] = Field(default=None, foreign_key='cases.id', index=True)
+    # Связь Attorney_id нужна, зачем?
     attorney_id: Optional[int] = Field(default=None, foreign_key='attorneys.id', index=True)
 
     created_at: datetime = Field(default_factory=datetime.now(timezone.utc))

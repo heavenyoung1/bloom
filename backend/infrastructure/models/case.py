@@ -4,11 +4,11 @@ from sqlalchemy.dialects.postgresql import BIT
 from typing import Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from backend.infrastructure.models.crm import Event
-    from backend.infrastructure.models.crm import Client
-    from backend.infrastructure.models.crm import Contact
-    from backend.infrastructure.models.matter import Document
-    from backend.infrastructure.models.indentity import Attorney
+    from backend.infrastructure.models import Event
+    from backend.infrastructure.models import Client
+    from backend.infrastructure.models import Contact
+    from backend.infrastructure.models import Document
+    from backend.infrastructure.models import Attorney
     
 
 class Case(SQLModel, table=True):

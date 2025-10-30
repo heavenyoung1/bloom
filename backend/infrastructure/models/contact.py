@@ -4,7 +4,8 @@ from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
 
-    from backend.infrastructure.models.matter import Case
+    from backend.infrastructure.models import Case
+    
 class Contact(SQLModel, table=True):
 
     id: int = Field(primary_key=True)

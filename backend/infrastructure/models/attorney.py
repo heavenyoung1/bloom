@@ -5,9 +5,9 @@ from sqlmodel import SQLModel, Field, Relationship
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from backend.infrastructure.models.billing import Subscription 
-    from backend.infrastructure.models.crm import Client
-    from backend.infrastructure.models.matter import Case, Document
+    from backend.infrastructure.models import Subscription 
+    from backend.infrastructure.models import Client
+    from backend.infrastructure.models import Case, Document
 
 class Attorney(SQLModel, table=True):
     'Таблица Адвокат'

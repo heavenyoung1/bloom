@@ -5,8 +5,8 @@ from enum import Enum as enum
 
 if TYPE_CHECKING:
 
-    from backend.infrastructure.models.indentity import Attorney
-    from backend.infrastructure.models.matter import Case
+    from backend.infrastructure.models import Attorney
+    from backend.infrastructure.models import Case
 
 # Справочник типов событий
 class EventType(str, enum):

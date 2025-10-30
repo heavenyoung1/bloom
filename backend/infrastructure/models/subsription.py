@@ -3,8 +3,8 @@ from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from backend.infrastructure.models.billing import Payment
-    from backend.infrastructure.models.indentity import Attorney
+    from backend.infrastructure.models import Payment
+    from backend.infrastructure.models import Attorney
 
 class Subscription(SQLModel, table=True):
 
