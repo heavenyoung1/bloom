@@ -16,7 +16,7 @@ async def engine(test_db_url):
     '''Создание engine для тестовой БД'''
     engine = create_async_engine(
         test_db_url,
-        echo=False,
+        echo=True,
         pool_pre_ping=True,
         pool_size=5,
         max_overflow=10,
@@ -54,12 +54,3 @@ async def session(SessionLocal):
 
         # Откатываем изменения после теста
         await sess.rollback()
-
-
-@pytest.fixture
-def repository(session):
-    '''Репозиторий с тестовой сессией'''
-    # ВАЖНО: Ваш Repository использует синхронную Session,
-    # но мы используем AsyncSession.
-    # Вариант: создайте sync версию для тестов или переделайте Repository на async
-    return AttorneyRepository(session)

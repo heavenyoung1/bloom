@@ -1,5 +1,8 @@
 pytest_plugins = [
+    'fixtures.attorneys',
     'fixtures.database',
+    'fixtures.fixed_data',
+    'fixtures.repositories',
 ]
 
 
