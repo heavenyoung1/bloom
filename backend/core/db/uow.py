@@ -24,9 +24,9 @@ class AsyncUnitOfWork:
 
         # Инициализируем репозитории с общей сессией
         # (будут созданы в __aenter__)
-        # self.user_repository = None
-        # self.product_repository = None
-        # self.price_repository = None
+        self.user_repository = None
+        self.product_repository = None
+        self.price_repository = None
 
     async def __aenter__(self):
         '''Вход в async context manager.'''

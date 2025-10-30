@@ -18,7 +18,7 @@ class AttorneyRepository(IAttorneyRepository):
     def save(self, attorney: Attorney) -> bool:
         '''Сохранить юриста в базе данных, если он не существует.'''
         try:
-            statement = select(Attorney).where(attorney.id == id)
+            statement = select(Attorney).where(Attorney.id == attorney.id)
             attorney_searched = self.session.exec(statement).first()
 
             if attorney_searched is None:  # Если юрист не найден, добавляем нового
@@ -78,8 +78,7 @@ class AttorneyRepository(IAttorneyRepository):
             attorney.is_active = updated_attorney.is_active
             attorney.updated_at = updated_attorney.updated_at
 
-            # Коммитим изменения
-            self.session.add()
+            self.session.add(attorney)
             return attorney  # Возвращаем обновленного адвоката
         except Exception as e:
             raise DatabaseErrorException(

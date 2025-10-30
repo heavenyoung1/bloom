@@ -12,6 +12,7 @@ dependencies = [
     "psycopg2-binary>=2.9.11",
     "pydantic-settings>=2.11.0",
     "pylint>=4.0.2",
+    "pytest>=8.4.2",
     "sqlalchemy>=2.0.44",
     "sqlmodel>=0.0.27",
 ]
