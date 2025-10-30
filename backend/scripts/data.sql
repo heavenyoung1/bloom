@@ -1,8 +1,11 @@
-INSERT INTO attorneys (first_name, last_name, patronymic, email, phone, password_hash, is_active, created_at, updated_at)
+INSERT INTO attorneys (attorney_id, first_name, last_name, patronymic, email, phone, password_hash)
 VALUES
-    ('Иван', 'Иванов', 'Иванович', 'ivanov@example.com', '1234567890', 'hashed_password_1', TRUE, timezone('utc', now()), timezone('utc', now())),
-    ('Алексей', 'Петров', 'Александрович', 'petrov@example.com', '0987654321', 'hashed_password_2', TRUE, timezone('utc', now()), timezone('utc', now())),
-    ('Мария', 'Смирнова', NULL, 'smirnova@example.com', '1122334455', 'hashed_password_3', FALSE, timezone('utc', now()), timezone('utc', now()));
+    ('32/142-в', 'Иван', 'Иванов', 'Иванович', 'ivanov@example.com', '1234567890', 'hashed_password_1'),
+    ('45/56-г', 'Петр', 'Петров', 'Петрович', 'petrov@example.com', '0987654321', 'hashed_password_2'),
+    ('12/134-д', 'Сергей', 'Сергеев', 'Сергеевич', 'sergeev@example.com', '1122334455', 'hashed_password_3'),
+    ('78/99-к', 'Алексей', 'Алексеев', 'Алексеевич', 'alekseev@example.com', '2233445566', 'hashed_password_4'),
+    ('56/78-м', 'Мария', 'Мариева', 'Мариевна', 'marieva@example.com', '3344556677', 'hashed_password_5');
+
 
 INSERT INTO clients (name, type, email, phone, personal_info, address, messenger, messenger_handle, created_at, owner_attorney_id)
 VALUES
