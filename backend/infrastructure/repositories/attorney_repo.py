@@ -1,5 +1,6 @@
 # from sqlalchemy.orm import Session
 from sqlmodel import Session, select
+from sqlalchemy.exc import IntegrityError
 from sqlmodel.ext.asyncio.session import AsyncSession
 from typing import List, TYPE_CHECKING
 from backend.domain.entities.attorney import Attorney
@@ -18,7 +19,12 @@ class AttorneyRepository(IAttorneyRepository):
         self.session = session
 
     async def save(self, attorney: Attorney) -> bool:
-        '''Сохранить юриста в базе данных, если он не существует.'''
+        '''
+        Сохранить юриста в БД.
+        Возвращает:
+            True  — если запись добавлена успешно
+            False — если нарушена уникальность (дубликат)
+        '''
         try:
             statement = select(AttorneyORM).where(AttorneyORM.id == attorney.id)
             result = await self.session.exec(statement)
@@ -27,9 +33,14 @@ class AttorneyRepository(IAttorneyRepository):
             if attorney_searched is None:  # Если юрист не найден, добавляем нового
                 orm_attorney = AttorneyMapper.to_orm(domain=attorney)
                 self.session.add(orm_attorney)
+                await self.session.flush() # ⚠️ фиксируем INSERT в транзакции
                 return True
             else:
                 return False  # Юрист с таким ID уже существует
+        except IntegrityError as e:
+            # Ловим ошибку попытки сохранения неуникальных данных
+            if "attorneys_attorney_id_key" in str(e):
+                return False
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при сохранении юриста: {str(e)}')
 
@@ -37,7 +48,21 @@ class AttorneyRepository(IAttorneyRepository):
     async def get(self, id: int) -> 'Attorney':
         '''Получить адвоката по ID.'''
         try:
-            statement = select(Attorney).where(Attorney.id == id)
+            statement = select(AttorneyORM).where(AttorneyORM.id == id)
+            result = await self.session.exec(statement)
+            attorney = result.first()
+
+            if not attorney:
+                raise EntityNotFoundException('Юрист не найден')
+
+            return attorney
+        except Exception as e:
+            raise DatabaseErrorException(f'Ошибка при получении юриста: {str(e)}')
+        
+    async def get_by_attorney_id(self, attorney_id: str) -> 'Attorney':
+        '''Получить адвоката по ID.'''
+        try:
+            statement = select(AttorneyORM).where(AttorneyORM.attorney_id == attorney_id)
             result = await self.session.exec(statement)
             attorney = result.first()
 

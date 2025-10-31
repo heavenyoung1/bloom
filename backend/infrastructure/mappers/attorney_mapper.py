@@ -4,7 +4,7 @@ from backend.infrastructure.models import AttorneyORM
 
 class AttorneyMapper:
     @staticmethod
-    def to_domain(orm: Attorney) -> 'Attorney':
+    def to_domain(orm: 'AttorneyORM') -> 'Attorney':
         '''Конвертация ORM модели в сущность домена.'''
         return Attorney(
             id=orm.id,
