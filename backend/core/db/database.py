@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from settings import Settings
 
@@ -25,6 +25,7 @@ class DataBaseConnection:
             pool_pre_ping=settings.pool_pre_ping,  # Лечит «мертвые» коннекты (проверять соединение перед использованием (защита от dead connections))
             pool_size=settings.pool_size,  # Тюнинг пула по ситуации (сколько соединений держать в пуле)
             max_overflow=settings.max_overflow,  # Сколько дополнительных можно создать при пиках
+            future=True,  # ?????????????????????
         )
 
         self.AsyncSessionLocal = async_sessionmaker(
@@ -60,3 +61,7 @@ class DataBaseConnection:
                 yield sesssion
             finally:
                 await sesssion.close()
+
+    async def dispose(self) -> None:
+        '''Корректно закрыть соединения пула (например, при завершении приложения/тестов).'''
+        await self.engine.dispose()

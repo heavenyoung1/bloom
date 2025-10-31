@@ -4,7 +4,7 @@ from typing import List, TYPE_CHECKING
 from backend.domain.entities.attorney import Attorney
 from backend.infrastructure.mappers import AttorneyMapper
 from backend.infrastructure.models import AttorneyORM
-from backend.core.exceptions import DatabaseErrorException
+from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 
 from ..repositories.interfaces import IAttorneyRepository
 

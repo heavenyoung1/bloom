@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class PaymentORM(SQLModel, table=True):
-    __tablename__ = 'payments' # Таблица 'Платежи'
+    __tablename__ = 'payments'  # Таблица 'Платежи'
 
     id: int = Field(primary_key=True)
     subscription_id: int = Field(foreign_key='subscriptions.id', index=True)
