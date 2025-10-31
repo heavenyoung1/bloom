@@ -19,7 +19,9 @@ class AttorneyORM(SQLModel, table=True):
     first_name: str = Field(max_length=50)
     last_name: str = Field(max_length=50)
     patronymic: Optional[str] = Field(max_length=50)
-    email: str = Field(max_length=50, index=True, unique=True)  # валидацию делаем на уровне Pydantic DTO / сервисов
+    email: str = Field(
+        max_length=50, index=True, unique=True
+    )  # валидацию делаем на уровне Pydantic DTO / сервисов
     phone: Optional[str] = Field(max_length=20)
     password_hash: str = Field(max_length=255)
     is_active: bool = Field(default=True)

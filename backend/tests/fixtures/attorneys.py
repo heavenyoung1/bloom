@@ -1,6 +1,7 @@
 from backend.domain.entities.attorney import Attorney
 
 import pytest
+
 # from .fixed_data import fixed_now
 
 
@@ -16,6 +17,4 @@ def sample_attorney(fixed_now):
         phone='+79991234567',
         password_hash='hash123',
         is_active=True,
-        # created_at=fixed_now,
-        # updated_at=fixed_now,
     )

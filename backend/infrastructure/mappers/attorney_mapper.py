@@ -16,8 +16,8 @@ class AttorneyMapper:
             phone=orm.phone,
             password_hash=orm.password_hash,
             is_active=orm.is_active,
-            #created_at=orm.created_at,
-            #updated_at=orm.updated_at,
+            # created_at=orm.created_at,
+            # updated_at=orm.updated_at,
         )
 
     @staticmethod
@@ -33,6 +33,6 @@ class AttorneyMapper:
             phone=domain.phone,
             password_hash=domain.password_hash,
             is_active=domain.is_active,
-            #created_at=domain.created_at,
-            #updated_at=domain.updated_at,
+            # created_at=domain.created_at,
+            # updated_at=domain.updated_at,
         )
