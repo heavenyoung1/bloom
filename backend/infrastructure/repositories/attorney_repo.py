@@ -1,5 +1,6 @@
 # from sqlalchemy.orm import Session
 from sqlmodel import Session, select
+from sqlmodel.ext.asyncio.session import AsyncSession
 from typing import List, TYPE_CHECKING
 from backend.domain.entities.attorney import Attorney
 from backend.infrastructure.mappers import AttorneyMapper
@@ -13,14 +14,14 @@ if TYPE_CHECKING:
 
 
 class AttorneyRepository(IAttorneyRepository):
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def save(self, attorney: Attorney) -> bool:
         '''Сохранить юриста в базе данных, если он не существует.'''
         try:
             statement = select(AttorneyORM).where(AttorneyORM.id == attorney.id)
-            result = await self.session.exec(select(AttorneyORM))
+            result = await self.session.exec(statement)
             attorney_searched = result.first()
 
             if attorney_searched is None:  # Если юрист не найден, добавляем нового

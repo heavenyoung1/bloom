@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 
 @dataclass
 class Attorney:
     id: str
+    attorney_id: str
     first_name: str
     last_name: str
     patronymic: str
@@ -12,5 +14,7 @@ class Attorney:
     phone: str
     password_hash: str
     is_active: bool
-    created_at: datetime
-    updated_at: datetime
+
+    # Необязательные атрибуты
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

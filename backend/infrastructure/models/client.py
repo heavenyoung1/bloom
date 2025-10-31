@@ -36,4 +36,4 @@ class ClientORM(SQLModel, table=True):
 
     # Отношения
     owner_attorney: Optional['AttorneyORM'] = Relationship(back_populates='clients')
-    cases: List['CaseORM'] = Relationship(back_populates='clients')
+    cases: List['CaseORM'] = Relationship(back_populates='client')

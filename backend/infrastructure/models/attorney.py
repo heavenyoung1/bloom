@@ -1,6 +1,9 @@
 from datetime import datetime, timezone
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column, DateTime
+from sqlalchemy.sql import func
+import sqlalchemy as sa
 
 from typing import TYPE_CHECKING
 
@@ -16,15 +19,12 @@ class AttorneyORM(SQLModel, table=True):
     first_name: str = Field(max_length=50)
     last_name: str = Field(max_length=50)
     patronymic: Optional[str] = Field(max_length=50)
-    email: str = Field(
-        max_length=50, index=True, unique=True
-    )  # валидацию делаем на уровне Pydantic DTO / сервисов
+    email: str = Field(max_length=50, index=True, unique=True)  # валидацию делаем на уровне Pydantic DTO / сервисов
     phone: Optional[str] = Field(max_length=20)
     password_hash: str = Field(max_length=255)
     is_active: bool = Field(default=True)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
     # Отношения (1:N обратные стороны)
     clients: List['ClientORM'] = Relationship(
         back_populates='owner_attorney',
