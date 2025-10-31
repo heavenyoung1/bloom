@@ -3,11 +3,11 @@ from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from backend.infrastructure.models import Case
-    from backend.infrastructure.models import Attorney
+    from backend.infrastructure.models import AttorneyORM, CaseORM
 
 
 class DocumentORM(SQLModel, table=True):
+    __tablename__ = 'documents'  # Таблица 'Связаные с делом Документы'
 
     id: int = Field(default=None, primary_key=True)
     file_name: str = Field(max_length=300)
@@ -22,8 +22,8 @@ class DocumentORM(SQLModel, table=True):
         default=None, foreign_key='attorneys.id', index=True
     )
 
-    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     # Отношения
-    case: Optional['Case'] = Relationship(back_populates='documents')
-    attorney: Optional['Attorney'] = Relationship(back_populates='documents')
+    attorney: Optional['AttorneyORM'] = Relationship(back_populates='documents')
+    case: Optional['CaseORM'] = Relationship(back_populates='documents')

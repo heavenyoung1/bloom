@@ -1,7 +1,7 @@
 from backend.domain.entities.attorney import Attorney
 
 import pytest
-from tests.fixtures.fixed_data import fixed_now
+from .fixed_data import fixed_now
 
 
 @pytest.fixture

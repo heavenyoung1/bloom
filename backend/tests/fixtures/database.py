@@ -8,7 +8,7 @@ from backend.infrastructure.repositories import AttorneyRepository
 @pytest.fixture(scope='session')
 def test_db_url():
     '''URL тестовой БД'''
-    return 'postgresql+asyncpg://postgres:1234@localhost:5436/test_db'
+    return 'postgresql+asyncpg://postgres:1234@192.168.175.129:5436/test_db'
 
 
 @pytest.fixture(scope='session')
@@ -16,7 +16,7 @@ async def engine(test_db_url):
     '''Создание engine для тестовой БД'''
     engine = create_async_engine(
         test_db_url,
-        echo=True,
+        echo=False,
         pool_pre_ping=True,
         pool_size=5,
         max_overflow=10,

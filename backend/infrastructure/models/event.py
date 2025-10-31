@@ -5,8 +5,7 @@ from enum import Enum as enum
 
 if TYPE_CHECKING:
 
-    from backend.infrastructure.models import Attorney
-    from backend.infrastructure.models import Case
+    from backend.infrastructure.models import AttorneyORM, CaseORM
 
 
 # Справочник типов событий
@@ -18,6 +17,8 @@ class EventType(str, enum):
 
 
 class EventORM(SQLModel, table=True):
+    __tablename__ = 'events'  # Таблица 'События по делу'
+
     id: int = Field(primary_key=True)
     name: str = Field(max_length=255)
     description: Optional[str] = Field(default=None, max_length=2000)
@@ -28,5 +29,5 @@ class EventORM(SQLModel, table=True):
     attorney_id: int = Field(foreign_key='attorneys.id', index=True)
 
     # relationships
-    case: Optional['Case'] = Relationship(back_populates='events')
-    attorney: Optional['Attorney'] = Relationship(back_populates='events')
+    case: Optional['CaseORM'] = Relationship(back_populates='events')
+    attorney: Optional['AttorneyORM'] = Relationship(back_populates='events')

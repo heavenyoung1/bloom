@@ -1,9 +1,10 @@
-from sqlalchemy.orm import Session
+# from sqlalchemy.orm import Session
 from sqlmodel import Session, select
 from typing import List, TYPE_CHECKING
 from backend.domain.entities.attorney import Attorney
 from backend.infrastructure.mappers import AttorneyMapper
-from core.exceptions import EntityNotFoundException, DatabaseErrorException
+from backend.infrastructure.models import AttorneyORM
+from backend.core.exceptions import DatabaseErrorException
 
 from ..repositories.interfaces import IAttorneyRepository
 
@@ -18,8 +19,8 @@ class AttorneyRepository(IAttorneyRepository):
     async def save(self, attorney: Attorney) -> bool:
         '''Сохранить юриста в базе данных, если он не существует.'''
         try:
-            statement = select(Attorney).where(Attorney.id == attorney.id)
-            result = await self.session.exec(statement)
+            statement = select(AttorneyORM).where(AttorneyORM.id == attorney.id)
+            result = await self.session.exec(select(AttorneyORM))
             attorney_searched = result.first()
 
             if attorney_searched is None:  # Если юрист не найден, добавляем нового
