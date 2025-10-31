@@ -22,8 +22,8 @@ class AttorneyRepository(IAttorneyRepository):
         '''
         Сохранить юриста в БД.
         Возвращает:
-            True  — если запись добавлена успешно
-            False — если нарушена уникальность (дубликат)
+            {'success': True, 'id': int}  — если запись добавлена
+            {'success': False, 'id': None} — если дубликат
         '''
         try:
             statement = select(AttorneyORM).where(AttorneyORM.id == attorney.id)
@@ -34,13 +34,13 @@ class AttorneyRepository(IAttorneyRepository):
                 orm_attorney = AttorneyMapper.to_orm(domain=attorney)
                 self.session.add(orm_attorney)
                 await self.session.flush() # ⚠️ фиксируем INSERT в транзакции
-                return True
+                return {'success': True, 'id': orm_attorney.id}
             else:
-                return False  # Юрист с таким ID уже существует
+                return {'success': False, 'id': attorney_searched.id}
         except IntegrityError as e:
             # Ловим ошибку попытки сохранения неуникальных данных
-            if "attorneys_attorney_id_key" in str(e):
-                return False
+            if 'attorneys_attorney_id_key' in str(e):
+                return {'success': False, 'id': None}
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при сохранении юриста: {str(e)}')
 
