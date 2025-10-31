@@ -1,8 +1,7 @@
-# from sqlalchemy.orm import Session
-from sqlmodel import Session, select
+from sqlmodel import select
 from sqlalchemy.exc import IntegrityError
 from sqlmodel.ext.asyncio.session import AsyncSession
-from typing import List, TYPE_CHECKING
+from typing import Dict, List, TYPE_CHECKING
 from backend.domain.entities.attorney import Attorney
 from backend.infrastructure.mappers import AttorneyMapper
 from backend.infrastructure.models import AttorneyORM
@@ -18,7 +17,7 @@ class AttorneyRepository(IAttorneyRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def save(self, attorney: Attorney) -> bool:
+    async def save(self, attorney: Attorney) -> Dict:
         '''
         Сохранить юриста в БД.
         Возвращает:
@@ -33,7 +32,7 @@ class AttorneyRepository(IAttorneyRepository):
             if attorney_searched is None:  # Если юрист не найден, добавляем нового
                 orm_attorney = AttorneyMapper.to_orm(domain=attorney)
                 self.session.add(orm_attorney)
-                await self.session.flush() # ⚠️ фиксируем INSERT в транзакции
+                await self.session.flush()  # ⚠️ фиксируем INSERT в транзакции
                 return {'success': True, 'id': orm_attorney.id}
             else:
                 return {'success': False, 'id': attorney_searched.id}
@@ -58,11 +57,13 @@ class AttorneyRepository(IAttorneyRepository):
             return attorney
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при получении юриста: {str(e)}')
-        
+
     async def get_by_attorney_id(self, attorney_id: str) -> 'Attorney':
         '''Получить адвоката по ID.'''
         try:
-            statement = select(AttorneyORM).where(AttorneyORM.attorney_id == attorney_id)
+            statement = select(AttorneyORM).where(
+                AttorneyORM.attorney_id == attorney_id
+            )
             result = await self.session.exec(statement)
             attorney = result.first()
 
@@ -77,27 +78,29 @@ class AttorneyRepository(IAttorneyRepository):
     async def get_all(self) -> List['Attorney']:
         '''Получить всех юристовю.'''
         try:
-            statement = select(Attorney)
+            statement = select(AttorneyORM)
             result = await self.session.exec(statement)
-            attorneys = result.all()
+            orm_attorneys = result.all()
+            domain_attorneys = [AttorneyMapper.to_domain(orm_attorneys) for domain in domain_attorneys]
 
-            if not attorneys:
+            if not domain_attorneys:
                 raise EntityNotFoundException('Юристы не найдены')
 
-            return attorneys
+            return domain_attorneys
         except Exception as e:
             raise DatabaseErrorException(
                 f'Ошибка при получении списка юристов: {str(e)}'
             )
 
-    async def update(self, id: int, updated_attorney: Attorney) -> 'Attorney':
+    async def update(self, id: int, updated_attorney: Attorney) -> Dict:
         try:
-            statement = select(Attorney).where(Attorney.id == id)
+            statement = select(AttorneyORM).where(AttorneyORM.id == id)
             result = await self.session.exec(statement)
-            attorney = result.first()
+            orm_attorney = result.first()
 
-            if not attorney:
+            if not orm_attorney:
                 raise EntityNotFoundException('Юрист не найден')
+            attorney = AttorneyMapper.to_domain(orm_attorney)
 
             # Обновляем поля адвоката
             attorney.first_name = updated_attorney.first_name
@@ -109,8 +112,9 @@ class AttorneyRepository(IAttorneyRepository):
             attorney.is_active = updated_attorney.is_active
             attorney.updated_at = updated_attorney.updated_at
 
-            self.session.add(attorney)
-            return attorney  # Возвращаем обновленного адвоката
+            updated_orm_attorney = AttorneyMapper.to_orm(attorney)
+            self.session.add(updated_orm_attorney)
+            return {'success': True, 'attorney': attorney}
         except Exception as e:
             raise DatabaseErrorException(
                 f'Ошибка при обновлении данных юриста: {str(e)}'
@@ -119,15 +123,15 @@ class AttorneyRepository(IAttorneyRepository):
     async def delete(self, id: int) -> bool:
         '''Удалить юриста по ID'''
         try:
-            statement = select(Attorney).where(Attorney.id == id)
+            statement = select(AttorneyORM).where(AttorneyORM.id == id)
             result = await self.session.exec(statement)
-            attorney = result.first()
+            orm_attorney = result.first()
 
-            if not attorney:
+            if not orm_attorney:
                 raise EntityNotFoundException('Юрист не найден')
                 # Удаляем адвоката
 
-            await self.session.delete(attorney)
+            await self.session.delete(orm_attorney)
             return True  # Возвращаем True, если удаление прошло успешно
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при удалении юриста: {str(e)}')

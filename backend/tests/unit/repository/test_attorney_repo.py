@@ -14,7 +14,7 @@ class TestAttorneyRepository:
         save_result = await attorney_repo.save(sample_attorney)
         assert save_result['success'] is True
 
-    # -------- SAVE AND GET --------    
+    # -------- SAVE AND GET --------
     @pytest.mark.asyncio
     async def test_save_and_get_success(self, attorney_repo, sample_attorney):
         '''Тест: сохранение нового юриста'''
@@ -27,7 +27,7 @@ class TestAttorneyRepository:
         assert domain_result.attorney_id == sample_attorney.attorney_id
         logger.info(f'ASSERTION {domain_result}')
 
-    # -------- SAVE DUPLICATE --------    
+    # -------- SAVE DUPLICATE --------
     @pytest.mark.asyncio
     async def test_save_duplicate(self, attorney_repo, sample_attorney):
         '''Тест: сохранение нового юриста'''
