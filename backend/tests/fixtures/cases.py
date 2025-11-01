@@ -2,76 +2,77 @@ from datetime import datetime
 import pytest
 from backend.domain.entities.case import Case  # Импортируем ваш класс Case
 
-# Фикстура для дефолтного дела
+
 @pytest.fixture
-def sample_case(fixed_now):
-    '''Фикстура для дефолтного дела.'''
+async def sample_case(sample_attorney, sample_client):
+    '''Фикстура для дефолтного дела с реальными attorney_id и client_id.'''
     return Case(
-        id=None,  # Позволяем БД генерировать ID
+        id=None,
         name='Дело о краже',
-        client_id='client-1',
-        attorney_id='attorney-1',
+        client_id=sample_client.id,  # Реальный ID из БД
+        attorney_id=sample_attorney.id,  # Реальный ID из БД
         status='В процессе',
         description='Описание дела о краже',
     )
 
 
-# Фикстура для дела, которое будет обновляться
 @pytest.fixture
-def sample_update_case(fixed_now):
+async def sample_update_case(sample_attorney_for_update, sample_client_for_update):
     '''Фикстура для дела, которое будет обновляться.'''
     return Case(
-        id=None,  # Позволяем БД генерировать ID
+        id=None,
         name='Дело о мошенничестве',
-        client_id='client-2',
-        attorney_id='attorney-2',
+        client_id=sample_client_for_update.id,  # Реальный ID из БД
+        attorney_id=sample_attorney_for_update.id,  # Реальный ID из БД
         status='Закрыто',
         description='Описание обновленного дела о мошенничестве',
     )
 
 
-# Фикстура для списка дел
 @pytest.fixture
-def cases_list(fixed_now):
-    '''Фикстура: список дел для тестирования.'''
+async def cases_list(sample_attorney, sample_client):
+    '''
+    Фикстура: список дел для тестирования.
+    Использует одних и тех же attorney и client для всех дел.
+    '''
     return [
         Case(
             id=None,
             name='Дело о краже',
-            client_id='client-1',
-            attorney_id='attorney-1',
+            client_id=sample_client.id,
+            attorney_id=sample_attorney.id,
             status='В процессе',
             description='Описание дела о краже',
         ),
         Case(
             id=None,
             name='Дело о мошенничестве',
-            client_id='client-2',
-            attorney_id='attorney-2',
+            client_id=sample_client.id,
+            attorney_id=sample_attorney.id,
             status='Закрыто',
             description='Описание дела о мошенничестве',
         ),
         Case(
             id=None,
             name='Дело о нападении',
-            client_id='client-3',
-            attorney_id='attorney-3',
+            client_id=sample_client.id,
+            attorney_id=sample_attorney.id,
             status='В процессе',
             description='Описание дела о нападении',
         ),
         Case(
             id=None,
             name='Дело о разбирательстве',
-            client_id='client-4',
-            attorney_id='attorney-4',
+            client_id=sample_client.id,
+            attorney_id=sample_attorney.id,
             status='Ожидает решения',
             description='Описание дела о разбирательстве',
         ),
         Case(
             id=None,
             name='Дело о ДТП',
-            client_id='client-5',
-            attorney_id='attorney-5',
+            client_id=sample_client.id,
+            attorney_id=sample_attorney.id,
             status='Закрыто',
             description='Описание дела о ДТП',
         ),

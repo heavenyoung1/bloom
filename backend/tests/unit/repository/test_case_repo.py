@@ -1,6 +1,7 @@
-# import pytest
-# from backend.infrastructure.mappers import CaseMapper
-# from backend.core import logger
+import pytest
+from backend.infrastructure.mappers import CaseMapper
+from backend.core import logger
+
 
 # class TestCaseRepository:
 #     # -------- SAVE --------

@@ -21,6 +21,7 @@ class AttorneyRepository(IAttorneyRepository):
     Реализует интерфейс IAttorneyRepository и предоставляет методы для сохранения,
     обновления, удаления и получения юристов из базы данных.
     '''
+
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -36,15 +37,15 @@ class AttorneyRepository(IAttorneyRepository):
         try:
             statement = select(AttorneyORM).where(AttorneyORM.id == attorney.id)
             result = await self.session.exec(statement)
-            attorney_searched = result.first()
+            attorney_found = result.first()
 
-            if attorney_searched is None:  # Если юрист не найден, добавляем нового
+            if attorney_found is None:  # Если юрист не найден, добавляем нового
                 orm_attorney = AttorneyMapper.to_orm(domain=attorney)
                 self.session.add(orm_attorney)
                 await self.session.flush()  # ⚠️ фиксируем INSERT в транзакции
                 return {'success': True, 'id': orm_attorney.id}
             else:
-                return {'success': False, 'id': attorney_searched.id}
+                return {'success': False, 'id': attorney_found.id}
         except IntegrityError as e:
             # Ловим ошибку попытки сохранения неуникальных данных
             if 'attorneys_attorney_id_key' in str(e):
@@ -174,7 +175,7 @@ class AttorneyRepository(IAttorneyRepository):
 
             await self.session.delete(orm_attorney)
             await self.session.flush()  # Фиксируем изменения в транзакции
-            return True 
-        
+            return True
+
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при удалении юриста: {str(e)}')

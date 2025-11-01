@@ -21,7 +21,7 @@ class TestAttorneyRepository:
 
         attorney = await attorney_repo.get(id)
         assert attorney.attorney_id == sample_attorney.attorney_id
-        #logger.debug(f'ASSERTION {attorney}')
+        # logger.debug(f'ASSERTION {attorney}')
 
     # -------- SAVE DUPLICATE --------
     @pytest.mark.asyncio
@@ -84,7 +84,7 @@ class TestAttorneyRepository:
             update_result['attorney'].password_hash
             == sample_update_attorney.password_hash
         )
-        #logger.debug(f'RESULT -> {update_result['attorney']}')
+        # logger.debug(f'RESULT -> {update_result['attorney']}')
 
     # -------- DELETE ATORNEY --------
     @pytest.mark.asyncio
@@ -97,4 +97,4 @@ class TestAttorneyRepository:
         assert delete_result is True
         get_result = await attorney_repo.get(id)
         assert get_result is None
-        #logger.debug(f'RESULT -> {get_result}')
+        # logger.debug(f'RESULT -> {get_result}')

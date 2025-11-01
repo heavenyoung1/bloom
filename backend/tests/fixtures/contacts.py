@@ -1,6 +1,9 @@
 from datetime import datetime, timezone
 import pytest
-from backend.domain.entities.contact import Contact  # Предполагается, что у вас есть такой класс Contact
+from backend.domain.entities.contact import (
+    Contact,
+)  # Предполагается, что у вас есть такой класс Contact
+
 
 # Фикстура для дефолтного контакта
 @pytest.fixture
@@ -13,7 +16,7 @@ def sample_contact(fixed_now):
         phone='+79991234567',
         email='ivan@example.com',
         created_at=fixed_now,
-        case_id=1  # Пример ссылки на дело
+        case_id=1,  # Пример ссылки на дело
     )
 
 
@@ -28,7 +31,7 @@ def sample_update_contact(fixed_now):
         phone='+79998887766',
         email='ivanov3232@example.com',
         created_at=fixed_now,
-        case_id=1  # Пример ссылки на дело
+        case_id=1,  # Пример ссылки на дело
     )
 
 
@@ -44,7 +47,7 @@ def contacts_list(fixed_now):
             phone='+79991234567',
             email='ivan@example.com',
             created_at=fixed_now,
-            case_id=1
+            case_id=1,
         ),
         Contact(
             id=None,
@@ -53,7 +56,7 @@ def contacts_list(fixed_now):
             phone='+79998887766',
             email='alexander@example.com',
             created_at=fixed_now,
-            case_id=2
+            case_id=2,
         ),
         Contact(
             id=None,
@@ -62,7 +65,7 @@ def contacts_list(fixed_now):
             phone='+79993332211',
             email='maria@example.com',
             created_at=fixed_now,
-            case_id=3
+            case_id=3,
         ),
         Contact(
             id=None,
@@ -71,7 +74,7 @@ def contacts_list(fixed_now):
             phone='+79992223344',
             email='ekaterina@example.com',
             created_at=fixed_now,
-            case_id=4
+            case_id=4,
         ),
         Contact(
             id=None,
@@ -80,6 +83,6 @@ def contacts_list(fixed_now):
             phone='+79995556677',
             email='dmitry@example.com',
             created_at=fixed_now,
-            case_id=5
+            case_id=5,
         ),
     ]
