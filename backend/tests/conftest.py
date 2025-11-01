@@ -1,9 +1,8 @@
-pytest_plugins = [
-    'backend.tests.fixtures.attorneys',
-    'backend.tests.fixtures.database',
-    'backend.tests.fixtures.fixed_data',
-    'backend.tests.fixtures.repositories',
-]
+# ПОДКЛЮЧЕНИЕ ФИКСТУР, НЕ ИСПОЛЬЗУЕМ pytest_plugins!
+from backend.tests.fixtures.database import *
+from backend.tests.fixtures.fixed_data import *
+from backend.tests.fixtures.repositories import *
+from backend.tests.fixtures.attorneys import *
 
 
 def pytest_configure(config):

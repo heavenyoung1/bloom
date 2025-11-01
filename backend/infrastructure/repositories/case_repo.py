@@ -17,4 +17,4 @@ class CaseRepository(ICaseRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def save(self, case: Case) -> dict:
+    # async def save(self, case: Case) -> dict:

@@ -52,7 +52,8 @@ class AttorneyRepository(IAttorneyRepository):
             attorney = result.first()
 
             if not attorney:
-                raise EntityNotFoundException('Юрист не найден')
+                return None
+                # raise EntityNotFoundException('Юрист не найден')
 
             return attorney
         except Exception as e:
@@ -65,10 +66,12 @@ class AttorneyRepository(IAttorneyRepository):
                 AttorneyORM.attorney_id == attorney_id
             )
             result = await self.session.exec(statement)
-            attorney = result.first()
+            orm_attorney = result.first()
+            attorney = AttorneyMapper.to_domain(orm_attorney)
 
             if not attorney:
-                raise EntityNotFoundException('Юрист не найден')
+                return None
+                # raise EntityNotFoundException('Юрист не найден')
 
             return attorney
         except Exception as e:
@@ -81,7 +84,9 @@ class AttorneyRepository(IAttorneyRepository):
             statement = select(AttorneyORM)
             result = await self.session.exec(statement)
             orm_attorneys = result.all()
-            domain_attorneys = [AttorneyMapper.to_domain(orm_attorneys) for domain in domain_attorneys]
+            domain_attorneys = [
+                AttorneyMapper.to_domain(orm_attorney) for orm_attorney in orm_attorneys
+            ]
 
             if not domain_attorneys:
                 raise EntityNotFoundException('Юристы не найдены')
@@ -110,10 +115,15 @@ class AttorneyRepository(IAttorneyRepository):
             attorney.phone = updated_attorney.phone
             attorney.password_hash = updated_attorney.password_hash
             attorney.is_active = updated_attorney.is_active
-            attorney.updated_at = updated_attorney.updated_at
+            # attorney.updated_at = updated_attorney.updated_at
 
+            # Преобразуем обновленного адвоката обратно в ORM модель
             updated_orm_attorney = AttorneyMapper.to_orm(attorney)
-            self.session.add(updated_orm_attorney)
+
+            # ПОЧЕМУ ЭТО РАБОТАЕТ БЕЗ MERGE и FLUSH???
+            # await self.session.flush()  # ⚠️ фиксируем INSERT в транзакции
+            # await self.session.merge(updated_orm_attorney)
+
             return {'success': True, 'attorney': attorney}
         except Exception as e:
             raise DatabaseErrorException(
@@ -132,6 +142,7 @@ class AttorneyRepository(IAttorneyRepository):
                 # Удаляем адвоката
 
             await self.session.delete(orm_attorney)
+            await self.session.flush()  # ⚠️ фиксируем INSERT в транзакции
             return True  # Возвращаем True, если удаление прошло успешно
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при удалении юриста: {str(e)}')
