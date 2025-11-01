@@ -22,10 +22,9 @@ class TestAttorneyRepository:
         assert save_result['success'] is True
         id = save_result['id']
 
-        orm_obj = await attorney_repo.get(id)
-        domain_result = AttorneyMapper.to_domain(orm_obj)
-        assert domain_result.attorney_id == sample_attorney.attorney_id
-        logger.info(f'ASSERTION {domain_result}')
+        attorney = await attorney_repo.get(id)
+        assert attorney.attorney_id == sample_attorney.attorney_id
+        #logger.debug(f'ASSERTION {attorney}')
 
     # -------- SAVE DUPLICATE --------
     @pytest.mark.asyncio
@@ -88,7 +87,7 @@ class TestAttorneyRepository:
             update_result['attorney'].password_hash
             == sample_update_attorney.password_hash
         )
-        logger.info(f'RESULT -> {update_result['attorney']}')
+        #logger.debug(f'RESULT -> {update_result['attorney']}')
 
     # -------- DELETE ATORNEY --------
     @pytest.mark.asyncio
@@ -101,4 +100,4 @@ class TestAttorneyRepository:
         assert delete_result is True
         get_result = await attorney_repo.get(id)
         assert get_result is None
-        logger.info(f'RESULT -> {get_result}')
+        #logger.debug(f'RESULT -> {get_result}')

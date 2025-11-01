@@ -63,11 +63,12 @@ class AttorneyRepository(IAttorneyRepository):
         try:
             statement = select(AttorneyORM).where(AttorneyORM.id == id)
             result = await self.session.exec(statement)
-            attorney = result.first()
+            orm_attorney = result.first()
 
-            if not attorney:
+            if not orm_attorney:
                 return None
 
+            attorney = AttorneyMapper.to_domain(orm_attorney)
             return attorney
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при получении юриста: {str(e)}')
