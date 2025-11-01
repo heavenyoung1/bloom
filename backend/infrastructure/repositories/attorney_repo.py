@@ -107,13 +107,12 @@ class AttorneyRepository(IAttorneyRepository):
             statement = select(AttorneyORM)
             result = await self.session.exec(statement)
             orm_attorneys = result.all()
+            if not orm_attorneys:
+                raise EntityNotFoundException('Юристы не найдены')
+
             domain_attorneys = [
                 AttorneyMapper.to_domain(orm_attorney) for orm_attorney in orm_attorneys
             ]
-
-            if not domain_attorneys:
-                raise EntityNotFoundException('Юристы не найдены')
-
             return domain_attorneys
         except Exception as e:
             raise DatabaseErrorException(
@@ -145,7 +144,6 @@ class AttorneyRepository(IAttorneyRepository):
             attorney.email = updated_attorney.email
             attorney.phone = updated_attorney.phone
             attorney.password_hash = updated_attorney.password_hash
-            attorney.is_active = updated_attorney.is_active
             attorney.updated_at = func.now()
 
             # Преобразуем обновленного адвоката обратно в ORM модель

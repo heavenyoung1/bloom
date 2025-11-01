@@ -1,9 +1,6 @@
 import pytest
-from sqlmodel import select
-from backend.infrastructure.models import AttorneyORM
 from backend.infrastructure.mappers import AttorneyMapper
 from backend.core import logger
-from backend.core.exceptions import DatabaseErrorException
 
 
 class TestAttorneyRepository:
