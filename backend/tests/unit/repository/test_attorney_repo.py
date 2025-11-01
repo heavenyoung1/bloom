@@ -88,6 +88,7 @@ class TestAttorneyRepository:
             update_result['attorney'].password_hash
             == sample_update_attorney.password_hash
         )
+        logger.info(f'RESULT -> {update_result['attorney']}')
 
     # -------- DELETE ATORNEY --------
     @pytest.mark.asyncio
