@@ -92,7 +92,7 @@ class CaseRepository(ICaseRepository):
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при обновлении данных ДЕЛА: {str(e)}')
 
-    async def update(self, id: int) -> bool:
+    async def delete(self, id: int) -> bool:
         try:
             statement = select(CaseORM).where(CaseORM.id == id)
             result = await self.session.exec(statement)
