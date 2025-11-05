@@ -5,6 +5,7 @@ from sqlalchemy import Column, DateTime
 from sqlalchemy.sql import func
 from sqlalchemy.orm import mapped_column
 import sqlalchemy as sa
+from backend.infrastructure.models.mixins import TimeStampMixin
 
 from typing import TYPE_CHECKING
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from backend.infrastructure.models import ClientORM, CaseORM, DocumentORM, EventORM
 
 
-class AttorneyORM(SQLModel, table=True):
+class AttorneyORM(SQLModel, TimeStampMixin, table=True):
     __tablename__ = 'attorneys'  # Таблица Адвокат
 
     id: int = Field(primary_key=True)
@@ -26,24 +27,7 @@ class AttorneyORM(SQLModel, table=True):
     phone: Optional[str] = Field(max_length=20)
     password_hash: str = Field(max_length=255)
     is_active: bool = Field(default=True)
-    # Правильный способ для PostgreSQL
-    created_at: datetime = Field(
-        default=None,
-        sa_column=mapped_column(
-            DateTime(timezone=True),
-            server_default=func.now(),
-            nullable=False
-        )
-    )
-    updated_at: datetime = Field(
-        default=None,
-        sa_column=mapped_column(
-            DateTime(timezone=True),
-            server_default=func.now(),
-            nullable=False,
-            onupdate=func.now()
-        )
-    )
+
     # Отношения (1:N обратные стороны)
     clients: List['ClientORM'] = Relationship(
         back_populates='owner_attorney',
