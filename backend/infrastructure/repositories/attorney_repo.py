@@ -1,8 +1,9 @@
 from typing import Dict, List, TYPE_CHECKING
-from sqlmodel import select
 from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.domain.entities.attorney import Attorney
 from backend.infrastructure.mappers import AttorneyMapper
@@ -35,9 +36,9 @@ class AttorneyRepository(IAttorneyRepository):
         :return: Словарь с ключами 'success' (True, если сохранение успешно) и 'id' (ID сохранённого юриста).
         '''
         try:
-            statement = select(AttorneyORM).where(AttorneyORM.id == attorney.id)
-            result = await self.session.exec(statement)
-            attorney_found = result.first()
+            stmt = select(AttorneyORM).where(AttorneyORM.id == attorney.id)
+            result = await self.session.execute(stmt)
+            attorney_found = result.scalar_one_or_none()
 
             if attorney_found is None:  # Если юрист не найден, добавляем нового
                 orm_attorney = AttorneyMapper.to_orm(domain=attorney)
@@ -62,9 +63,9 @@ class AttorneyRepository(IAttorneyRepository):
         :raises DatabaseErrorException: Если произошла ошибка при получении юриста.
         '''
         try:
-            statement = select(AttorneyORM).where(AttorneyORM.id == id)
-            result = await self.session.exec(statement)
-            orm_attorney = result.first()
+            stmt = select(AttorneyORM).where(AttorneyORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_attorney = result.scalar_one_or_none()
 
             if not orm_attorney:
                 return None
@@ -83,16 +84,14 @@ class AttorneyRepository(IAttorneyRepository):
         :raises DatabaseErrorException: Если произошла ошибка при получении юриста.
         '''
         try:
-            statement = select(AttorneyORM).where(
-                AttorneyORM.attorney_id == attorney_id
-            )
-            result = await self.session.exec(statement)
-            orm_attorney = result.first()
-            attorney = AttorneyMapper.to_domain(orm_attorney)
-
-            if not attorney:
+            stmt = select(AttorneyORM).where(AttorneyORM.attorney_id == attorney_id)
+            result = await self.session.execute(stmt)
+            orm_attorney = result.scalar_one_or_none()
+            
+            if not orm_attorney:
                 return None
 
+            attorney = AttorneyMapper.to_domain(orm_attorney)
             return attorney
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при получении юриста: {str(e)}')
@@ -105,9 +104,9 @@ class AttorneyRepository(IAttorneyRepository):
         :raises DatabaseErrorException: Если произошла ошибка при получении списка юристов.
         '''
         try:
-            statement = select(AttorneyORM)
-            result = await self.session.exec(statement)
-            orm_attorneys = result.all()
+            stmt = select(AttorneyORM)
+            result = await self.session.execute(stmt)
+            orm_attorneys = result.scalars().all()
             if not orm_attorneys:
                 raise EntityNotFoundException('Юристы не найдены')
 
@@ -130,9 +129,9 @@ class AttorneyRepository(IAttorneyRepository):
         :raises DatabaseErrorException: Если произошла ошибка при обновлении данных.
         '''
         try:
-            statement = select(AttorneyORM).where(AttorneyORM.id == id)
-            result = await self.session.exec(statement)
-            orm_attorney = result.first()
+            stmt = select(AttorneyORM).where(AttorneyORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_attorney = result.scalar_one_or_none()
 
             if not orm_attorney:
                 raise EntityNotFoundException('Юрист не найден')
@@ -166,16 +165,16 @@ class AttorneyRepository(IAttorneyRepository):
         :raises DatabaseErrorException: Если произошла ошибка при удалении.
         '''
         try:
-            statement = select(AttorneyORM).where(AttorneyORM.id == id)
-            result = await self.session.exec(statement)
-            orm_attorney = result.first()
+            stmt = select(AttorneyORM).where(AttorneyORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_attorney = result.scalar_one_or_none()
 
             if not orm_attorney:
                 raise EntityNotFoundException('Юрист не найден')
 
             await self.session.delete(orm_attorney)
             await self.session.flush()  # Фиксируем изменения в транзакции
-            return True
 
+            return True
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при удалении юриста: {str(e)}')

@@ -1,6 +1,6 @@
-from sqlmodel import select
+from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Dict, List, TYPE_CHECKING
 
 from backend.domain.entities.case import Case
@@ -19,9 +19,9 @@ class CaseRepository(ICaseRepository):
 
     async def save(self, case: Case) -> dict:
         try:
-            statement = select(CaseORM).where(CaseORM.id == case.id)
-            result = await self.session.exec(statement)
-            case_found = result.first()
+            stmt = select(CaseORM).where(CaseORM.id == case.id)
+            result = await self.session.execute(stmt)
+            case_found = result.scalars().first()
 
             if case_found is None:
                 orm_case = CaseMapper.to_orm(domain=case)
@@ -40,9 +40,9 @@ class CaseRepository(ICaseRepository):
 
     async def get(self, id: int) -> 'Case':
         try:
-            statement = select(CaseORM).where(CaseORM.id == id)
-            result = await self.session.exec(statement)
-            orm_case = result.first()
+            stmt = select(CaseORM).where(CaseORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_case = result.scalars().first()
 
             if not orm_case:
                 return None
@@ -54,9 +54,9 @@ class CaseRepository(ICaseRepository):
 
     async def get_all(self) -> List['Case']:
         try:
-            statement = select(CaseORM)
-            result = await self.session.exec(statement)
-            orm_cases = result.all()
+            stmt = select(CaseORM)
+            result = await self.session.execute(stmt)
+            orm_cases = result.scalars().all()
 
             if not orm_cases:
                 return None
@@ -69,9 +69,9 @@ class CaseRepository(ICaseRepository):
     async def update(self, updated_case: Case) -> Dict:
         try:
             id = updated_case.id
-            statement = select(CaseORM).where(CaseORM.id == id)
-            result = await self.session.exec(statement)
-            orm_case = result.first()
+            stmt = select(CaseORM).where(CaseORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_case = result.scalars().first()
 
             if not orm_case:
                 raise EntityNotFoundException('Дело не найдено')
@@ -94,9 +94,9 @@ class CaseRepository(ICaseRepository):
 
     async def delete(self, id: int) -> bool:
         try:
-            statement = select(CaseORM).where(CaseORM.id == id)
-            result = await self.session.exec(statement)
-            orm_case = result.first()
+            stmt = select(CaseORM).where(CaseORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_case = result.scalars().first()
             if not orm_case:
                 raise EntityNotFoundException('Дело не найдено')
 

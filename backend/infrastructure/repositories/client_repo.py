@@ -1,6 +1,6 @@
-from sqlmodel import select
+from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Dict, List, TYPE_CHECKING
 
 from backend.domain.entities.client import Client
@@ -16,9 +16,9 @@ class ClientRepository(IClientRepository):
 
     async def save(self, client: Client) -> Dict:
         try:
-            statement = select(ClientORM).where(ClientORM.id == client.id)
-            result = await self.session.exec(statement)
-            client_found = result.first()
+            stmt = select(ClientORM).where(ClientORM.id == client.id)
+            result = await self.session.execute(stmt)
+            client_found = result.scalar_one_or_none()
 
             if client_found is None:
                 orm_client = ClientMapper.to_orm(domain=client)
@@ -33,9 +33,9 @@ class ClientRepository(IClientRepository):
         
     async def get(self, id: int) -> 'Client':
         try:
-            statement = select(ClientORM).whee(ClientORM.id == id)
-            result = await self.session.exec(statement)
-            orm_client = result.first()
+            stmt = select(ClientORM).where(ClientORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_client = result.scalar_one_or_none()
 
             if not orm_client:
                 return None

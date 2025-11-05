@@ -1,8 +1,8 @@
 import pytest
 import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlmodel import SQLModel
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
+from backend.infrastructure.models._base import Base
 
 
 @pytest.fixture(scope='session')
@@ -37,7 +37,7 @@ async def engine(test_db_url):
 
     # Создаём таблицы один раз для всей сессии
     async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.create_all)
+        await conn.run_sync(Base.metadata.create_all)
 
     yield engine
 
