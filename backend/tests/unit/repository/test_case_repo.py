@@ -7,6 +7,6 @@ class TestCaseRepository:
     # -------- SAVE --------
     @pytest.mark.asyncio
     async def test_save_success(self, case_repo, sample_case):
-        '''Тест: сохранение нового дела'''
+        '''Тест: Сохранение дела со связанными клиентом и адвокатом.'''
         save_result = await case_repo.save(sample_case)
         assert save_result['success'] is True

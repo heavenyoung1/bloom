@@ -2,12 +2,19 @@ from datetime import datetime, timezone
 import pytest
 from backend.domain.entities.client import (
     Client,
-)  # Предполагается, что у вас есть такой класс Client
+)  # Предполагается, что у вас есть такой класс Clientа
+from backend.infrastructure.models.client import Messenger
 
+@pytest.fixture
+async def persisted_client(client_repo, sample_client):
+    '''Сохраняет юриста и client_repo ID юриста.'''
+    result = await client_repo.save(sample_client)
+    assert result['success'] is True
+    return result['id']
 
 # Фикстура для дефолтного клиента
 @pytest.fixture
-def sample_client(sample_attorney):
+def sample_client(sample_attorney, fixed_now):
     '''Фикстура для дефолтного клиента.'''
     return Client(
         id=None,  # Позволяем БД генерировать ID
@@ -17,15 +24,16 @@ def sample_client(sample_attorney):
         phone='+79991234567',
         personal_info='1234567890',  # ИНН или номер паспорта
         address='Москва, ул. Тверская, 1',
-        messenger='tg',  # Мессенджер Telegram
+        messenger=Messenger.TG,  # Мессенджер Telegram
         messenger_handle='ivan123',
         owner_attorney_id=sample_attorney.id,  # Пример ссылки на адвоката
+        created_at=fixed_now,
     )
 
 
 # Фикстура для клиента, который будет обновляться
 @pytest.fixture
-def sample_update_client(sample_attorney):
+def sample_update_client(sample_attorney, fixed_now):
     '''Фикстура для обновленного клиента.'''
     return Client(
         id=None,  # Позволяем БД генерировать ID
@@ -35,9 +43,10 @@ def sample_update_client(sample_attorney):
         phone='+79998887766',
         personal_info='0987654321',  # Новый номер паспорта или ИНН
         address='Москва, ул. Арбат, 5',
-        messenger='wa',  # Мессенджер WhatsApp
+        messenger=Messenger.WA,  # Мессенджер WhatsApp
         messenger_handle='ivanov3232',
         owner_attorney_id=sample_attorney.id,  # Пример ссылки на адвоката
+        created_at=fixed_now,
     )
 
 
@@ -54,7 +63,7 @@ def clients_list(fixed_now):
             phone='+79991234567',
             personal_info='1234567890',
             address='Москва, ул. Тверская, 1',
-            messenger='tg',
+            messenger=Messenger.TG,
             messenger_handle='ivan123',
             created_at=fixed_now,
             owner_attorney_id=1,
@@ -67,7 +76,7 @@ def clients_list(fixed_now):
             phone='+79998887766',
             personal_info='2345678901',
             address='Москва, ул. Ленина, 10',
-            messenger='wa',
+            messenger=Messenger.WA,
             messenger_handle='alexander_ivanov',
             created_at=fixed_now,
             owner_attorney_id=2,
@@ -80,7 +89,7 @@ def clients_list(fixed_now):
             phone='+79993332211',
             personal_info='3456789012',
             address='Москва, ул. Пушкина, 15',
-            messenger='tg',
+            messenger=Messenger.MA,
             messenger_handle='maria_smirnova',
             created_at=fixed_now,
             owner_attorney_id=3,
@@ -93,7 +102,7 @@ def clients_list(fixed_now):
             phone='+79992223344',
             personal_info='4567890123',
             address='Москва, ул. Красная, 20',
-            messenger='ma',
+            messenger=Messenger.MA,
             messenger_handle='ekaterina_vasileva',
             created_at=fixed_now,
             owner_attorney_id=4,
@@ -106,7 +115,7 @@ def clients_list(fixed_now):
             phone='+79995556677',
             personal_info='5678901234',
             address='Москва, ул. Маяковская, 30',
-            messenger='tg',
+            messenger=Messenger.MA,
             messenger_handle='dmitry_alexandrov',
             created_at=fixed_now,
             owner_attorney_id=5,

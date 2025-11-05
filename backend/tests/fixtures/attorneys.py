@@ -4,6 +4,12 @@ import pytest
 
 # from .fixed_data import fixed_now
 
+@pytest.fixture
+async def persisted_attorney(attorney_repo, sample_attorney):
+    '''Сохраняет юриста и возвращает ID юриста.'''
+    result = await attorney_repo.save(sample_attorney)
+    assert result['success'] is True
+    return result['id']
 
 @pytest.fixture
 def sample_attorney(fixed_now):

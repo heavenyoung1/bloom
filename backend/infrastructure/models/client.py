@@ -1,17 +1,17 @@
 from datetime import datetime, timezone
 from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
-from enum import Enum as enum
+from enum import Enum
 
 
 if TYPE_CHECKING:
     from backend.infrastructure.models import AttorneyORM, CaseORM
 
 
-class Mesenger(str, enum):
-    tg = 'Telegram'
-    wa = 'WhatsApp'
-    ma = 'MAX'
+class Messenger(str, Enum):
+    TG = 'Telegram'
+    WA = 'WhatsApp'
+    MA = 'MAX'
 
 
 class ClientORM(SQLModel, table=True):

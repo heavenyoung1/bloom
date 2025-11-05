@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from backend.infrastructure.models.client import Messenger
 
 
 @dataclass
@@ -11,7 +12,7 @@ class Client:
     phone: str
     personal_info: str  # ИНН/ПАСПОРТ
     address: str
-    messenger_type: str
+    messenger: Messenger
     messenger_handle: str
     owner_attorney_id: str
     created_at: datetime
