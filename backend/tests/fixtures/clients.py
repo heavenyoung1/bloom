@@ -6,8 +6,9 @@ from backend.domain.entities.client import (
 from backend.infrastructure.models.client import Messenger
 
 @pytest.fixture
-async def persisted_client(client_repo, sample_client):
-    '''Сохраняет юриста и client_repo ID юриста.'''
+async def persisted_client_id(client_repo, sample_client, persisted_attorney_id):
+    '''Сохраняет клиента и возвращает его ID. Требует существующего адвоката-владельца.'''
+    sample_client.owner_attorney_id = persisted_attorney_id
     result = await client_repo.save(sample_client)
     assert result['success'] is True
     return result['id']

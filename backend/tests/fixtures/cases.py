@@ -12,13 +12,13 @@ async def persisted_case(case_repo, sample_case):
     return result['id']
 
 @pytest.fixture
-async def sample_case(persisted_attorney, persisted_client, fixed_now):
+async def sample_case(persisted_attorney_id, persisted_client_id, fixed_now):
     '''Фикстура для дефолтного дела с реальными attorney_id и client_id.'''
     return Case(
         id=None,
         name='Дело о краже',
-        client_id=persisted_client.id,  # Реальный ID из БД
-        attorney_id=persisted_attorney.id,  # Реальный ID из БД
+        client_id=persisted_client_id,  # Реальный ID из БД
+        attorney_id=persisted_attorney_id,  # Реальный ID из БД
         status=CaseStatus.IN_PROGRESS,
         description='Описание дела о краже',
         created_at=fixed_now,

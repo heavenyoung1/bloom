@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
+from backend.infrastructure.models.mixins import TimeStampMixin
 from enum import Enum
 import sqlalchemy as sa
 
@@ -15,7 +16,7 @@ class Messenger(str, Enum):
     MA = 'MAX'
 
 
-class ClientORM(SQLModel, table=True):
+class ClientORM(SQLModel, TimeStampMixin, table=True):
     __tablename__ = 'clients'  # Таблица 'Клиенты'
 
     id: int = Field(primary_key=True)
@@ -32,13 +33,6 @@ class ClientORM(SQLModel, table=True):
     messenger: Optional[str] = Field(default=None, description='Мессенджер клиента')
 
     messenger_handle: Optional[str] = Field(max_length=50)
-
-    created_at: datetime | None = Field(
-    sa_column=sa.Column(
-        sa.DateTime(timezone=True),
-        server_default=sa.func.now(),   # ставит NOW() на INSERT
-        nullable=False,
-    ))
 
     owner_attorney_id: int = Field(foreign_key='attorneys.id', index=True)
 

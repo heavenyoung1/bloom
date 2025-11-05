@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
+from backend.infrastructure.models.mixins import TimeStampMixin
 from enum import Enum as enum
 
 if TYPE_CHECKING:
@@ -16,7 +17,7 @@ class EventType(str, enum):
     court_hearing = 'Судебное заседание'
 
 
-class EventORM(SQLModel, table=True):
+class EventORM(SQLModel, TimeStampMixin, table=True):
     __tablename__ = 'events'  # Таблица 'События по делу'
 
     id: int = Field(primary_key=True)
