@@ -17,6 +17,7 @@ from backend.infrastructure.models import (
     ContactORM,
     DocumentORM,
     EventORM,
+    TimeStampMixin,
 )
 
 # === Настройка ===

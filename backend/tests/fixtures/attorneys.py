@@ -12,7 +12,7 @@ async def persisted_attorney_id(attorney_repo, sample_attorney):
     return result['id']
 
 @pytest.fixture
-def sample_attorney(fixed_now):
+def sample_attorney():
     return Attorney(
         id=None,  # Позволяем БД генерировать ID
         attorney_id='322/4767',
