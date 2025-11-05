@@ -1,25 +1,21 @@
-from datetime import datetime, timezone
-from typing import Optional, TYPE_CHECKING
-from sqlmodel import SQLModel, Field, Relationship
+from __future__ import annotations
+from sqlalchemy import String, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from backend.infrastructure.models._base import Base
 from backend.infrastructure.models.mixins import TimeStampMixin
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-
     from backend.infrastructure.models import CaseORM
 
+class ContactORM(TimeStampMixin, Base):
+    __tablename__ = 'contacts'
 
-class ContactORM(SQLModel, TimeStampMixin, table=True):
-    __tablename__ = 'contacts'  # Таблица 'Связаные с делом контакты'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    personal_info: Mapped[str] = mapped_column(String(20))
+    phone: Mapped[str] = mapped_column(String(20))
+    email: Mapped[str | None] = mapped_column(String(50))
 
-    id: int = Field(primary_key=True)
-    name: str = Field(max_length=100, description='ФИО полностью')
-    personal_info: Optional[str] = Field(
-        default=None, description='Паспорт', max_length=20
-    )
-    phone: Optional[str] = Field(default=None, max_length=20)
-    email: Optional[str] = Field(default=None, max_length=50)
-
-    case_id: int = Field(foreign_key='cases.id', index=True)
-
-    # relationships
-    case: Optional['CaseORM'] = Relationship(back_populates='contacts')
+    case_id: Mapped[int] = mapped_column(ForeignKey('cases.id', ondelete='CASCADE'), nullable=False, index=True)
+    case: Mapped['CaseORM'] = relationship(back_populates='contacts')

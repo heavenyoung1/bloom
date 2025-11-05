@@ -1,28 +1,24 @@
-from datetime import datetime, timezone
-from typing import Optional, TYPE_CHECKING
-from sqlmodel import SQLModel, Field, Relationship
+# backend/infrastructure/models/document.py
+from __future__ import annotations
+from sqlalchemy import String, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from backend.infrastructure.models._base import Base
 from backend.infrastructure.models.mixins import TimeStampMixin
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from backend.infrastructure.models import AttorneyORM, CaseORM
 
+class DocumentORM(TimeStampMixin, Base):
+    __tablename__ = 'documents'
 
-class DocumentORM(SQLModel, TimeStampMixin, table=True):
-    __tablename__ = 'documents'  # Таблица 'Связаные с делом Документы'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    file_name: Mapped[str] = mapped_column(String(300), nullable=False)
+    storage_path: Mapped[str] = mapped_column(String(1000), nullable=False)
+    checksum: Mapped[str | None] = mapped_column(String(64))
 
-    id: int = Field(default=None, primary_key=True)
-    file_name: str = Field(max_length=300)
-    storage_path: str = Field(max_length=1000)
-    checksum: Optional[str] = Field(
-        default=None, max_length=64
-    )  # Какая максимальная величина тут должна быть?
+    case_id: Mapped[int] = mapped_column(ForeignKey('cases.id', ondelete='SET NULL'), index=True)
+    attorney_id: Mapped[int] = mapped_column(ForeignKey('attorneys.id', ondelete='SET NULL'), index=True)
 
-    case_id: Optional[int] = Field(default=None, foreign_key='cases.id', index=True)
-    # Связь Attorney_id нужна, зачем?
-    attorney_id: Optional[int] = Field(
-        default=None, foreign_key='attorneys.id', index=True
-    )
-
-    # Отношения
-    attorney: Optional['AttorneyORM'] = Relationship(back_populates='documents')
-    case: Optional['CaseORM'] = Relationship(back_populates='documents')
+    case: Mapped['CaseORM'] = relationship(back_populates='documents')
+    attorney: Mapped['AttorneyORM'] = relationship(back_populates='documents')

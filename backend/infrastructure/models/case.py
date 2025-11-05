@@ -1,8 +1,10 @@
-from enum import Enum
-from datetime import datetime, timezone
-from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, List, TYPE_CHECKING
+from __future__ import annotations
+from sqlalchemy import String, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from backend.infrastructure.models._base import Base
 from backend.infrastructure.models.mixins import TimeStampMixin
+from typing import TYPE_CHECKING
+from enum import Enum
 
 
 if TYPE_CHECKING:
@@ -26,26 +28,19 @@ class CaseStatus(str, Enum):
     ARCHIVED = 'Архивировано'         # Перемещено в архив (историческое дело)
 
 
-class CaseORM(SQLModel, TimeStampMixin, table=True):
-    __tablename__ = 'cases'  # Таблица 'Дела'
+class CaseORM(TimeStampMixin, Base):
+    __tablename__ = 'cases'
 
-    id: int = Field(primary_key=True)
-    name: str = Field(max_length=255)
-    client_id: int = Field(foreign_key='clients.id', index=True)
-    attorney_id: int = Field(default=None, foreign_key='attorneys.id', index=True)
-    status: str = Field(max_length=50, description='Статус делопроизводства')
-    description: Optional[str] = Field(default=None, max_length=500)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    client_id: Mapped[int] = mapped_column(ForeignKey('clients.id', ondelete='RESTRICT'), nullable=False, index=True)
+    attorney_id: Mapped[int] = mapped_column(ForeignKey('attorneys.id', ondelete='RESTRICT'), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(50), nullable=False)
+    description: Mapped[str | None] = mapped_column(String(500))
 
-    # отношения
-    attorney: 'AttorneyORM' = Relationship(back_populates='cases')
-    client: 'ClientORM' = Relationship(back_populates='cases')
+    attorney: Mapped['AttorneyORM'] = relationship(back_populates='cases')
+    client: Mapped['ClientORM'] = relationship(back_populates='cases')
 
-    contacts: List['ContactORM'] = Relationship(
-        back_populates='case', sa_relationship_kwargs={'cascade': 'all, delete-orphan'}
-    )
-    documents: List['DocumentORM'] = Relationship(
-        back_populates='case', sa_relationship_kwargs={'cascade': 'all, delete-orphan'}
-    )
-    events: List['EventORM'] = Relationship(
-        back_populates='case', sa_relationship_kwargs={'cascade': 'all, delete-orphan'}
-    )
+    contacts: Mapped[list['ContactORM']] = relationship(back_populates='case', cascade='all, delete-orphan')
+    documents: Mapped[list['DocumentORM']] = relationship(back_populates='case', cascade='all, delete-orphan')
+    events: Mapped[list['EventORM']] = relationship(back_populates='case', cascade='all, delete-orphan')

@@ -1,6 +1,7 @@
 from backend.core.db.settings import Settings
 from backend.infrastructure.models import *
 from backend.core.logger import logger
+from backend.infrastructure.models._base import Base
 
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config
@@ -8,17 +9,13 @@ from sqlalchemy import pool, create_engine
 from alembic import context
 
 # === Импортируем Settings и модели ===
-from sqlmodel import SQLModel
 from backend.core.db.settings import Settings
-from backend.infrastructure.models import (
-    AttorneyORM,
-    CaseORM,
-    ClientORM,
-    ContactORM,
-    DocumentORM,
-    EventORM,
-    TimeStampMixin,
-)
+from backend.infrastructure.models.attorney import AttorneyORM
+from backend.infrastructure.models.client import ClientORM
+from backend.infrastructure.models.case import CaseORM
+from backend.infrastructure.models.contact import ContactORM
+from backend.infrastructure.models.document import DocumentORM
+from backend.infrastructure.models.event import EventORM
 
 # === Настройка ===
 config = context.config
@@ -26,7 +23,7 @@ config = context.config
 #     fileConfig(config.config_file_name)
 
 
-target_metadata = SQLModel.metadata
+target_metadata = Base.metadata
 
 
 def get_alembic_url():

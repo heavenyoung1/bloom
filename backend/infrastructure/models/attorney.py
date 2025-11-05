@@ -1,47 +1,44 @@
-from datetime import datetime, timezone
-from typing import Optional, List
-from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, DateTime
-from sqlalchemy.sql import func
-from sqlalchemy.orm import mapped_column
-import sqlalchemy as sa
+from sqlalchemy import String, Boolean
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.infrastructure.models.mixins import TimeStampMixin
-
 from typing import TYPE_CHECKING
 
+from backend.infrastructure.models._base import Base
+
 if TYPE_CHECKING:
-    from backend.infrastructure.models import ClientORM, CaseORM, DocumentORM, EventORM
+    from backend.infrastructure.models import Base, EventORM, ClientORM, DocumentORM, CaseORM
 
+class AttorneyORM(TimeStampMixin, Base):
+    __tablename__ = 'attorneys'
 
-class AttorneyORM(SQLModel, TimeStampMixin, table=True):
-    __tablename__ = 'attorneys'  # Таблица Адвокат
+    id: Mapped[int] = mapped_column(primary_key=True)
+    attorney_id: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)  # номер удостоверения
+    first_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    patronymic: Mapped[str | None] = mapped_column(String(50))
+    email: Mapped[str] = mapped_column(String(50), nullable=False, unique=True, index=True)
+    phone: Mapped[str] = mapped_column(String(20))
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    id: int = Field(primary_key=True)
-    attorney_id: str = Field(max_length=50, unique=True)  # Номер удостоверения юриста
-    first_name: str = Field(max_length=50)
-    last_name: str = Field(max_length=50)
-    patronymic: Optional[str] = Field(max_length=50)
-    email: str = Field(
-        max_length=50, index=True, unique=True
-    )  # валидацию делаем на уровне Pydantic DTO / сервисов
-    phone: Optional[str] = Field(max_length=20)
-    password_hash: str = Field(max_length=255)
-    is_active: bool = Field(default=True)
-
-    # Отношения (1:N обратные стороны)
-    clients: List['ClientORM'] = Relationship(
+    # 1:N
+    clients: Mapped[list['ClientORM']] = relationship(
         back_populates='owner_attorney',
-        sa_relationship_kwargs={'cascade': 'all, delete-orphan'},
+        cascade='save-update, merge',  # не удаляем клиентов вместе с адвокатом
+        passive_deletes=True,
     )
-    cases: List['CaseORM'] = Relationship(
+    cases: Mapped[list['CaseORM']] = relationship(
         back_populates='attorney',
-        sa_relationship_kwargs={'cascade': 'all, delete-orphan'},
+        cascade='save-update, merge',
+        passive_deletes=True,
     )
-    documents: List['DocumentORM'] = Relationship(
+    documents: Mapped[list['DocumentORM']] = relationship(
         back_populates='attorney',
-        sa_relationship_kwargs={'cascade': 'all, delete-orphan'},
+        cascade='save-update, merge',
+        passive_deletes=True,
     )
-    events: List['EventORM'] = Relationship(
+    events: Mapped[list['EventORM']] = relationship(
         back_populates='attorney',
-        sa_relationship_kwargs={'cascade': 'all, delete-orphan'},
+        cascade='save-update, merge',
+        passive_deletes=True,
     )

@@ -1,34 +1,25 @@
+from __future__ import annotations
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING
-from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import String, ForeignKey, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from backend.infrastructure.models._base import Base
 from backend.infrastructure.models.mixins import TimeStampMixin
-from enum import Enum as enum
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-
     from backend.infrastructure.models import AttorneyORM, CaseORM
 
+class EventORM(TimeStampMixin, Base):
+    __tablename__ = 'events'
 
-# Справочник типов событий
-class EventType(str, enum):
-    meeting = 'Встреча'
-    task = 'Задача'
-    deadline = 'Дедлайн'
-    court_hearing = 'Судебное заседание'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str | None] = mapped_column(String(2000))
+    event_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    event_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
+    case_id: Mapped[int] = mapped_column(ForeignKey('cases.id', ondelete='CASCADE'), nullable=False, index=True)
+    attorney_id: Mapped[int] = mapped_column(ForeignKey('attorneys.id', ondelete='RESTRICT'), nullable=False, index=True)
 
-class EventORM(SQLModel, TimeStampMixin, table=True):
-    __tablename__ = 'events'  # Таблица 'События по делу'
-
-    id: int = Field(primary_key=True)
-    name: str = Field(max_length=255)
-    description: Optional[str] = Field(default=None, max_length=2000)
-    event_type: str = Field(max_length=50)
-    event_date: datetime
-
-    case_id: int = Field(foreign_key='cases.id', index=True)
-    attorney_id: int = Field(foreign_key='attorneys.id', index=True)
-
-    # relationships
-    case: Optional['CaseORM'] = Relationship(back_populates='events')
-    attorney: Optional['AttorneyORM'] = Relationship(back_populates='events')
+    case: Mapped['CaseORM'] = relationship(back_populates='events')
+    attorney: Mapped['AttorneyORM'] = relationship(back_populates='events')
