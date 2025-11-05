@@ -11,13 +11,12 @@ from alembic import context
 from sqlmodel import SQLModel
 from backend.core.db.settings import Settings
 from backend.infrastructure.models import (
-    Attorney,
-    Case,
-    Client,
-    Contact,
-    Document,
-    Payment,
-    Subscription,
+    AttorneyORM,
+    CaseORM,
+    ClientORM,
+    ContactORM,
+    DocumentORM,
+    EventORM,
 )
 
 # === Настройка ===
@@ -32,7 +31,7 @@ target_metadata = SQLModel.metadata
 def get_alembic_url():
     """Получить URL из Settings (читает .env)"""
     settings = Settings()  # pydantic сам загрузит .env
-    logger.debug(f'📡 - Получен Alembic url для миграций - {settings.alembic_url()}')
+    logger.debug(f'Получен Alembic url для миграций - {settings.alembic_url()}')
     return settings.alembic_url()
 
 

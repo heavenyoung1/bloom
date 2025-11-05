@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional, List, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
+import sqlalchemy as sa
 
 
 if TYPE_CHECKING:
@@ -29,8 +30,15 @@ class ClientORM(SQLModel, table=True):
     )
     address: Optional[str] = Field(default=None, max_length=255)
     messenger: Optional[str] = Field(default=None, description='Мессенджер клиента')
+
     messenger_handle: Optional[str] = Field(max_length=50)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    created_at: datetime | None = Field(
+    sa_column=sa.Column(
+        sa.DateTime(timezone=True),
+        server_default=sa.func.now(),   # ставит NOW() на INSERT
+        nullable=False,
+    ))
 
     owner_attorney_id: int = Field(foreign_key='attorneys.id', index=True)
 

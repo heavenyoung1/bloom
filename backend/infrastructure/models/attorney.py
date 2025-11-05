@@ -3,6 +3,7 @@ from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, DateTime
 from sqlalchemy.sql import func
+from sqlalchemy.orm import mapped_column
 import sqlalchemy as sa
 
 from typing import TYPE_CHECKING
@@ -25,8 +26,24 @@ class AttorneyORM(SQLModel, table=True):
     phone: Optional[str] = Field(max_length=20)
     password_hash: str = Field(max_length=255)
     is_active: bool = Field(default=True)
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
+    # Правильный способ для PostgreSQL
+    created_at: datetime = Field(
+        default=None,
+        sa_column=mapped_column(
+            DateTime(timezone=True),
+            server_default=func.now(),
+            nullable=False
+        )
+    )
+    updated_at: datetime = Field(
+        default=None,
+        sa_column=mapped_column(
+            DateTime(timezone=True),
+            server_default=func.now(),
+            nullable=False,
+            onupdate=func.now()
+        )
+    )
     # Отношения (1:N обратные стороны)
     clients: List['ClientORM'] = Relationship(
         back_populates='owner_attorney',
