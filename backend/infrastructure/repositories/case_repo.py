@@ -1,5 +1,15 @@
 from sqlalchemy.future import select
-from sqlalchemy.exc import IntegrityError
+
+from sqlalchemy.exc import (
+    SQLAlchemyError,
+    IntegrityError,
+    OperationalError,
+    ProgrammingError,
+    DataError,
+    NoResultFound,
+    MultipleResultsFound,
+    InvalidRequestError
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Dict, List, TYPE_CHECKING
 
@@ -23,17 +33,12 @@ class CaseRepository(ICaseRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def save(self, case: Case) -> dict:
+    async def save(self, case: Case) -> 'Case':
         try:
-            # 1. Проверка существования сущности в БД
-            if await self._exists(case.id):
-                logger.info(f'Попытка сохранения дубликата ДЕЛА ID - {case.id}')
-                raise EntityAlreadyExistsError(f'ДЕЛО с ID {case.id} уже существует')
-
-            # 2. Конвертация доменной сущности в ORM-объект
+            # 1. Конвертация доменной сущности в ORM-объект
             orm_case = CaseMapper.to_orm(case)
 
-            # 3. Добавление в сессию
+            # 2. Добавление в сессию
             self.session.add(orm_case)
 
             # 4. flush() — отправляем в БД, получаем ID
@@ -41,87 +46,99 @@ class CaseRepository(ICaseRepository):
 
             # 5. Обновляем ID в доменном объекте
             case.id = orm_case.id
-            logger.info(f'ДЕЛО сохранено с ID - {case.id}')
 
+            logger.info(f'ДЕЛО сохранено.ID - {case.id}')
             return case
-
-        except IntegrityError as e:
-            raise DatabaseErrorException(f'Ошибка целостности БД: {str(e)}')
         
-        except Exception as e:
-            raise DatabaseErrorException(f'Неожиданная ошибка при сохранении: {str(e)}')
+        except IntegrityError as e:
+            logger.error(f'Ошибка при сохранении ДЕЛА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при сохранении ДЕЛА: {str(e)}')
+
+        except SQLAlchemyError  as e:
+            logger.error(f'Ошибка при сохранении ДЕЛА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при сохранении ДЕЛА: {str(e)}')
 
     async def get(self, id: int) -> 'Case':
         try:
+            # 1. Получение записи из базы данных
             stmt = select(CaseORM).where(CaseORM.id == id)
             result = await self.session.execute(stmt)
             orm_case = result.scalars().first()
 
+            # 2. Проверка существования записи в БД
             if not orm_case:
-                return None
+                raise EntityNotFoundException(f'Дело с ID {id} не найдено')
 
+            # 3. Преобразование ORM объекта в доменную сущность
             case = CaseMapper.to_domain(orm_case)
+
+            logger.info(f'ДЕЛО получено. ID - {case.id}')
             return case
-        except Exception as e:
+
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка БД при получении дела ID={id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении ДЕЛА: {str(e)}')
 
     async def get_all(self) -> List['Case']:
         try:
+            # 1. Получение записей из базы данных
             stmt = select(CaseORM)
             result = await self.session.execute(stmt)
             orm_cases = result.scalars().all()
 
-            if not orm_cases:
-                return None
-
-            cases = [CaseMapper.to_domain(orm_case) for orm_case in orm_cases]
-            return cases
-        except Exception as e:
+            # 2. Списковый генератор для всех записей из базы данных
+            return [CaseMapper.to_domain(orm_case) for orm_case in orm_cases]
+        
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка БД при получении всех ДЕЛ: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при получении ДЕЛА: {str(e)}')
 
-    async def update(self, updated_case: Case) -> Dict:
+    async def update(self, updated_case: Case) -> 'Case':
         try:
-            id = updated_case.id
-            stmt = select(CaseORM).where(CaseORM.id == id)
+            # 1. Выполнение запроса на извлечение данных из БД
+            stmt = select(CaseORM).where(CaseORM.id == updated_case.id)
             result = await self.session.execute(stmt)
             orm_case = result.scalars().first()
 
+            # 2. Проверка наличия записи в БД 
             if not orm_case:
-                raise EntityNotFoundException('Дело не найдено')
-            case = CaseMapper.to_domain(orm_case)
+                logger.error(f'Дело с ID {updated_case.id} не найдено.')
+                raise EntityNotFoundException(f'Дело с ID {id} не найдено')
 
-            # Обновляем поля дела
-            case.name = updated_case.name
-            case.client_id = updated_case.client_id
-            case.status = updated_case.status
-            case.description = updated_case.description
+            # 3. Прямое обновление полей ORM-объекта
+            orm_case.name = updated_case.name
+            orm_case.client_id = updated_case.client_id
+            orm_case.status = updated_case.status
+            orm_case.description = updated_case.description
 
-            # Преобразуем обновленное дело обратно в ORM модель
-            updated_orm_case = CaseMapper.to_orm(case)
-            # ТУТ МОЖЕТ БЫТЬ НУЖЕН FLASH
+            # 4. Сохранение в БД
+            await self.session.flush()  # или session.commit() если нужна транзакция
 
-            # Важно: update здесь сохраняет изменения без явного merge и flush
-            return {'success': True, 'case': case}
-        except Exception as e:
+            # 5. Возврат доменного объекта
+            logger.info(f'Дело обновлено. ID={updated_case.id}')
+            return CaseMapper.to_domain(orm_case)
+        
+        except SQLAlchemyError  as e:
+            logger.error(f'Ошибка БД при обновлении дела ID={updated_case.id}: {e}')
             raise DatabaseErrorException(f'Ошибка при обновлении данных ДЕЛА: {str(e)}')
 
     async def delete(self, id: int) -> bool:
         try:
+            # 1. Выполнение запроса на извлечение данных из БД
             stmt = select(CaseORM).where(CaseORM.id == id)
             result = await self.session.execute(stmt)
             orm_case = result.scalars().first()
-            if not orm_case:
-                raise EntityNotFoundException('Дело не найдено')
 
+            if not orm_case:
+                logger.warning(f'Дело с ID {id} не найдено при удалении.')
+                raise EntityNotFoundException(f'Дело с ID {id} не найдено')
+
+            # 2. Удаление
             await self.session.delete(orm_case)
-            await self.session.flush()  # Фиксируем изменения в транзакции
+            await self.session.flush()  # Фиксируем изменения в транзакции !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            logger.info(f'Дело с ID {id} успешно удалено.')
             return True
 
-        except Exception as e:
+        except SQLAlchemyError as e:
             raise DatabaseErrorException(f'Ошибка при удалении ДЕЛА: {str(e)}')
-
-    async def _exists(self, id: str) -> bool:
-        '''Проверяет существование записи.'''
-        stmt = select(CaseORM).where(CaseORM.id == id)
-        result = await self.session.execute(stmt)
-        return result.scalars().first() is not None
