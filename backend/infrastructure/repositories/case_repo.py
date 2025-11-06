@@ -67,7 +67,8 @@ class CaseRepository(ICaseRepository):
 
             # 2. Проверка существования записи в БД
             if not orm_case:
-                raise EntityNotFoundException(f'Дело с ID {id} не найдено')
+                return None
+                #raise EntityNotFoundException(f'Дело с ID {id} не найдено')
 
             # 3. Преобразование ORM объекта в доменную сущность
             case = CaseMapper.to_domain(orm_case)
@@ -79,10 +80,14 @@ class CaseRepository(ICaseRepository):
             logger.error(f'Ошибка БД при получении дела ID={id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении ДЕЛА: {str(e)}')
 
-    async def get_all(self) -> List['Case']:
+    async def get_all_for_attorney(self, id: int) -> List['Case']:
         try:
             # 1. Получение записей из базы данных
-            stmt = select(CaseORM)
+            stmt = (
+                select(CaseORM)
+                .where(CaseORM.attorney_id == id)  # Фильтрация по адвокату
+                .order_by(CaseORM.created_at.desc())  # Например, сортировка по дате
+        )
             result = await self.session.execute(stmt)
             orm_cases = result.scalars().all()
 
@@ -103,7 +108,7 @@ class CaseRepository(ICaseRepository):
             # 2. Проверка наличия записи в БД 
             if not orm_case:
                 logger.error(f'Дело с ID {updated_case.id} не найдено.')
-                raise EntityNotFoundException(f'Дело с ID {id} не найдено')
+                raise EntityNotFoundException(f'Дело с ID {updated_case.id} не найдено')
 
             # 3. Прямое обновление полей ORM-объекта
             orm_case.name = updated_case.name
@@ -115,7 +120,7 @@ class CaseRepository(ICaseRepository):
             await self.session.flush()  # или session.commit() если нужна транзакция
 
             # 5. Возврат доменного объекта
-            logger.info(f'Дело обновлено. ID={updated_case.id}')
+            logger.info(f'Дело обновлено. ID= {updated_case.id}')
             return CaseMapper.to_domain(orm_case)
         
         except SQLAlchemyError  as e:
@@ -135,7 +140,7 @@ class CaseRepository(ICaseRepository):
 
             # 2. Удаление
             await self.session.delete(orm_case)
-            await self.session.flush()  # Фиксируем изменения в транзакции !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            await self.session.flush()
 
             logger.info(f'Дело с ID {id} успешно удалено.')
             return True
