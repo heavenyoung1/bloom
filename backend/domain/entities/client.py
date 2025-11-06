@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
+
 from backend.infrastructure.models.client import Messenger
 
 
@@ -15,4 +17,7 @@ class Client:
     messenger: Messenger
     messenger_handle: str
     owner_attorney_id: str
-    created_at: datetime
+
+    # Необязательные атрибуты
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

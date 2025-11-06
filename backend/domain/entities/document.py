@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-
+from typing import Optional
 
 @dataclass
 class Document:
@@ -11,4 +11,7 @@ class Document:
     client_id: int
     case_id: int
     attorney: int
-    created_at: datetime
+    
+    # Необязательные атрибуты
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

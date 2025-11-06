@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 
 @dataclass
@@ -10,4 +11,7 @@ class Contact:
     phone: str
     email: str
     case_id: str
-    created_at: datetime
+
+    # Необязательные атрибуты
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

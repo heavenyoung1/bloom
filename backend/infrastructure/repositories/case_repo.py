@@ -6,8 +6,14 @@ from typing import Dict, List, TYPE_CHECKING
 from backend.domain.entities.case import Case
 from backend.infrastructure.mappers import CaseMapper
 from backend.infrastructure.models import CaseORM
-from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
+from backend.core.exceptions import (
+    DatabaseErrorException, 
+    EntityNotFoundException,
+    EntityAlreadyExistsError,
+)
+
 from backend.infrastructure.repositories.interfaces import ICaseRepository
+from backend.core.logger import logger
 
 if TYPE_CHECKING:
     from backend.domain.entities.case import Case
@@ -19,24 +25,31 @@ class CaseRepository(ICaseRepository):
 
     async def save(self, case: Case) -> dict:
         try:
-            stmt = select(CaseORM).where(CaseORM.id == case.id)
-            result = await self.session.execute(stmt)
-            case_found = result.scalars().first()
+            # 1. Проверка существования сущности в БД
+            if await self._exists(case.id):
+                logger.info(f'Попытка сохранения дубликата ДЕЛА ID - {case.id}')
+                raise EntityAlreadyExistsError(f'ДЕЛО с ID {case.id} уже существует')
 
-            if case_found is None:
-                orm_case = CaseMapper.to_orm(domain=case)
-                self.session.add(orm_case)
-                await self.session.flush()
-                return {'success': True, 'id': orm_case.id}
-            else:
-                return {'success': False, 'id': orm_case.id}
+            # 2. Конвертация доменной сущности в ORM-объект
+            orm_case = CaseMapper.to_orm(case)
+
+            # 3. Добавление в сессию
+            self.session.add(orm_case)
+
+            # 4. flush() — отправляем в БД, получаем ID
+            await self.session.flush()
+
+            # 5. Обновляем ID в доменном объекте
+            case.id = orm_case.id
+            logger.info(f'ДЕЛО сохранено с ID - {case.id}')
+
+            return case
+
         except IntegrityError as e:
-            # Ловим ошибку попытки сохранения неуникальных данных
-            # ТУТ БУДЕТ ДРУГАЯ ОШИБКА
-            if 'attorneys_attorney_id_key' in str(e):
-                return {'success': False, 'id': None}
+            raise DatabaseErrorException(f'Ошибка целостности БД: {str(e)}')
+        
         except Exception as e:
-            raise DatabaseErrorException(f'Ошибка при сохранении ДЕЛА: {str(e)}')
+            raise DatabaseErrorException(f'Неожиданная ошибка при сохранении: {str(e)}')
 
     async def get(self, id: int) -> 'Case':
         try:
@@ -106,3 +119,9 @@ class CaseRepository(ICaseRepository):
 
         except Exception as e:
             raise DatabaseErrorException(f'Ошибка при удалении ДЕЛА: {str(e)}')
+
+    async def _exists(self, id: str) -> bool:
+        '''Проверяет существование записи.'''
+        stmt = select(CaseORM).where(CaseORM.id == id)
+        result = await self.session.execute(stmt)
+        return result.scalars().first() is not None
