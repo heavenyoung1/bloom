@@ -47,7 +47,7 @@ class CaseRepository(ICaseRepository):
             # 4. Обновляем ID в доменном объекте
             case.id = orm_case.id
 
-            logger.info(f'ДЕЛО сохранено.ID - {case.id}')
+            logger.info(f'ДЕЛО сохранено. ID - {case.id}')
             return case
         
         except IntegrityError as e:

@@ -2,13 +2,15 @@ from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Dict, List, TYPE_CHECKING
+from sqlalchemy.exc import (
+    SQLAlchemyError)
 
 from backend.domain.entities.client import Client
 from backend.infrastructure.mappers import ClientMapper
 from backend.infrastructure.models import ClientORM
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.infrastructure.repositories.interfaces import IClientRepository
-
+from backend.core.logger import logger
 
 class ClientRepository(IClientRepository):
     def __init__(self, session: AsyncSession):
@@ -16,31 +18,100 @@ class ClientRepository(IClientRepository):
 
     async def save(self, client: Client) -> Dict:
         try:
-            stmt = select(ClientORM).where(ClientORM.id == client.id)
-            result = await self.session.execute(stmt)
-            client_found = result.scalar_one_or_none()
+            # 1. Конвертация доменной сущности в ORM-объект
+            orm_client = ClientMapper.to_orm(client)
 
-            if client_found is None:
-                orm_client = ClientMapper.to_orm(domain=client)
-                self.session.add(orm_client)
-                await self.session.flush()
-                return {'success': True, 'id': orm_client.id}
-            else:
-                return {'success': False, 'id': orm_client.id}
+            # 2. Добавление в сессию
+            self.session.add(orm_client)
 
-        except Exception as e:
+            # 3. flush() — отправляем в БД, получаем ID
+            await self.session.flush()
+
+            # 4. Обновляем ID в доменном объекте
+            client.id = orm_client.id
+
+            logger.info(f'КЛИЕНТ сохранен. ID - {client.id}')
+            return client
+        
+        except IntegrityError as e:
+            logger.error(f'Ошибка при сохранении КЛИЕНТА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при сохранении КЛИЕНТА: {str(e)}')
+
+        except SQLAlchemyError  as e:
+            logger.error(f'Ошибка при сохранении КЛИЕНТА: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при сохранении КЛИЕНТА: {str(e)}')
         
     async def get(self, id: int) -> 'Client':
         try:
+            # 1. Получение записи из базы данных
             stmt = select(ClientORM).where(ClientORM.id == id)
             result = await self.session.execute(stmt)
-            orm_client = result.scalar_one_or_none()
+            orm_client = result.scalars().first()
 
+            # 2. Проверка существования записи в БД
             if not orm_client:
                 return None
-            
-            client = ClientMapper.to_domain(orm_client)
-            return client
-        except Exception as e:
+
+            # 3. Преобразование ORM объекта в доменную сущность
+            case = ClientMapper.to_domain(orm_client)
+
+            logger.info(f'КЛИЕНТ получен. ID - {case.id}')
+            return case
+
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка БД при получении КЛИЕНТА ID={id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении КЛИЕНТА: {str(e)}')
+        
+    async def get_all_for_attorney(self, id: int) -> List[Client]:
+        try:
+            # 1. Получение записи из базы данных
+            stmt = select(ClientORM).where(ClientORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_client = result.scalars().first()
+
+            # 2. Проверка существования записи в БД
+            if not orm_client:
+                return None
+
+            # 3. Преобразование ORM объекта в доменную сущность
+            client = ClientMapper.to_domain(orm_client)
+
+            logger.info(f'КЛИЕНТ получен. ID - {client.id}')
+            return client
+
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка БД при получении КЛИЕНТА ID={id}: {e}')
+            raise DatabaseErrorException(f'Ошибка при получении КЛИЕНТА: {str(e)}')
+        
+    async def update(self, updated_client: Client) -> 'Client':
+        try:
+            # 1. Выполнение запроса на извлечение данных из БД
+            stmt = select(ClientORM).where(ClientORM.id == updated_client.id)
+            result = await self.session.execute(stmt)
+            orm_client = result.scalars().first()
+
+            # 2. Проверка наличия записи в БД 
+            if not orm_client:
+                logger.error(f'КЛИЕНТ с ID {updated_client.id} не найден.')
+                raise EntityNotFoundException(f'КЛИЕНТ с ID {updated_client.id} не найден.')
+
+            # 3. Прямое обновление полей ORM-объекта
+            orm_client.name = updated_client.name
+            orm_client.type = updated_client.type
+            orm_client.email = updated_client.email
+            orm_client.phone = updated_client.phone
+            orm_client.address = updated_client.address
+            orm_client.messenger = updated_client.messenger
+            orm_client.messenger_handle = updated_client.messenger_handle
+            orm_client.personal_info = updated_client.personal_info
+
+            # 4. Сохранение в БД
+            await self.session.flush()  # или session.commit() если нужна транзакция
+
+            # 5. Возврат доменного объекта
+            logger.info(f'КЛИЕНТ обновлен. ID= {updated_client.id}')
+            return ClientMapper.to_domain(orm_client)
+        
+        except SQLAlchemyError  as e:
+            logger.error(f'Ошибка БД при обновлении КЛИЕНТА. ID={updated_client.id}: {e}')
+            raise DatabaseErrorException(f'Ошибка БД при обновлении КЛИЕНТА. ID={updated_client.id}: {e}')
