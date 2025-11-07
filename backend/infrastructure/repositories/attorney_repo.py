@@ -4,12 +4,24 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from backend.core.logger import logger
 
 from backend.domain.entities.attorney import Attorney
 from backend.infrastructure.mappers import AttorneyMapper
 from backend.infrastructure.models import AttorneyORM
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from ..repositories.interfaces import IAttorneyRepository
+
+from sqlalchemy.exc import (
+    SQLAlchemyError,
+    IntegrityError,
+    OperationalError,
+    ProgrammingError,
+    DataError,
+    NoResultFound,
+    MultipleResultsFound,
+    InvalidRequestError
+)
 
 if TYPE_CHECKING:
     from backend.domain.entities.attorney import Attorney
@@ -26,100 +38,53 @@ class AttorneyRepository(IAttorneyRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def save(self, attorney: Attorney) -> Dict:
-        '''
-        Сохранить нового юриста в базе данных.
-
-        Проверяет, существует ли уже юрист с данным ID. Если нет, добавляет нового.
-
-        :param attorney: Объект юриста, который нужно сохранить.
-        :return: Словарь с ключами 'success' (True, если сохранение успешно) и 'id' (ID сохранённого юриста).
-        '''
+    async def save(self, attorney: Attorney) -> 'Attorney':
         try:
-            stmt = select(AttorneyORM).where(AttorneyORM.id == attorney.id)
-            result = await self.session.execute(stmt)
-            attorney_found = result.scalar_one_or_none()
+            # 1. Конвертация доменной сущности в ORM-объект
+            orm_attorney = AttorneyMapper.to_orm(attorney)
 
-            if attorney_found is None:  # Если юрист не найден, добавляем нового
-                orm_attorney = AttorneyMapper.to_orm(domain=attorney)
-                self.session.add(orm_attorney)
-                await self.session.flush()  # ⚠️ фиксируем INSERT в транзакции
-                return {'success': True, 'id': orm_attorney.id}
-            else:
-                return {'success': False, 'id': attorney_found.id}
+            # 2. Добавление в сессию
+            self.session.add(orm_attorney)
+
+            # 3. flush() — отправляем в БД, получаем ID
+            await self.session.flush()
+
+            # 4. Обновляем ID в доменном объекте
+            attorney.id = orm_attorney.id
+
+            logger.info(f'ЮРИСТ сохранен. ID - {attorney.id}')
+            return attorney
+        
         except IntegrityError as e:
-            # Ловим ошибку попытки сохранения неуникальных данных
-            if 'attorneys_attorney_id_key' in str(e):
-                return {'success': False, 'id': None}
-        except Exception as e:
-            raise DatabaseErrorException(f'Ошибка при сохранении юриста: {str(e)}')
+            logger.error(f'Ошибка при сохранении ЮРИСТА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при сохранении ЮРИСТА: {str(e)}')
+
+        except SQLAlchemyError  as e:
+            logger.error(f'Ошибка при сохранении ЮРИСТА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при сохранении ЮРИСТА: {str(e)}')
 
     async def get(self, id: int) -> 'Attorney':
-        '''
-        Получить юриста по ID.
-
-        :param id: ID юриста.
-        :return: Объект юриста, если найден.
-        :raises DatabaseErrorException: Если произошла ошибка при получении юриста.
-        '''
         try:
+            # 1. Получение записи из базы данных
             stmt = select(AttorneyORM).where(AttorneyORM.id == id)
             result = await self.session.execute(stmt)
-            orm_attorney = result.scalar_one_or_none()
+            orm_attorney = result.scalars().first()
 
+            # 2. Проверка существования записи в БД
             if not orm_attorney:
                 return None
 
+            # 3. Преобразование ORM объекта в доменную сущность
             attorney = AttorneyMapper.to_domain(orm_attorney)
+
+            logger.info(f'ЮРИСТ успешно получен. ID - {attorney.id}')
             return attorney
-        except Exception as e:
-            raise DatabaseErrorException(f'Ошибка при получении юриста: {str(e)}')
 
-    async def get_by_attorney_id(self, attorney_id: str) -> 'Attorney':
-        '''
-        Получить юриста по его уникальному номеру удостоверения (attorney_id).
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка БД при получении ЮРИСТА ID={id}: {e}')
+            raise DatabaseErrorException(f'Ошибка БД при получении ЮРИСТА: {str(e)}')
 
-        :param attorney_id: Уникальный ID юриста.
-        :return: Объект юриста, если найден.
-        :raises DatabaseErrorException: Если произошла ошибка при получении юриста.
-        '''
-        try:
-            stmt = select(AttorneyORM).where(AttorneyORM.attorney_id == attorney_id)
-            result = await self.session.execute(stmt)
-            orm_attorney = result.scalar_one_or_none()
-            
-            if not orm_attorney:
-                return None
-
-            attorney = AttorneyMapper.to_domain(orm_attorney)
-            return attorney
-        except Exception as e:
-            raise DatabaseErrorException(f'Ошибка при получении юриста: {str(e)}')
-
-    async def get_all(self) -> List['Attorney']:
-        '''
-        Получить всех юристов из базы данных.
-
-        :return: Список всех юристов в базе данных.
-        :raises DatabaseErrorException: Если произошла ошибка при получении списка юристов.
-        '''
-        try:
-            stmt = select(AttorneyORM)
-            result = await self.session.execute(stmt)
-            orm_attorneys = result.scalars().all()
-            if not orm_attorneys:
-                raise EntityNotFoundException('Юристы не найдены')
-
-            domain_attorneys = [
-                AttorneyMapper.to_domain(orm_attorney) for orm_attorney in orm_attorneys
-            ]
-            return domain_attorneys
-        except Exception as e:
-            raise DatabaseErrorException(
-                f'Ошибка при получении списка юристов: {str(e)}'
-            )
-
-    async def update(self, id: int, updated_attorney: Attorney) -> Dict:
+    async def update(self, updated_attorney: Attorney) -> 'Attorney':
         '''
         Обновить данные юриста по ID.
 
@@ -129,52 +94,53 @@ class AttorneyRepository(IAttorneyRepository):
         :raises DatabaseErrorException: Если произошла ошибка при обновлении данных.
         '''
         try:
-            stmt = select(AttorneyORM).where(AttorneyORM.id == id)
+            # 1. Выполнение запроса на извлечение данных из БД
+            stmt = select(AttorneyORM).where(AttorneyORM.id == updated_attorney.id)
             result = await self.session.execute(stmt)
             orm_attorney = result.scalar_one_or_none()
 
+            # 2. Проверка наличия записи в БД 
             if not orm_attorney:
-                raise EntityNotFoundException('Юрист не найден')
-            attorney = AttorneyMapper.to_domain(orm_attorney)
+                logger.error(f'Юрист с ID {updated_attorney.id} не найден.')
+                raise EntityNotFoundException(f'Юрист с ID {updated_attorney.id} не найден.')
 
-            # Обновляем поля адвоката
-            attorney.first_name = updated_attorney.first_name
-            attorney.last_name = updated_attorney.last_name
-            attorney.patronymic = updated_attorney.patronymic
-            attorney.email = updated_attorney.email
-            attorney.phone = updated_attorney.phone
-            attorney.password_hash = updated_attorney.password_hash
-            attorney.updated_at = func.now()
+            # 3. Прямое обновление полей ORM-объекта
+            orm_attorney.first_name = updated_attorney.first_name
+            orm_attorney.last_name = updated_attorney.last_name
+            orm_attorney.patronymic = updated_attorney.patronymic
+            orm_attorney.email = updated_attorney.email
+            orm_attorney.phone = updated_attorney.phone
+            orm_attorney.password_hash = updated_attorney.password_hash
+            # orm_attorney.updated_at = func.now()!!!!!!!!!!!!!!
 
-            # Преобразуем обновленного адвоката обратно в ORM модель
-            updated_orm_attorney = AttorneyMapper.to_orm(attorney)
+            # 4. Сохранение в БД
+            await self.session.flush()  # или session.commit() если нужна транзакция
 
-            # Важно: update здесь сохраняет изменения без явного merge и flush
-            return {'success': True, 'attorney': attorney}
-        except Exception as e:
-            raise DatabaseErrorException(
-                f'Ошибка при обновлении данных юриста: {str(e)}'
-            )
+            # 5. Возврат доменного объекта
+            logger.info(f'Юрист обновлен. ID = {updated_attorney.id}')
+            return AttorneyMapper.to_domain(orm_attorney)
+        
+        except SQLAlchemyError  as e:
+            logger.error(f'Ошибка БД при обновлении ЮРИСТА ID={updated_attorney.id}: {e}')
+            raise DatabaseErrorException(f'Ошибка при обновлении данных ДЕЛА: {str(e)}')
 
     async def delete(self, id: int) -> bool:
-        '''
-        Удалить юриста по ID.
-
-        :param id: ID юриста, которого нужно удалить.
-        :return: True, если удаление прошло успешно.
-        :raises DatabaseErrorException: Если произошла ошибка при удалении.
-        '''
         try:
+            # 1. Выполнение запроса на извлечение данных из БД
             stmt = select(AttorneyORM).where(AttorneyORM.id == id)
             result = await self.session.execute(stmt)
-            orm_attorney = result.scalar_one_or_none()
+            orm_attorney = result.scalars().first()
 
             if not orm_attorney:
-                raise EntityNotFoundException('Юрист не найден')
+                logger.warning(f'ЮРИСТ с ID {id} не найден при удалении.')
+                raise EntityNotFoundException(f'ЮРИСТ с ID {id} не найден при удалении.')
 
+            # 2. Удаление
             await self.session.delete(orm_attorney)
-            await self.session.flush()  # Фиксируем изменения в транзакции
+            await self.session.flush()
 
+            logger.info(f'ЮРИСТ с ID {id} успешно удален.')
             return True
-        except Exception as e:
-            raise DatabaseErrorException(f'Ошибка при удалении юриста: {str(e)}')
+
+        except SQLAlchemyError as e:
+            raise DatabaseErrorException(f'Ошибка при удалении ЮРИСТА: {str(e)}')

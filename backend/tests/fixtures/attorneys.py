@@ -8,8 +8,7 @@ import pytest
 async def persisted_attorney_id(attorney_repo, sample_attorney):
     '''Сохраняет юриста и возвращает ID юриста.'''
     result = await attorney_repo.save(sample_attorney)
-    assert result['success'] is True
-    return result['id']
+    return result.id
 
 @pytest.fixture
 def sample_attorney():

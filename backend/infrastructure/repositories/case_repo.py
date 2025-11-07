@@ -41,10 +41,10 @@ class CaseRepository(ICaseRepository):
             # 2. Добавление в сессию
             self.session.add(orm_case)
 
-            # 4. flush() — отправляем в БД, получаем ID
+            # 3. flush() — отправляем в БД, получаем ID
             await self.session.flush()
 
-            # 5. Обновляем ID в доменном объекте
+            # 4. Обновляем ID в доменном объекте
             case.id = orm_case.id
 
             logger.info(f'ДЕЛО сохранено.ID - {case.id}')

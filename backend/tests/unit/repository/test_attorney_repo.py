@@ -1,6 +1,20 @@
 import pytest
 from backend.infrastructure.mappers import AttorneyMapper
 from backend.core import logger
+from backend.domain.entities.attorney import Attorney
+from backend.infrastructure.models.attorney import AttorneyORM
+from sqlalchemy.future import select
+
+from backend.core.exceptions import (
+    DatabaseErrorException, 
+    EntityNotFoundException,
+    EntityAlreadyExistsError,
+)
+
+from sqlalchemy.exc import (
+    SQLAlchemyError,
+    IntegrityError,
+    )
 
 
 class TestAttorneyRepository:
@@ -9,92 +23,77 @@ class TestAttorneyRepository:
     async def test_save_success(self, attorney_repo, sample_attorney):
         '''Тест: сохранение нового юриста'''
         save_result = await attorney_repo.save(sample_attorney)
-        assert save_result['success'] is True
+        assert save_result is not None
+        assert save_result.attorney_id == sample_attorney.attorney_id
 
     # -------- SAVE AND GET --------
     @pytest.mark.asyncio
     async def test_save_and_get_success(self, attorney_repo, sample_attorney):
         '''Тест: сохранение нового юриста'''
         save_result = await attorney_repo.save(sample_attorney)
-        assert save_result['success'] is True
-        id = save_result['id']
+        assert save_result is not None
+        logger.debug(f'Сохранен ЮРИСТ {save_result}')
+        id = save_result.id
 
         attorney = await attorney_repo.get(id)
         assert attorney.attorney_id == sample_attorney.attorney_id
-        # logger.debug(f'ASSERTION {attorney}')
 
     # -------- SAVE DUPLICATE --------
     @pytest.mark.asyncio
     async def test_save_duplicate(self, attorney_repo, sample_attorney):
         '''Тест: сохранение нового юриста'''
-        save_result = await attorney_repo.save(sample_attorney)
-        assert save_result['success'] is True
-        assert save_result['id'] is not None
+        # 1. Сначала сохраняем исходный объект (это должно пройти успешно)
+        first_save  = await attorney_repo.save(sample_attorney)
+        assert isinstance(first_save, Attorney)
+        assert first_save.id is not None  # Убедимся, что ID был назначен
 
-        repeat_save_result = await attorney_repo.save(sample_attorney)
-        assert repeat_save_result['success'] is False
-        assert repeat_save_result['id'] is None
+        # 2. Теперь пытаемся сохранить тот же объект повторно (должен вызвать исключение)
+        with pytest.raises(DatabaseErrorException) as exc_info:
+            await attorney_repo.save(sample_attorney)
 
-    # -------- GET BY ATTORNEY_ID --------
+        # 3. Проверяем сообщение исключения
+        assert 'Ошибка при сохранении ЮРИСТА' in str(exc_info.value)
+        assert 'duplicate key' in str(exc_info.value).lower()  # подсказка из PostgreSQL
+
     @pytest.mark.asyncio
-    async def test_get_by_attorney_id(self, attorney_repo, sample_attorney):
-        '''Тест: получение юриста по номеру его удостоверения (attorney_id), не ID'''
-        save_result = await attorney_repo.save(sample_attorney)
-        assert save_result['success'] is True
-        attorney = await attorney_repo.get_by_attorney_id(sample_attorney.attorney_id)
-        assert attorney.attorney_id == sample_attorney.attorney_id
+    async def test_update_success(self, attorney_repo, sample_attorney, sample_update_attorney):
+        # Вызываем метод обновления
+        saved_attorney = await attorney_repo.save(sample_attorney)
+        assert isinstance(saved_attorney, Attorney)
+        assert saved_attorney.id is not None
+        #logger.debug(f'ID для сохраненного ЮРИСТА {saved_attorney.id}')
 
-    # -------- GET ALL ATORNEYS --------
-    @pytest.mark.asyncio
-    async def test_get_all_attorneys(self, attorney_repo, attorneys_list):
-        '''Тест:'''
-        for attorney_single in attorneys_list:
-            await attorney_repo.save(AttorneyMapper.to_orm(attorney_single))
+        # Присваиваем ID из сохранённого объекта
+        sample_update_attorney.id = saved_attorney.id
+        logger.debug(f'ID для сохраненного ЮРИСТА {saved_attorney.id}')
 
-        result = await attorney_repo.get_all()
-        assert len(result) == len(attorneys_list)
+        update_attorney = await attorney_repo.update(sample_update_attorney)
 
-        # Проверка, что каждый юрист в базе имеет правильный attorney_id
-        for attorney, saved_attorney in zip(result, attorneys_list):
-            assert attorney.attorney_id == saved_attorney.attorney_id
-            assert attorney.first_name == saved_attorney.first_name
-            assert attorney.last_name == saved_attorney.last_name
-            assert attorney.patronymic == saved_attorney.patronymic
-            assert attorney.email == saved_attorney.email
-            assert attorney.phone == saved_attorney.phone
-            assert attorney.is_active == saved_attorney.is_active
+        assert update_attorney.first_name == sample_update_attorney.first_name
+        assert update_attorney.last_name == sample_update_attorney.last_name
+        assert update_attorney.patronymic == sample_update_attorney.patronymic
+        assert update_attorney.email == sample_update_attorney.email
+        assert update_attorney.phone == sample_update_attorney.phone
+        assert update_attorney.password_hash == sample_update_attorney.password_hash
 
-    # -------- GET ALL ATORNEYS --------
-    @pytest.mark.asyncio
-    async def test_update_attorney(
-        self, attorney_repo, sample_attorney, sample_update_attorney
-    ):
-        '''Тест:'''
-        save_result = await attorney_repo.save(sample_attorney)
-        id = save_result['id']
-        assert save_result['success'] is True
-        update_result = await attorney_repo.update(
-            id=id, updated_attorney=sample_update_attorney
-        )
 
-        assert update_result['success'] is True
-        assert update_result['attorney'].email == sample_update_attorney.email
-        assert update_result['attorney'].phone == sample_update_attorney.phone
-        assert (
-            update_result['attorney'].password_hash
-            == sample_update_attorney.password_hash
-        )
-        # logger.debug(f'RESULT -> {update_result['attorney']}')
+    async def delete(self, id: int) -> bool:
+        try:
+            # 1. Выполнение запроса на извлечение данных из БД
+            stmt = select(AttorneyORM).where(AttorneyORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_attorney = result.scalars().first()
 
-    # -------- DELETE ATORNEY --------
-    @pytest.mark.asyncio
-    async def test_delete_attorney(self, attorney_repo, sample_attorney):
-        '''Тест:'''
-        save_result = await attorney_repo.save(sample_attorney)
-        assert save_result['success'] is True
-        id = save_result['id']
-        delete_result = await attorney_repo.delete(id)
-        assert delete_result is True
-        get_result = await attorney_repo.get(id)
-        assert get_result is None
-        # logger.debug(f'RESULT -> {get_result}')
+            if not orm_attorney:
+                logger.warning(f'ЮРИСТ с ID {id} не найден при удалении.')
+                raise EntityNotFoundException(f'ЮРИСТ с ID {id} не найден при удалении.')
+
+            # 2. Удаление
+            await self.session.delete(orm_attorney)
+            await self.session.flush()
+
+            logger.info(f'ЮРИСТ с ID {id} успешно удалено.')
+            return True
+
+        except SQLAlchemyError as e:
+            raise DatabaseErrorException(f'Ошибка при удалении ЮРИСТА: {str(e)}')
