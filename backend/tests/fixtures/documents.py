@@ -16,14 +16,13 @@ def temp_storage_dir():
     #shutil.rmtree(temp_dir, ignore_errors=True)
 
 @pytest.fixture
-def sample_document(test_case, persisted_attorney_id, persisted_case):
+def sample_document(persisted_attorney_id, persisted_case):
     '''
     Создает доменный объект документа для тестов
     '''
     return Document(
         id=None,
         file_name='test_contract.pdf',
-        case_id=test_case.id,
         storage_path=None,
         file_size=None,
         case_id=persisted_case,
