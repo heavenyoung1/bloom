@@ -6,6 +6,7 @@ from backend.tests.fixtures.attorneys import *
 from backend.tests.fixtures.cases import *
 from backend.tests.fixtures.contacts import *
 from backend.tests.fixtures.clients import *
+from backend.tests.fixtures.documents import *
 
 
 def pytest_configure(config):

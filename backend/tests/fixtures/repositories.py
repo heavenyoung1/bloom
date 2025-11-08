@@ -37,7 +37,7 @@ def contact_repo(session):
 @pytest.fixture
 def document_repo(session):
     '''Репозиторий с тестовой сессией'''
-    return DocumentRepository(session)
+    return DocumentRepository(session, storage_path=temp_storage_dir)
 
 
 @pytest.fixture
