@@ -34,3 +34,7 @@ class ValidationException(BaseCustomException):
     def __init__(self, message: str = 'Невалидные данные'):
         self.message = message
         super().__init__(self.message)
+
+
+class FileStorageException(BaseCustomException):
+    '''Ошибка сохранения файла.'''

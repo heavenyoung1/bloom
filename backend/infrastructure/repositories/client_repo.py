@@ -16,7 +16,7 @@ class ClientRepository(IClientRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def save(self, client: Client) -> Dict:
+    async def save(self, client: Client) -> 'Client':
         try:
             # 1. Конвертация доменной сущности в ORM-объект
             orm_client = ClientMapper.to_orm(client)
@@ -62,7 +62,7 @@ class ClientRepository(IClientRepository):
             logger.error(f'Ошибка БД при получении КЛИЕНТА ID={id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении КЛИЕНТА: {str(e)}')
 
-    async def get_all_for_attorney(self, id: int) -> List[Client]:
+    async def get_all_for_attorney(self, id: int) -> List['Client']:
         try:
             # 1. Получение записей из базы данных
             stmt = (

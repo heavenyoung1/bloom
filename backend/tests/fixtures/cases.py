@@ -8,8 +8,7 @@ from backend.infrastructure.models import CaseStatus
 async def persisted_case(case_repo, sample_case):
     '''Сохраняет дело и возвращает ID дела.'''
     result = await case_repo.save(sample_case)
-    assert result['success'] is True
-    return result['id']
+    return result.id
 
 
 @pytest.fixture

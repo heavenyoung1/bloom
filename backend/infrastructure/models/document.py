@@ -16,7 +16,7 @@ class DocumentORM(TimeStampMixin, Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     file_name: Mapped[str] = mapped_column(String(300), nullable=False)
     storage_path: Mapped[str] = mapped_column(String(1000), nullable=False)
-    checksum: Mapped[str | None] = mapped_column(String(64))
+    file_size: Mapped[str | None] = mapped_column(String(64))
 
     case_id: Mapped[int] = mapped_column(
         ForeignKey('cases.id', ondelete='SET NULL'), index=True

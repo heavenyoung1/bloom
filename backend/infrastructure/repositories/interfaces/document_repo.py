@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
 
 
-class IDocunentRepository(ABC):
+class IDocumentRepository(ABC):
     pass
