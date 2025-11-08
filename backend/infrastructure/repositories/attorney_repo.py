@@ -20,7 +20,7 @@ from sqlalchemy.exc import (
     DataError,
     NoResultFound,
     MultipleResultsFound,
-    InvalidRequestError
+    InvalidRequestError,
 )
 
 if TYPE_CHECKING:
@@ -54,12 +54,12 @@ class AttorneyRepository(IAttorneyRepository):
 
             logger.info(f'ЮРИСТ сохранен. ID - {attorney.id}')
             return attorney
-        
+
         except IntegrityError as e:
             logger.error(f'Ошибка при сохранении ЮРИСТА: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при сохранении ЮРИСТА: {str(e)}')
 
-        except SQLAlchemyError  as e:
+        except SQLAlchemyError as e:
             logger.error(f'Ошибка при сохранении ЮРИСТА: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при сохранении ЮРИСТА: {str(e)}')
 
@@ -99,10 +99,12 @@ class AttorneyRepository(IAttorneyRepository):
             result = await self.session.execute(stmt)
             orm_attorney = result.scalar_one_or_none()
 
-            # 2. Проверка наличия записи в БД 
+            # 2. Проверка наличия записи в БД
             if not orm_attorney:
                 logger.error(f'Юрист с ID {updated_attorney.id} не найден.')
-                raise EntityNotFoundException(f'Юрист с ID {updated_attorney.id} не найден.')
+                raise EntityNotFoundException(
+                    f'Юрист с ID {updated_attorney.id} не найден.'
+                )
 
             # 3. Прямое обновление полей ORM-объекта
             orm_attorney.first_name = updated_attorney.first_name
@@ -119,9 +121,11 @@ class AttorneyRepository(IAttorneyRepository):
             # 5. Возврат доменного объекта
             logger.info(f'Юрист обновлен. ID = {updated_attorney.id}')
             return AttorneyMapper.to_domain(orm_attorney)
-        
-        except SQLAlchemyError  as e:
-            logger.error(f'Ошибка БД при обновлении ЮРИСТА ID={updated_attorney.id}: {e}')
+
+        except SQLAlchemyError as e:
+            logger.error(
+                f'Ошибка БД при обновлении ЮРИСТА ID={updated_attorney.id}: {e}'
+            )
             raise DatabaseErrorException(f'Ошибка при обновлении данных ДЕЛА: {str(e)}')
 
     async def delete(self, id: int) -> bool:
@@ -133,7 +137,9 @@ class AttorneyRepository(IAttorneyRepository):
 
             if not orm_attorney:
                 logger.warning(f'ЮРИСТ с ID {id} не найден при удалении.')
-                raise EntityNotFoundException(f'ЮРИСТ с ID {id} не найден при удалении.')
+                raise EntityNotFoundException(
+                    f'ЮРИСТ с ID {id} не найден при удалении.'
+                )
 
             # 2. Удаление
             await self.session.delete(orm_attorney)

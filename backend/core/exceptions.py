@@ -5,9 +5,12 @@ class BaseCustomException(Exception):
         self.message = message
         super().__init__(self.message)
 
+
 class EntityAlreadyExistsError(BaseCustomException):
     '''Исключение при попытке создать сущность с уже существующим ID.'''
+
     pass
+
 
 class EntityNotFoundException(BaseCustomException):
     '''Ошибка, когда сущность не найдена.'''

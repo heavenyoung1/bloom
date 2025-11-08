@@ -6,17 +6,28 @@ from typing import TYPE_CHECKING
 from backend.infrastructure.models._base import Base
 
 if TYPE_CHECKING:
-    from backend.infrastructure.models import Base, EventORM, ClientORM, DocumentORM, CaseORM
+    from backend.infrastructure.models import (
+        Base,
+        EventORM,
+        ClientORM,
+        DocumentORM,
+        CaseORM,
+    )
+
 
 class AttorneyORM(TimeStampMixin, Base):
     __tablename__ = 'attorneys'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    attorney_id: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)  # номер удостоверения
+    attorney_id: Mapped[str] = mapped_column(
+        String(50), nullable=False, unique=True
+    )  # номер удостоверения
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
     patronymic: Mapped[str | None] = mapped_column(String(50))
-    email: Mapped[str] = mapped_column(String(50), nullable=False, unique=True, index=True)
+    email: Mapped[str] = mapped_column(
+        String(50), nullable=False, unique=True, index=True
+    )
     phone: Mapped[str] = mapped_column(String(20))
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

@@ -11,6 +11,7 @@ async def persisted_case(case_repo, sample_case):
     assert result['success'] is True
     return result['id']
 
+
 @pytest.fixture
 async def sample_case(persisted_attorney_id, persisted_client_id, fixed_now):
     '''Фикстура для дефолтного дела с реальными attorney_id и client_id.'''

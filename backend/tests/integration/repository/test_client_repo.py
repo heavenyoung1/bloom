@@ -3,7 +3,7 @@ from backend.domain.entities.client import Client
 from backend.infrastructure.mappers import ClientMapper
 from backend.core import logger
 from backend.core.exceptions import (
-    DatabaseErrorException, 
+    DatabaseErrorException,
     EntityNotFoundException,
     EntityAlreadyExistsError,
 )
@@ -16,8 +16,9 @@ from sqlalchemy.exc import (
     DataError,
     NoResultFound,
     MultipleResultsFound,
-    InvalidRequestError
+    InvalidRequestError,
 )
+
 
 class TestClientRepository:
     # -------- SAVE --------
@@ -58,18 +59,24 @@ class TestClientRepository:
         assert get_case.owner_attorney_id == sample_client.owner_attorney_id
 
     @pytest.mark.asyncio
-    async def test_get_all_success(self, client_repo, clients_list, persisted_attorney_id):
+    async def test_get_all_success(
+        self, client_repo, clients_list, persisted_attorney_id
+    ):
         for i in clients_list:
             await client_repo.save(i)
 
         get_clients = await client_repo.get_all_for_attorney(persisted_attorney_id)
         assert len(get_clients) == len(clients_list)
         for client in get_clients:
-            logger.info(f'ID клиента = {client.id}; ID юриста = {client.owner_attorney_id}')
+            logger.info(
+                f'ID клиента = {client.id}; ID юриста = {client.owner_attorney_id}'
+            )
             assert client.owner_attorney_id == persisted_attorney_id
 
     @pytest.mark.asyncio
-    async def test_update_success(self, client_repo, sample_client, sample_update_client, persisted_attorney_id):
+    async def test_update_success(
+        self, client_repo, sample_client, sample_update_client, persisted_attorney_id
+    ):
         '''Тест: Сохранение дела со связанными клиентом и адвокатом.'''
         # Вызываем метод обновления
         saved_case = await client_repo.save(sample_client)

@@ -8,10 +8,12 @@ from enum import Enum
 if TYPE_CHECKING:
     from backend.infrastructure.models import AttorneyORM, CaseORM
 
+
 class Messenger(str, Enum):
     TG = 'Telegram'
     WA = 'WhatsApp'
     MA = 'MAX'
+
 
 class ClientORM(TimeStampMixin, Base):
     __tablename__ = 'clients'
@@ -32,4 +34,6 @@ class ClientORM(TimeStampMixin, Base):
 
     # связи
     owner_attorney: Mapped['AttorneyORM'] = relationship(back_populates='clients')
-    cases: Mapped[list['CaseORM']] = relationship(back_populates='client', cascade='all, delete-orphan')
+    cases: Mapped[list['CaseORM']] = relationship(
+        back_populates='client', cascade='all, delete-orphan'
+    )

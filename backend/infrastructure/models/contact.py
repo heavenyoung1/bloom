@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from backend.infrastructure.models import CaseORM
 
+
 class ContactORM(TimeStampMixin, Base):
     __tablename__ = 'contacts'
 
@@ -17,5 +18,7 @@ class ContactORM(TimeStampMixin, Base):
     phone: Mapped[str] = mapped_column(String(20))
     email: Mapped[str | None] = mapped_column(String(50))
 
-    case_id: Mapped[int] = mapped_column(ForeignKey('cases.id', ondelete='CASCADE'), nullable=False, index=True)
+    case_id: Mapped[int] = mapped_column(
+        ForeignKey('cases.id', ondelete='CASCADE'), nullable=False, index=True
+    )
     case: Mapped['CaseORM'] = relationship(back_populates='contacts')

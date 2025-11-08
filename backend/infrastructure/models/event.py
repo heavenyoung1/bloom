@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from backend.infrastructure.models import AttorneyORM, CaseORM
 
+
 class EventORM(TimeStampMixin, Base):
     __tablename__ = 'events'
 
@@ -16,10 +17,16 @@ class EventORM(TimeStampMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(String(2000))
     event_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    event_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    event_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
 
-    case_id: Mapped[int] = mapped_column(ForeignKey('cases.id', ondelete='CASCADE'), nullable=False, index=True)
-    attorney_id: Mapped[int] = mapped_column(ForeignKey('attorneys.id', ondelete='RESTRICT'), nullable=False, index=True)
+    case_id: Mapped[int] = mapped_column(
+        ForeignKey('cases.id', ondelete='CASCADE'), nullable=False, index=True
+    )
+    attorney_id: Mapped[int] = mapped_column(
+        ForeignKey('attorneys.id', ondelete='RESTRICT'), nullable=False, index=True
+    )
 
     case: Mapped['CaseORM'] = relationship(back_populates='events')
     attorney: Mapped['AttorneyORM'] = relationship(back_populates='events')

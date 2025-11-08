@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from backend.infrastructure.models import AttorneyORM, CaseORM
 
+
 class DocumentORM(TimeStampMixin, Base):
     __tablename__ = 'documents'
 
@@ -17,8 +18,12 @@ class DocumentORM(TimeStampMixin, Base):
     storage_path: Mapped[str] = mapped_column(String(1000), nullable=False)
     checksum: Mapped[str | None] = mapped_column(String(64))
 
-    case_id: Mapped[int] = mapped_column(ForeignKey('cases.id', ondelete='SET NULL'), index=True)
-    attorney_id: Mapped[int] = mapped_column(ForeignKey('attorneys.id', ondelete='SET NULL'), index=True)
+    case_id: Mapped[int] = mapped_column(
+        ForeignKey('cases.id', ondelete='SET NULL'), index=True
+    )
+    attorney_id: Mapped[int] = mapped_column(
+        ForeignKey('attorneys.id', ondelete='SET NULL'), index=True
+    )
 
     case: Mapped['CaseORM'] = relationship(back_populates='documents')
     attorney: Mapped['AttorneyORM'] = relationship(back_populates='documents')

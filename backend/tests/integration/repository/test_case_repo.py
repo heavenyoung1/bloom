@@ -3,7 +3,7 @@ from backend.domain.entities.case import Case
 from backend.infrastructure.mappers import CaseMapper
 from backend.core import logger
 from backend.core.exceptions import (
-    DatabaseErrorException, 
+    DatabaseErrorException,
     EntityNotFoundException,
     EntityAlreadyExistsError,
 )
@@ -16,8 +16,9 @@ from sqlalchemy.exc import (
     DataError,
     NoResultFound,
     MultipleResultsFound,
-    InvalidRequestError
+    InvalidRequestError,
 )
+
 
 class TestCaseRepository:
     # -------- SAVE --------
@@ -33,13 +34,12 @@ class TestCaseRepository:
         assert case.attorney_id == sample_case.attorney_id
         assert case.description == sample_case.description
 
-
     # -------- SAVE DUPLICATE --------
     @pytest.mark.asyncio
     async def test_save_duplicate(self, case_repo, sample_case):
         '''Тест: Сохранение дела со связанными клиентом и адвокатом.'''
         # 1. Сначала сохраняем исходный объект (это должно пройти успешно)
-        first_save  = await case_repo.save(sample_case)
+        first_save = await case_repo.save(sample_case)
         assert isinstance(first_save, Case)
         assert first_save.id is not None  # Убедимся, что ID был назначен
 
@@ -62,7 +62,7 @@ class TestCaseRepository:
         assert get_case.client_id == sample_case.client_id
         assert get_case.attorney_id == sample_case.attorney_id
         assert get_case.name == sample_case.name
-    
+
     @pytest.mark.asyncio
     async def test_get_all_success(self, case_repo, cases_list, persisted_attorney_id):
         for i in cases_list:
@@ -92,7 +92,7 @@ class TestCaseRepository:
 
         update_case = await case_repo.update(sample_update_case)
 
-         # Проверяем данные после изменения
+        # Проверяем данные после изменения
         assert update_case.name == sample_update_case.name
         assert update_case.status == sample_update_case.status
         assert update_case.description == sample_update_case.description
@@ -110,5 +110,3 @@ class TestCaseRepository:
         check_empty = await case_repo.get(saved_case.id)
         logger.info(f'Запись удалилась, тут None == {check_empty}')
         assert check_empty is None
-
-

@@ -8,7 +8,7 @@ from sqlalchemy.exc import (
     DataError,
     NoResultFound,
     MultipleResultsFound,
-    InvalidRequestError
+    InvalidRequestError,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Dict, List, TYPE_CHECKING
@@ -17,7 +17,7 @@ from backend.domain.entities.case import Case
 from backend.infrastructure.mappers import CaseMapper
 from backend.infrastructure.models import CaseORM
 from backend.core.exceptions import (
-    DatabaseErrorException, 
+    DatabaseErrorException,
     EntityNotFoundException,
     EntityAlreadyExistsError,
 )
@@ -49,12 +49,12 @@ class CaseRepository(ICaseRepository):
 
             logger.info(f'ДЕЛО сохранено. ID - {case.id}')
             return case
-        
+
         except IntegrityError as e:
             logger.error(f'Ошибка при сохранении ДЕЛА: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при сохранении ДЕЛА: {str(e)}')
 
-        except SQLAlchemyError  as e:
+        except SQLAlchemyError as e:
             logger.error(f'Ошибка при сохранении ДЕЛА: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при сохранении ДЕЛА: {str(e)}')
 
@@ -68,7 +68,7 @@ class CaseRepository(ICaseRepository):
             # 2. Проверка существования записи в БД
             if not orm_case:
                 return None
-                #raise EntityNotFoundException(f'Дело с ID {id} не найдено')
+                # raise EntityNotFoundException(f'Дело с ID {id} не найдено')
 
             # 3. Преобразование ORM объекта в доменную сущность
             case = CaseMapper.to_domain(orm_case)
@@ -87,13 +87,13 @@ class CaseRepository(ICaseRepository):
                 select(CaseORM)
                 .where(CaseORM.attorney_id == id)  # Фильтрация по адвокату
                 .order_by(CaseORM.created_at.desc())  # Например, сортировка по дате
-        )
+            )
             result = await self.session.execute(stmt)
             orm_cases = result.scalars().all()
 
             # 2. Списковый генератор для всех записей из базы данных
             return [CaseMapper.to_domain(orm_case) for orm_case in orm_cases]
-        
+
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении всех ДЕЛ: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при получении ДЕЛА: {str(e)}')
@@ -105,7 +105,7 @@ class CaseRepository(ICaseRepository):
             result = await self.session.execute(stmt)
             orm_case = result.scalars().first()
 
-            # 2. Проверка наличия записи в БД 
+            # 2. Проверка наличия записи в БД
             if not orm_case:
                 logger.error(f'Дело с ID {updated_case.id} не найдено.')
                 raise EntityNotFoundException(f'Дело с ID {updated_case.id} не найдено')
@@ -122,8 +122,8 @@ class CaseRepository(ICaseRepository):
             # 5. Возврат доменного объекта
             logger.info(f'Дело обновлено. ID= {updated_case.id}')
             return CaseMapper.to_domain(orm_case)
-        
-        except SQLAlchemyError  as e:
+
+        except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при обновлении дела ID={updated_case.id}: {e}')
             raise DatabaseErrorException(f'Ошибка при обновлении данных ДЕЛА: {str(e)}')
 

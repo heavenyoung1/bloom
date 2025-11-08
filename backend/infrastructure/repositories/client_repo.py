@@ -2,8 +2,7 @@ from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Dict, List, TYPE_CHECKING
-from sqlalchemy.exc import (
-    SQLAlchemyError)
+from sqlalchemy.exc import SQLAlchemyError
 
 from backend.domain.entities.client import Client
 from backend.infrastructure.mappers import ClientMapper
@@ -11,6 +10,7 @@ from backend.infrastructure.models import ClientORM
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.infrastructure.repositories.interfaces import IClientRepository
 from backend.core.logger import logger
+
 
 class ClientRepository(IClientRepository):
     def __init__(self, session: AsyncSession):
@@ -32,15 +32,15 @@ class ClientRepository(IClientRepository):
 
             logger.info(f'КЛИЕНТ сохранен. ID - {client.id}')
             return client
-        
+
         except IntegrityError as e:
             logger.error(f'Ошибка при сохранении КЛИЕНТА: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при сохранении КЛИЕНТА: {str(e)}')
 
-        except SQLAlchemyError  as e:
+        except SQLAlchemyError as e:
             logger.error(f'Ошибка при сохранении КЛИЕНТА: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при сохранении КЛИЕНТА: {str(e)}')
-        
+
     async def get(self, id: int) -> 'Client':
         try:
             # 1. Получение записи из базы данных
@@ -61,7 +61,7 @@ class ClientRepository(IClientRepository):
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении КЛИЕНТА ID={id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении КЛИЕНТА: {str(e)}')
-        
+
     async def get_all_for_attorney(self, id: int) -> List[Client]:
         try:
             # 1. Получение записей из базы данных
@@ -69,7 +69,7 @@ class ClientRepository(IClientRepository):
                 select(ClientORM)
                 .where(ClientORM.owner_attorney_id == id)  # Фильтрация по адвокату
                 .order_by(ClientORM.created_at.desc())  # Например, сортировка по дате
-        )
+            )
             result = await self.session.execute(stmt)
             orm_cases = result.scalars().all()
 
@@ -79,7 +79,7 @@ class ClientRepository(IClientRepository):
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении КЛИЕНТА ID={id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении КЛИЕНТА: {str(e)}')
-        
+
     async def update(self, updated_client: Client) -> 'Client':
         try:
             # 1. Выполнение запроса на извлечение данных из БД
@@ -87,10 +87,12 @@ class ClientRepository(IClientRepository):
             result = await self.session.execute(stmt)
             orm_client = result.scalars().first()
 
-            # 2. Проверка наличия записи в БД 
+            # 2. Проверка наличия записи в БД
             if not orm_client:
                 logger.error(f'КЛИЕНТ с ID {updated_client.id} не найден.')
-                raise EntityNotFoundException(f'КЛИЕНТ с ID {updated_client.id} не найден.')
+                raise EntityNotFoundException(
+                    f'КЛИЕНТ с ID {updated_client.id} не найден.'
+                )
 
             # 3. Прямое обновление полей ORM-объекта
             orm_client.name = updated_client.name
@@ -108,11 +110,15 @@ class ClientRepository(IClientRepository):
             # 5. Возврат доменного объекта
             logger.info(f'КЛИЕНТ обновлен. ID= {updated_client.id}')
             return ClientMapper.to_domain(orm_client)
-        
-        except SQLAlchemyError  as e:
-            logger.error(f'Ошибка БД при обновлении КЛИЕНТА. ID={updated_client.id}: {e}')
-            raise DatabaseErrorException(f'Ошибка БД при обновлении КЛИЕНТА. ID={updated_client.id}: {e}')
-        
+
+        except SQLAlchemyError as e:
+            logger.error(
+                f'Ошибка БД при обновлении КЛИЕНТА. ID={updated_client.id}: {e}'
+            )
+            raise DatabaseErrorException(
+                f'Ошибка БД при обновлении КЛИЕНТА. ID={updated_client.id}: {e}'
+            )
+
     async def delete(self, id: int) -> bool:
         try:
             # 1. Выполнение запроса на извлечение данных из БД
@@ -122,7 +128,9 @@ class ClientRepository(IClientRepository):
 
             if not orm_client:
                 logger.warning(f'КЛИЕНТ с ID {id} не найден при удалении.')
-                raise EntityNotFoundException(f'КЛИЕНТ с ID {id} не найден при удалении.')
+                raise EntityNotFoundException(
+                    f'КЛИЕНТ с ID {id} не найден при удалении.'
+                )
 
             # 2. Удаление
             await self.session.delete(orm_client)

@@ -6,7 +6,7 @@ from backend.infrastructure.models.attorney import AttorneyORM
 from sqlalchemy.future import select
 
 from backend.core.exceptions import (
-    DatabaseErrorException, 
+    DatabaseErrorException,
     EntityNotFoundException,
     EntityAlreadyExistsError,
 )
@@ -14,7 +14,7 @@ from backend.core.exceptions import (
 from sqlalchemy.exc import (
     SQLAlchemyError,
     IntegrityError,
-    )
+)
 
 
 class TestAttorneyRepository:
@@ -43,7 +43,7 @@ class TestAttorneyRepository:
     async def test_save_duplicate(self, attorney_repo, sample_attorney):
         '''Тест: сохранение нового юриста'''
         # 1. Сначала сохраняем исходный объект (это должно пройти успешно)
-        first_save  = await attorney_repo.save(sample_attorney)
+        first_save = await attorney_repo.save(sample_attorney)
         assert isinstance(first_save, Attorney)
         assert first_save.id is not None  # Убедимся, что ID был назначен
 
@@ -56,12 +56,14 @@ class TestAttorneyRepository:
         assert 'duplicate key' in str(exc_info.value).lower()  # подсказка из PostgreSQL
 
     @pytest.mark.asyncio
-    async def test_update_success(self, attorney_repo, sample_attorney, sample_update_attorney):
+    async def test_update_success(
+        self, attorney_repo, sample_attorney, sample_update_attorney
+    ):
         # Вызываем метод обновления
         saved_attorney = await attorney_repo.save(sample_attorney)
         assert isinstance(saved_attorney, Attorney)
         assert saved_attorney.id is not None
-        #logger.debug(f'ID для сохраненного ЮРИСТА {saved_attorney.id}')
+        # logger.debug(f'ID для сохраненного ЮРИСТА {saved_attorney.id}')
 
         # Присваиваем ID из сохранённого объекта
         sample_update_attorney.id = saved_attorney.id
@@ -76,7 +78,6 @@ class TestAttorneyRepository:
         assert update_attorney.phone == sample_update_attorney.phone
         assert update_attorney.password_hash == sample_update_attorney.password_hash
 
-
     async def delete(self, id: int) -> bool:
         try:
             # 1. Выполнение запроса на извлечение данных из БД
@@ -86,7 +87,9 @@ class TestAttorneyRepository:
 
             if not orm_attorney:
                 logger.warning(f'ЮРИСТ с ID {id} не найден при удалении.')
-                raise EntityNotFoundException(f'ЮРИСТ с ID {id} не найден при удалении.')
+                raise EntityNotFoundException(
+                    f'ЮРИСТ с ID {id} не найден при удалении.'
+                )
 
             # 2. Удаление
             await self.session.delete(orm_attorney)

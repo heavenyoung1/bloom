@@ -4,6 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import declared_attr
 from sqlalchemy import event  # <-- вот так
 
+
 class TimeStampMixin:
     @declared_attr
     def created_at(cls):
