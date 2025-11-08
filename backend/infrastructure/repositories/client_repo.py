@@ -64,20 +64,17 @@ class ClientRepository(IClientRepository):
         
     async def get_all_for_attorney(self, id: int) -> List[Client]:
         try:
-            # 1. Получение записи из базы данных
-            stmt = select(ClientORM).where(ClientORM.id == id)
+            # 1. Получение записей из базы данных
+            stmt = (
+                select(ClientORM)
+                .where(ClientORM.owner_attorney_id == id)  # Фильтрация по адвокату
+                .order_by(ClientORM.created_at.desc())  # Например, сортировка по дате
+        )
             result = await self.session.execute(stmt)
-            orm_client = result.scalars().first()
+            orm_cases = result.scalars().all()
 
-            # 2. Проверка существования записи в БД
-            if not orm_client:
-                return None
-
-            # 3. Преобразование ORM объекта в доменную сущность
-            client = ClientMapper.to_domain(orm_client)
-
-            logger.info(f'КЛИЕНТ получен. ID - {client.id}')
-            return client
+            # 2. Списковый генератор для всех записей из базы данных
+            return [ClientMapper.to_domain(orm_case) for orm_case in orm_cases]
 
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении КЛИЕНТА ID={id}: {e}')
@@ -115,3 +112,24 @@ class ClientRepository(IClientRepository):
         except SQLAlchemyError  as e:
             logger.error(f'Ошибка БД при обновлении КЛИЕНТА. ID={updated_client.id}: {e}')
             raise DatabaseErrorException(f'Ошибка БД при обновлении КЛИЕНТА. ID={updated_client.id}: {e}')
+        
+    async def delete(self, id: int) -> bool:
+        try:
+            # 1. Выполнение запроса на извлечение данных из БД
+            stmt = select(ClientORM).where(ClientORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_client = result.scalars().first()
+
+            if not orm_client:
+                logger.warning(f'КЛИЕНТ с ID {id} не найден при удалении.')
+                raise EntityNotFoundException(f'КЛИЕНТ с ID {id} не найден при удалении.')
+
+            # 2. Удаление
+            await self.session.delete(orm_client)
+            await self.session.flush()
+
+            logger.info(f'КЛИЕНТ с ID {id} успешно удален.')
+            return True
+
+        except SQLAlchemyError as e:
+            raise DatabaseErrorException(f'Ошибка при удалении КЛИЕНТА: {str(e)}')

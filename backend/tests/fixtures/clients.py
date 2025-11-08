@@ -14,7 +14,7 @@ async def persisted_client_id(client_repo, sample_client, persisted_attorney_id)
 
 # Фикстура для дефолтного клиента
 @pytest.fixture
-def sample_client(sample_attorney, fixed_now):
+def sample_client(persisted_attorney_id, fixed_now):
     '''Фикстура для дефолтного клиента.'''
     return Client(
         id=None,  # Позволяем БД генерировать ID
@@ -26,7 +26,7 @@ def sample_client(sample_attorney, fixed_now):
         address='Москва, ул. Тверская, 1',
         messenger=Messenger.TG,  # Мессенджер Telegram
         messenger_handle='ivan123',
-        owner_attorney_id=sample_attorney.id,  # Пример ссылки на адвоката
+        owner_attorney_id=persisted_attorney_id,  # Пример ссылки на адвоката
         created_at=fixed_now,
     )
 
@@ -52,7 +52,7 @@ def sample_update_client(sample_attorney, fixed_now):
 
 # Фикстура для списка клиентов
 @pytest.fixture
-def clients_list(fixed_now):
+def clients_list(fixed_now, persisted_attorney_id):
     '''Фикстура: список клиентов для тестирования.'''
     return [
         Client(
@@ -66,7 +66,7 @@ def clients_list(fixed_now):
             messenger=Messenger.TG,
             messenger_handle='ivan123',
             created_at=fixed_now,
-            owner_attorney_id=1,
+            owner_attorney_id=persisted_attorney_id,
         ),
         Client(
             id=None,
@@ -79,7 +79,7 @@ def clients_list(fixed_now):
             messenger=Messenger.WA,
             messenger_handle='alexander_ivanov',
             created_at=fixed_now,
-            owner_attorney_id=2,
+            owner_attorney_id=persisted_attorney_id,
         ),
         Client(
             id=None,
@@ -92,7 +92,7 @@ def clients_list(fixed_now):
             messenger=Messenger.MA,
             messenger_handle='maria_smirnova',
             created_at=fixed_now,
-            owner_attorney_id=3,
+            owner_attorney_id=persisted_attorney_id,
         ),
         Client(
             id=None,
@@ -105,7 +105,7 @@ def clients_list(fixed_now):
             messenger=Messenger.MA,
             messenger_handle='ekaterina_vasileva',
             created_at=fixed_now,
-            owner_attorney_id=4,
+            owner_attorney_id=persisted_attorney_id,
         ),
         Client(
             id=None,
@@ -118,6 +118,6 @@ def clients_list(fixed_now):
             messenger=Messenger.MA,
             messenger_handle='dmitry_alexandrov',
             created_at=fixed_now,
-            owner_attorney_id=5,
+            owner_attorney_id=persisted_attorney_id,
         ),
     ]

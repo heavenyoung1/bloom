@@ -82,11 +82,17 @@ class TestCaseRepository:
         assert isinstance(saved_case, Case)
         assert saved_case.id is not None
 
+        # Проверяем данные до их изменения
+        assert saved_case.name == sample_case.name
+        assert saved_case.status == sample_case.status
+        assert saved_case.description == sample_case.description
+
         # Присваиваем ID из сохранённого объекта в sample_update_case
         sample_update_case.id = saved_case.id
 
         update_case = await case_repo.update(sample_update_case)
 
+         # Проверяем данные после изменения
         assert update_case.name == sample_update_case.name
         assert update_case.status == sample_update_case.status
         assert update_case.description == sample_update_case.description

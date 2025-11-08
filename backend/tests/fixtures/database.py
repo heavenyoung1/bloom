@@ -8,7 +8,7 @@ from backend.infrastructure.models._base import Base
 @pytest.fixture(scope='session')
 def test_db_url():
     '''URL тестовой БД'''
-    return 'postgresql+asyncpg://postgres:1234@192.168.175.129:5436/test_db'
+    return 'postgresql+asyncpg://postgres:1234@192.168.31.203:5436/test_db'
 
 
 # @pytest.fixture(scope='session')
