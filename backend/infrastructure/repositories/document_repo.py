@@ -1,34 +1,24 @@
-from sqlalchemy.future import select
-
-from sqlalchemy.exc import (
-    SQLAlchemyError,
-    IntegrityError,
-    OperationalError,
-    ProgrammingError,
-    DataError,
-    NoResultFound,
-    MultipleResultsFound,
-    InvalidRequestError,
-)
-from typing import Optional
-import aiofiles
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Dict, List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional
+from pathlib import Path
 from datetime import datetime
-from backend.domain.entities.document import Document
-from backend.infrastructure.mappers import DocumentMapper
-from backend.infrastructure.models import DocumentORM
+import aiofiles
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.core.logger import logger
 from backend.core.exceptions import (
     DatabaseErrorException,
     EntityNotFoundException,
-    EntityAlreadyExistsError,
     FileStorageException,
 )
-
+from backend.domain.entities.document import Document
+from backend.infrastructure.mappers import DocumentMapper
+from backend.infrastructure.models import DocumentORM
 from backend.infrastructure.repositories.interfaces import IDocumentRepository
-from backend.core.logger import logger
 
-from pathlib import Path
+if TYPE_CHECKING:
+    from backend.domain.entities.document import Document
 
 
 class DocumentRepository(IDocumentRepository):

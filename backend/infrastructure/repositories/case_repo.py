@@ -1,35 +1,26 @@
-from sqlalchemy.future import select
+from typing import TYPE_CHECKING, List
 
-from sqlalchemy.exc import (
-    SQLAlchemyError,
-    IntegrityError,
-    OperationalError,
-    ProgrammingError,
-    DataError,
-    NoResultFound,
-    MultipleResultsFound,
-    InvalidRequestError,
-)
+from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Dict, List, TYPE_CHECKING
 
+from backend.core.logger import logger
+from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.domain.entities.case import Case
 from backend.infrastructure.mappers import CaseMapper
 from backend.infrastructure.models import CaseORM
-from backend.core.exceptions import (
-    DatabaseErrorException,
-    EntityNotFoundException,
-    EntityAlreadyExistsError,
-)
-
 from backend.infrastructure.repositories.interfaces import ICaseRepository
-from backend.core.logger import logger
 
 if TYPE_CHECKING:
     from backend.domain.entities.case import Case
 
 
 class CaseRepository(ICaseRepository):
+    '''
+    Репозиторий для работы с сущностью «Дело» (Case) в базе данных.
+    Реализует CRUD-операции через async SQLAlchemy.
+    '''
+
     def __init__(self, session: AsyncSession):
         self.session = session
 

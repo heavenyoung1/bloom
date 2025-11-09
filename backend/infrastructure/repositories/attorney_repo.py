@@ -1,27 +1,15 @@
-from typing import Dict, List, TYPE_CHECKING
-from sqlalchemy.sql import func
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.future import select
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
-from backend.core.logger import logger
+from typing import TYPE_CHECKING
 
+from sqlalchemy import select, func
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.core.logger import logger
+from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.domain.entities.attorney import Attorney
 from backend.infrastructure.mappers import AttorneyMapper
 from backend.infrastructure.models import AttorneyORM
-from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from ..repositories.interfaces import IAttorneyRepository
-
-from sqlalchemy.exc import (
-    SQLAlchemyError,
-    IntegrityError,
-    OperationalError,
-    ProgrammingError,
-    DataError,
-    NoResultFound,
-    MultipleResultsFound,
-    InvalidRequestError,
-)
 
 if TYPE_CHECKING:
     from backend.domain.entities.attorney import Attorney
@@ -29,13 +17,14 @@ if TYPE_CHECKING:
 
 class AttorneyRepository(IAttorneyRepository):
     '''
-    Репозиторий для работы с данными юристов в базе данных.
+    Репозиторий для работы с сущностью «Юрист» (Attorney) в базе данных.
 
-    Реализует интерфейс IAttorneyRepository и предоставляет методы для сохранения,
-    обновления, удаления и получения юристов из базы данных.
+    Реализует CRUD-операции через SQLAlchemy AsyncSession.
+    Все методы асинхронны и выбрасывают кастомные исключения при ошибках.
     '''
 
     def __init__(self, session: AsyncSession):
+        '''Инициализация репозитория с асинхронной сессией SQLAlchemy.'''
         self.session = session
 
     async def save(self, attorney: Attorney) -> 'Attorney':

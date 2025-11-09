@@ -1,18 +1,26 @@
-from sqlalchemy.future import select
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Dict, List, TYPE_CHECKING
-from sqlalchemy.exc import SQLAlchemyError
+from typing import TYPE_CHECKING, List
 
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.core.logger import logger
+from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.domain.entities.contact import Contact
 from backend.infrastructure.mappers import ContactMapper
 from backend.infrastructure.models import ContactORM
-from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.infrastructure.repositories.interfaces import IContactRepository
-from backend.core.logger import logger
+
+if TYPE_CHECKING:
+    from backend.domain.entities.contact import Contact
 
 
 class ContactRepository(IContactRepository):
+    '''
+    Репозиторий для работы с сущностью «Связанный контакт» (Contact) в базе данных.
+    Хранит дополнительные контакты, связанные с делом, например доверитель.
+    '''
+
     def __init__(self, session: AsyncSession):
         self.session = session
 

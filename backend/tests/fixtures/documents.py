@@ -5,6 +5,7 @@ from backend.infrastructure.models import DocumentORM
 import shutil
 import tempfile
 
+
 @pytest.fixture()
 def temp_storage_dir():
     '''
@@ -13,7 +14,8 @@ def temp_storage_dir():
     temp_dir = tempfile.mkdtemp(prefix='test_documents_')
     yield temp_dir
     # Удаляем после теста
-    #shutil.rmtree(temp_dir, ignore_errors=True)
+    # shutil.rmtree(temp_dir, ignore_errors=True)
+
 
 @pytest.fixture
 def sample_document(persisted_attorney_id, persisted_case):
@@ -29,6 +31,7 @@ def sample_document(persisted_attorney_id, persisted_case):
         attorney_id=persisted_attorney_id,
         description='Тестовый договор',
     )
+
 
 @pytest.fixture
 def sample_file_content():

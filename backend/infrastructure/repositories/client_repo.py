@@ -1,18 +1,26 @@
-from sqlalchemy.future import select
+from typing import TYPE_CHECKING, List
+
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Dict, List, TYPE_CHECKING
-from sqlalchemy.exc import SQLAlchemyError
 
+from backend.core.logger import logger
+from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.domain.entities.client import Client
 from backend.infrastructure.mappers import ClientMapper
 from backend.infrastructure.models import ClientORM
-from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.infrastructure.repositories.interfaces import IClientRepository
-from backend.core.logger import logger
+
+if TYPE_CHECKING:
+    from backend.domain.entities.client import Client
 
 
 class ClientRepository(IClientRepository):
+    '''
+    Репозиторий для работы с сущностью «Клиент» (Client) в базе данных.
+    Реализует асинхронные CRUD-операции через SQLAlchemy 2.0+.
+    '''
+
     def __init__(self, session: AsyncSession):
         self.session = session
 
