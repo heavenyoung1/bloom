@@ -7,7 +7,7 @@ from backend.domain.entities.contact import (
 
 # Фикстура для дефолтного контакта
 @pytest.fixture
-def sample_contact(fixed_now):
+def sample_contact(fixed_now, persisted_case):
     '''Фикстура для дефолтного контакта.'''
     return Contact(
         id=None,  # Позволяем БД генерировать ID
@@ -15,14 +15,13 @@ def sample_contact(fixed_now):
         personal_info='1234567890',  # Номер паспорта или другие данные
         phone='+79991234567',
         email='ivan@example.com',
-        created_at=fixed_now,
-        case_id=1,  # Пример ссылки на дело
+        case_id=persisted_case,
     )
 
 
 # Фикстура для контакта, который будет обновляться
 @pytest.fixture
-def sample_update_contact(fixed_now):
+def sample_update_contact(fixed_now, persisted_case):
     '''Фикстура для обновленного контакта.'''
     return Contact(
         id=None,  # Позволяем БД генерировать ID
@@ -30,14 +29,13 @@ def sample_update_contact(fixed_now):
         personal_info='0987654321',  # Новый номер паспорта или другие данные
         phone='+79998887766',
         email='ivanov3232@example.com',
-        created_at=fixed_now,
-        case_id=1,  # Пример ссылки на дело
+        case_id=persisted_case,
     )
 
 
 # Фикстура для списка контактов
 @pytest.fixture
-def contacts_list(fixed_now):
+def contacts_list(fixed_now, persisted_case):
     '''Фикстура: список контактов для тестирования.'''
     return [
         Contact(
@@ -46,8 +44,7 @@ def contacts_list(fixed_now):
             personal_info='1234567890',
             phone='+79991234567',
             email='ivan@example.com',
-            created_at=fixed_now,
-            case_id=1,
+            case_id=persisted_case,
         ),
         Contact(
             id=None,
@@ -55,8 +52,7 @@ def contacts_list(fixed_now):
             personal_info='2345678901',
             phone='+79998887766',
             email='alexander@example.com',
-            created_at=fixed_now,
-            case_id=2,
+            case_id=persisted_case,
         ),
         Contact(
             id=None,
@@ -64,8 +60,7 @@ def contacts_list(fixed_now):
             personal_info='3456789012',
             phone='+79993332211',
             email='maria@example.com',
-            created_at=fixed_now,
-            case_id=3,
+            case_id=persisted_case,
         ),
         Contact(
             id=None,
@@ -73,8 +68,7 @@ def contacts_list(fixed_now):
             personal_info='4567890123',
             phone='+79992223344',
             email='ekaterina@example.com',
-            created_at=fixed_now,
-            case_id=4,
+            case_id=persisted_case,
         ),
         Contact(
             id=None,
@@ -82,7 +76,6 @@ def contacts_list(fixed_now):
             personal_info='5678901234',
             phone='+79995556677',
             email='dmitry@example.com',
-            created_at=fixed_now,
-            case_id=5,
+            case_id=persisted_case,
         ),
     ]

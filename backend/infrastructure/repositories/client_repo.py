@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, List
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from backend.core.logger import logger
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException

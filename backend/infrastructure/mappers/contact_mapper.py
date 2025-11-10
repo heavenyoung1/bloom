@@ -17,7 +17,7 @@ class ContactMapper:
         )
 
     @staticmethod
-    def to_orm(domain: 'Contact') -> ContactORM:
+    def to_orm(domain: 'Contact') -> 'ContactORM':
         '''Конвертация доменной сущности контакта в ORM модель.'''
         return ContactORM(
             id=domain.id,

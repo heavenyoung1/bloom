@@ -81,14 +81,16 @@ class ContactRepository(IContactRepository):
             # 1. Получение записей из базы данных
             stmt = (
                 select(ContactORM)
-                .where(ContactORM.owner_attorney_id == id)  # Фильтрация по адвокату
+                .where(ContactORM.case_id == id)  # Фильтрация по адвокату
                 .order_by(ContactORM.created_at.desc())  # Например, сортировка по дате
             )
             result = await self.session.execute(stmt)
             orm_contacts = result.scalars().all()
 
             # 2. Списковый генератор для всех записей из базы данных
-            return [ContactORM.to_domain(orm_contact) for orm_contact in orm_contacts]
+            return [
+                ContactMapper.to_domain(orm_contact) for orm_contact in orm_contacts
+            ]
 
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении СВЯЗАННОГО КОНТАКТА ID = {id}: {e}')
@@ -112,10 +114,10 @@ class ContactRepository(IContactRepository):
 
             # 3. Прямое обновление полей ORM-объекта
             orm_contact.name = updated_contact.name
-            orm_contact.type = updated_contact.type
-            orm_contact.personal_info = updated_contact.email
+            orm_contact.personal_info = updated_contact.personal_info
             orm_contact.phone = updated_contact.phone
-            orm_contact.email = updated_contact.address
+            orm_contact.email = updated_contact.email
+            orm_contact.case_id = updated_contact.case_id
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция
@@ -130,4 +132,29 @@ class ContactRepository(IContactRepository):
             )
             raise DatabaseErrorException(
                 f'Ошибка БД при обновлении СВЯЗАННОГО КОНТАКТА. ID={updated_contact.id}: {e}'
+            )
+
+    async def delete(self, id: int) -> bool:
+        try:
+            # 1. Выполнение запроса на извлечение данных из БД
+            stmt = select(ContactORM).where(ContactORM.id == id)
+            result = await self.session.execute(stmt)
+            orm_contact = result.scalars().first()
+
+            if not orm_contact:
+                logger.warning(f'СВЯЗАННЫЙ КОНТАКТ с ID {id} не найден при удалении.')
+                raise EntityNotFoundException(
+                    f'СВЯЗАННЫЙ КОНТАКТ с ID {id} не найден при удалении.'
+                )
+
+            # 2. Удаление
+            await self.session.delete(orm_contact)
+            await self.session.flush()
+
+            logger.info(f'СВЯЗАННЫЙ КОНТАКТ с ID {id} успешно удален.')
+            return True
+
+        except SQLAlchemyError as e:
+            raise DatabaseErrorException(
+                f'Ошибка при удалении СВЯЗАННОГО КОНТАКТА: {str(e)}'
             )
