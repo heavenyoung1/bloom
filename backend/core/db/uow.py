@@ -4,6 +4,15 @@ from sqlalchemy import select
 
 from backend.core.logger import logger
 
+from backend.infrastructure.repositories import (
+    AttorneyRepository,
+    CaseRepository,
+    ClientRepository,
+    ContactRepository,
+    DocumentMetadataRepository,
+    EventRepository,
+)
+
 
 class AsyncUnitOfWork:
     '''
@@ -23,24 +32,15 @@ class AsyncUnitOfWork:
         self.session = session
 
         # Инициализируем репозитории с общей сессией
-        # (будут созданы в __aenter__)
-        self.user_repository = None
-        self.product_repository = None
-        self.price_repository = None
+        self.attorney_repo = AttorneyRepository(session)
+        self.case_repo = CaseRepository(session)
+        self.client_repo = ClientRepository(session)
+        self.contact_repo = ContactRepository(session)
+        self.doc_meta_repo = DocumentMetadataRepository(session)
+        self.event_repo = EventRepository(session)
 
     async def __aenter__(self):
         '''Вход в async context manager.'''
-        # from src.infrastructure.database.repositories import (
-        #     UserRepositoryImpl,
-        #     ProductRepositoryImpl,
-        #     PriceRepositoryImpl,
-        # )
-
-        # Инициализируем репозитории с ОДНОЙ сессией
-        # self.user_repository = UserRepositoryImpl(self.session)
-        # self.product_repository = ProductRepositoryImpl(self.session)
-        # self.price_repository = PriceRepositoryImpl(self.session)
-
         logger.info('🏗️ AsyncUnitOfWork инициализирован')
         return self
 

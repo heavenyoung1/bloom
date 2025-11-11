@@ -54,11 +54,11 @@ class DataBaseConnection:
                         await uow.users.create(...)
             '''
 
-            sesssion = self.AsyncSessionLocal()
+            session = self.AsyncSessionLocal()
             try:
-                yield sesssion
+                yield session
             finally:
-                await sesssion.close()
+                await session.close()
 
     async def dispose(self) -> None:
         '''Корректно закрыть соединения пула (например, при завершении приложения/тестов).'''
