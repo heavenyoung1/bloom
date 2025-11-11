@@ -6,17 +6,6 @@ import shutil
 import tempfile
 
 
-@pytest.fixture()
-def temp_storage_dir():
-    '''
-    Создает временную директорию для файлов
-    '''
-    temp_dir = tempfile.mkdtemp(prefix='test_documents_')
-    yield temp_dir
-    # Удаляем после теста
-    # shutil.rmtree(temp_dir, ignore_errors=True)
-
-
 @pytest.fixture
 def sample_document(persisted_attorney_id, persisted_case):
     '''
@@ -25,16 +14,9 @@ def sample_document(persisted_attorney_id, persisted_case):
     return Document(
         id=None,
         file_name='test_contract.pdf',
-        storage_path=None,
+        storage_path='/opt/documents/',
         file_size=None,
         case_id=persisted_case,
         attorney_id=persisted_attorney_id,
         description='Тестовый договор',
     )
-
-
-@pytest.fixture
-def sample_file_content():
-    '''
-    Создает тестовое содержимое файла
-    '''

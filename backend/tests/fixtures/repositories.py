@@ -3,7 +3,7 @@ from backend.infrastructure.repositories import (
     CaseRepository,
     ClientRepository,
     ContactRepository,
-    DocumentRepository,
+    DocumentMetadataRepository,
     EventRepository,
 )
 
@@ -35,9 +35,9 @@ def contact_repo(session):
 
 
 @pytest.fixture
-def document_repo(session, temp_storage_dir):
+def document_repo(session):
     '''Репозиторий с тестовой сессией'''
-    return DocumentRepository(session, storage_path=temp_storage_dir)
+    return DocumentMetadataRepository(session)
 
 
 @pytest.fixture

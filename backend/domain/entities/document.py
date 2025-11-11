@@ -10,8 +10,8 @@ class Document:
     storage_path: str
     file_size: str
     case_id: int
-    case_id: int
-    attorney: int
+    attorney_id: int
+    description: str
 
     # Необязательные атрибуты
     created_at: Optional[datetime] = None

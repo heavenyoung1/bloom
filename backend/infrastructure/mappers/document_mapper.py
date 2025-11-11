@@ -13,6 +13,7 @@ class DocumentMapper:
             file_size=orm.file_size,
             case_id=orm.case_id,
             attorney_id=orm.attorney_id,
+            description=orm.description,
             created_at=orm.created_at,
         )
 
@@ -26,5 +27,6 @@ class DocumentMapper:
             file_size=domain.file_size,
             case_id=domain.case_id,
             attorney_id=domain.attorney_id,
+            description=domain.description,
             created_at=domain.created_at,
         )

@@ -81,7 +81,7 @@ class ContactRepository(IContactRepository):
             # 1. Получение записей из базы данных
             stmt = (
                 select(ContactORM)
-                .where(ContactORM.case_id == id)  # Фильтрация по адвокату
+                .where(ContactORM.case_id == id)  # Фильтрация по делу
                 .order_by(ContactORM.created_at.desc())  # Например, сортировка по дате
             )
             result = await self.session.execute(stmt)

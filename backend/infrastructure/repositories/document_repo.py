@@ -15,221 +15,152 @@ from backend.core.exceptions import (
 from backend.domain.entities.document import Document
 from backend.infrastructure.mappers import DocumentMapper
 from backend.infrastructure.models import DocumentORM
-from backend.infrastructure.repositories.interfaces import IDocumentRepository
+from backend.infrastructure.repositories.interfaces import IDocumentMetadataRepository
 
 if TYPE_CHECKING:
     from backend.domain.entities.document import Document
 
 
-class DocumentRepository(IDocumentRepository):
-    def __init__(
-        self, session: AsyncSession, storage_path: str = '/var/law_system/documents'
-    ):
-        '''
-        :param session: Асинхронная сессия SQLAlchemy
-        :param storage_path: Корневая директория для хранения файлов
-        '''
+class DocumentMetadataRepository(IDocumentMetadataRepository):
+    '''
+    Репозиторий для работы с информацией о документах в БД.
+    НЕ работает с реальными файлами!
+    '''
+    def __init__(self, session: AsyncSession):
         self.session = session
-        self.storage_path = Path(storage_path)
 
-        # Создаем директорию если её нет
-        self.storage_path.mkdir(parents=True, exist_ok=True)
-
-    def _generate_file_path(self, case_id: int, filename: str) -> Path:
-        '''
-        Генерирует путь для сохранения файла.
-        Структура: /var/law_system/documents/{case_id}/{timestamp}_{filename}
-        '''
-        case_dir = self.storage_path / str(case_id)
-        case_dir.mkdir(parents=True, exist_ok=True)
-
-        # Добавляем timestamp для уникальности
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        unique_filename = f'{timestamp}_{filename}'
-
-        return case_dir / unique_filename
-
-    async def save(self, document: Document, file_content: bytes) -> 'Document':
+    async def save(self, document: Document) -> 'Document':
         '''Сохраняет документ: метаданные в БД, файл в файловую систему'''
         try:
-            # 1. Генерируем путь для файла
-            file_path = self._generate_file_path(document.case_id, document.filename)
-
-            # 2. Сохраняем файл в файловую систему асинхронно
-            async with aiofiles.open(file_path, 'wb') as f:
-                await f.write(file_content)
-
-            # 3. Обновляем путь в документе
-            document.storage_path = str(file_path)
-            document.file_size = len(file_content)
-
-            # 4. Конвертируем в ORM и сохраняем метаданные в БД
+            # 1. Конвертация доменной сущности в ORM-объект
             orm_document = DocumentMapper.to_orm(document)
+
+            # 2. Добавление в сессию
             self.session.add(orm_document)
+
+            # 3. flush() — отправляем в БД, получаем ID
             await self.session.flush()
 
-            # 5. Обновляем ID в доменном объекте
+            # 4. Обновляем ID в доменном объекте
             document.id = orm_document.id
 
-            logger.info(f'Документ сохранен. ID={document.id}, Path={file_path}')
+            logger.info(f'МЕТАДАННЫЕ ДОКУМЕНТА сохранены. ID - {document.id}')
             return document
 
-        except OSError as e:
-            logger.error(f'Ошибка при сохранении файла: {str(e)}')
-            raise FileStorageException(f'Ошибка при сохранении файла: {str(e)}')
-
         except IntegrityError as e:
-            # Если ошибка в БД, удаляем созданный файл
-            if file_path.exists():
-                file_path.unlink()
-            logger.error(f'Ошибка целостности при сохранении документа: {str(e)}')
-            raise DatabaseErrorException(f'Ошибка при сохранении документа: {str(e)}')
+            logger.error(f'Ошибка при сохранении МЕТАДАННЫХ ДОКУМЕНТА: {str(e)}')
+            raise DatabaseErrorException(
+                f'Ошибка при сохранении МЕТАДАННЫХ ДОКУМЕНТА: {str(e)}'
+            )
 
-    async def get(self, id: int) -> Optional[Document]:
-        '''
-        Получает метаданные документа по ID
-        '''
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка при сохранении МЕТАДАННЫХ ДОКУМЕНТА: {str(e)}')
+            raise DatabaseErrorException(
+                f'Ошибка при сохранении МЕТАДАННЫХ ДОКУМЕНТА: {str(e)}'
+            )
+        
+    async def get(self, id: int) -> 'Document':
         try:
+            # 1. Получение записи из базы данных
             stmt = select(DocumentORM).where(DocumentORM.id == id)
             result = await self.session.execute(stmt)
             orm_document = result.scalars().first()
 
+            # 2. Проверка существования записи в БД
             if not orm_document:
                 return None
 
-            document = DocumentMapper.to_domain(orm_document)
-            logger.info(f'Документ получен. ID={document.id}')
-            return document
+            # 3. Преобразование ORM объекта в доменную сущность
+            case = DocumentMapper.to_domain(orm_document)
+
+            logger.info(f'МЕТАДАННЫЕ ДОКУМЕНТА получены. ID - {case.id}')
+            return case
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении документа ID={id}: {e}')
-            raise DatabaseErrorException(f'Ошибка при получении документа: {str(e)}')
+            logger.error(f'Ошибка БД при получении МЕТАДАННЫХ ДОКУМЕНТА. ID = {id}: {e}')
+            raise DatabaseErrorException(
+                f'Ошибка при получении МЕТАДАННЫХ ДОКУМЕНТА: {str(e)}'
+            )
 
-    async def get_file_content(self, id: int) -> bytes:
-        '''
-        Получает содержимое файла документа
-        '''
+    async def get_all_for_case(self, id: int) -> List['Document']:
         try:
-            # 1. Получаем метаданные документа
-            document = await self.get(id)
-
-            if not document:
-                raise EntityNotFoundException(f'Документ с ID {id} не найден')
-
-            # 2. Проверяем существование файла
-            file_path = Path(document.file_path)
-            if not file_path.exists():
-                logger.error(f'Файл не найден: {file_path}')
-                raise FileStorageException(f'Файл документа не найден: {file_path}')
-
-            # 3. Читаем файл асинхронно
-            async with aiofiles.open(file_path, 'rb') as f:
-                content = await f.read()
-
-            logger.info(f'Содержимое документа получено. ID={id}')
-            return content
-
-        except OSError as e:
-            logger.error(f'Ошибка при чтении файла: {str(e)}')
-            raise FileStorageException(f'Ошибка при чтении файла: {str(e)}')
-
-    async def get_all_for_case(self, case_id: int) -> List['Document']:
-        '''Получает все документы для конкретного дела'''
-        try:
+            # 1. Получение записей из базы данных
             stmt = (
                 select(DocumentORM)
-                .where(DocumentORM.case_id == case_id)
-                .order_by(DocumentORM.created_at.desc())
+                .where(DocumentORM.case_id == id)  # Фильтрация по делу
+                .order_by(DocumentORM.created_at.desc())  # Сортировка по дате
             )
             result = await self.session.execute(stmt)
             orm_documents = result.scalars().all()
 
-            documents = [DocumentMapper.to_domain(orm_doc) for orm_doc in orm_documents]
-            return documents
+            # 2. Списковый генератор для всех записей из базы данных
+            return [
+                DocumentMapper.to_domain(orm_contact) for orm_contact in orm_documents
+            ]
 
         except SQLAlchemyError as e:
-            logger.error(
-                f'Ошибка БД при получении документов для дела ID={case_id}: {e}'
+            logger.error(f'Ошибка БД при получении МЕТАДАННЫХ ДОКУМЕНТА. ID = {id}: {e}')
+            raise DatabaseErrorException(
+                f'Ошибка при получении МЕТАДАННЫХ ДОКУМЕНТА: {str(e)}'
             )
-            raise DatabaseErrorException(f'Ошибка при получении документов: {str(e)}')
-
-    async def update(self, updated_document: Document) -> Document:
-        '''
-        Обновляет метаданные документа (НЕ сам файл!)
-        '''
+    
+    async def update(self, updated_document: Document) -> 'Document':
         try:
-            stmt = select(DocumentORM).where(DocumentORM.id == updated_document.id)
+            # 1. Выполнение запроса на извлечение данных из БД
+            stmt = select(DocumentORM).where(DocumentORM.id == DocumentORM.id)
             result = await self.session.execute(stmt)
             orm_document = result.scalars().first()
 
+            # 2. Проверка наличия записи в БД
             if not orm_document:
-                logger.error(f'Документ с ID {updated_document.id} не найден.')
+                logger.error(f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {updated_document.id} не найдены.')
                 raise EntityNotFoundException(
-                    f'Документ с ID {updated_document.id} не найден'
+                    f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {updated_document.id} не найдены.'
                 )
 
-            # Обновляем только метаданные
-            orm_document.filename = updated_document.filename
+            # 3. Прямое обновление полей ORM-объекта
+            orm_document.file_name = updated_document.file_name
+            orm_document.storage_path = updated_document.storage_path
+            orm_document.file_size = updated_document.file_size
             orm_document.description = updated_document.description
-            orm_document.document_type = updated_document.document_type
 
-            await self.session.flush()
+            # 4. Сохранение в БД
+            await self.session.flush()  # или session.commit() если нужна транзакция
 
-            logger.info(f'Документ обновлен. ID={updated_document.id}')
+            # 5. Возврат доменного объекта
+            logger.info(f'МЕТАДАННЫЕ ДОКУМЕНТА обновлены. ID= {updated_document.id}')
             return DocumentMapper.to_domain(orm_document)
 
         except SQLAlchemyError as e:
             logger.error(
-                f'Ошибка БД при обновлении документа ID={updated_document.id}: {e}'
+                f'Ошибка БД при обновлении МЕТАДАННЫХ ДОКУМЕНТА. ID={updated_document.id}: {e}'
             )
-            raise DatabaseErrorException(f'Ошибка при обновлении документа: {str(e)}')
+            raise DatabaseErrorException(
+                f'Ошибка БД при обновлении МЕТАДАННЫХ ДОКУМЕНТА. ID={updated_document.id}: {e}'
+            )
 
     async def delete(self, id: int) -> bool:
-        '''
-        Удаляет документ: и из БД, и из файловой системы
-        '''
         try:
-            # 1. Получаем документ
+            # 1. Выполнение запроса на извлечение данных из БД
             stmt = select(DocumentORM).where(DocumentORM.id == id)
             result = await self.session.execute(stmt)
             orm_document = result.scalars().first()
 
             if not orm_document:
-                logger.warning(f'Документ с ID {id} не найден при удалении.')
-                raise EntityNotFoundException(f'Документ с ID {id} не найден')
+                logger.warning(f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {id} не найдены при удалении.')
+                raise EntityNotFoundException(
+                    f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {id} не найдены при удалении.'
+                )
 
-            # 2. Удаляем файл из файловой системы
-            file_path = Path(orm_document.file_path)
-            if file_path.exists():
-                file_path.unlink()
-                logger.info(f'Файл удален: {file_path}')
-            else:
-                logger.warning(f'Файл уже отсутствует: {file_path}')
-
-            # 3. Удаляем запись из БД
+            # 2. Удаление
             await self.session.delete(orm_document)
             await self.session.flush()
 
-            logger.info(f'Документ с ID {id} успешно удален.')
+            logger.info(f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {id} успешно удалены.')
             return True
 
-        except OSError as e:
-            logger.error(f'Ошибка при удалении файла: {str(e)}')
-            raise FileStorageException(f'Ошибка при удалении файла: {str(e)}')
-
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при удалении документа ID={id}: {e}')
-            raise DatabaseErrorException(f'Ошибка при удалении документа: {str(e)}')
-
-    async def exists(self, id: int) -> bool:
-        '''
-        Проверяет существование документа
-        '''
-        try:
-            stmt = select(DocumentORM.id).where(DocumentORM.id == id)
-            result = await self.session.execute(stmt)
-            return result.scalar_one_or_none() is not None
-
-        except SQLAlchemyError as e:
-            logger.error(f'Ошибка при проверке существования документа ID={id}: {e}')
-            raise DatabaseErrorException(f'Ошибка при проверке документа: {str(e)}')
+            raise DatabaseErrorException(
+                f'Ошибка при удалении МЕТАДАННЫЕ ДОКУМЕНТА: {str(e)}'
+            )
+        
