@@ -26,6 +26,7 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
     Репозиторий для работы с информацией о документах в БД.
     НЕ работает с реальными файлами!
     '''
+
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -58,7 +59,7 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
             raise DatabaseErrorException(
                 f'Ошибка при сохранении МЕТАДАННЫХ ДОКУМЕНТА: {str(e)}'
             )
-        
+
     async def get(self, id: int) -> 'Document':
         try:
             # 1. Получение записи из базы данных
@@ -77,7 +78,9 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
             return case
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении МЕТАДАННЫХ ДОКУМЕНТА. ID = {id}: {e}')
+            logger.error(
+                f'Ошибка БД при получении МЕТАДАННЫХ ДОКУМЕНТА. ID = {id}: {e}'
+            )
             raise DatabaseErrorException(
                 f'Ошибка при получении МЕТАДАННЫХ ДОКУМЕНТА: {str(e)}'
             )
@@ -99,11 +102,13 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
             ]
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении МЕТАДАННЫХ ДОКУМЕНТА. ID = {id}: {e}')
+            logger.error(
+                f'Ошибка БД при получении МЕТАДАННЫХ ДОКУМЕНТА. ID = {id}: {e}'
+            )
             raise DatabaseErrorException(
                 f'Ошибка при получении МЕТАДАННЫХ ДОКУМЕНТА: {str(e)}'
             )
-    
+
     async def update(self, updated_document: Document) -> 'Document':
         try:
             # 1. Выполнение запроса на извлечение данных из БД
@@ -113,7 +118,9 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
 
             # 2. Проверка наличия записи в БД
             if not orm_document:
-                logger.error(f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {updated_document.id} не найдены.')
+                logger.error(
+                    f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {updated_document.id} не найдены.'
+                )
                 raise EntityNotFoundException(
                     f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {updated_document.id} не найдены.'
                 )
@@ -147,7 +154,9 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
             orm_document = result.scalars().first()
 
             if not orm_document:
-                logger.warning(f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {id} не найдены при удалении.')
+                logger.warning(
+                    f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {id} не найдены при удалении.'
+                )
                 raise EntityNotFoundException(
                     f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {id} не найдены при удалении.'
                 )
@@ -163,4 +172,3 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
             raise DatabaseErrorException(
                 f'Ошибка при удалении МЕТАДАННЫЕ ДОКУМЕНТА: {str(e)}'
             )
-        
