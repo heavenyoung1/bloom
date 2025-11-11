@@ -19,6 +19,7 @@ def sample_document(persisted_attorney_id, persisted_case):
         description='Тестовый договор',
     )
 
+
 @pytest.fixture
 def sample_update_document(persisted_attorney_id, persisted_case):
     '''Создает доменный объект документа для тестов'''

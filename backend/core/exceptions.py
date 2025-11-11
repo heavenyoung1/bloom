@@ -39,8 +39,10 @@ class ValidationException(BaseCustomException):
 class FileStorageException(BaseCustomException):
     '''Ошибка сохранения файла.'''
 
+
 class FileNotFound(BaseCustomException):
     pass
+
 
 class FileAlreadyExists(BaseCustomException):
     pass

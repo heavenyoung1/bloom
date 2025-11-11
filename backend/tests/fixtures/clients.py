@@ -1,8 +1,6 @@
 from datetime import datetime, timezone
 import pytest
-from backend.domain.entities.client import (
-    Client,
-)  # Предполагается, что у вас есть такой класс Clientа
+from backend.domain.entities.client import Client
 from backend.infrastructure.models.client import Messenger
 
 

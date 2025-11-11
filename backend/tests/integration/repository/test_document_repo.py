@@ -111,4 +111,3 @@ class TestDocumentMetaRepository:
         check_empty = await document_repo.get(sample_document.id)
         logger.info(f'Запись удалилась, тут None == {check_empty}')
         assert check_empty is None
-
