@@ -102,7 +102,6 @@ class AttorneyRepository(IAttorneyRepository):
             orm_attorney.email = updated_attorney.email
             orm_attorney.phone = updated_attorney.phone
             orm_attorney.password_hash = updated_attorney.password_hash
-            # orm_attorney.updated_at = func.now()!!!!!!!!!!!!!!
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция
@@ -115,7 +114,7 @@ class AttorneyRepository(IAttorneyRepository):
             logger.error(
                 f'Ошибка БД при обновлении ЮРИСТА ID={updated_attorney.id}: {e}'
             )
-            raise DatabaseErrorException(f'Ошибка при обновлении данных ДЕЛА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при обновлении данных ЮРИСТА: {str(e)}')
 
     async def delete(self, id: int) -> bool:
         try:

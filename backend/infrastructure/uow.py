@@ -31,7 +31,7 @@ class AsyncUnitOfWork:
         '''
         self.session = session
 
-        # Инициализируем репозитории с общей сессией
+        # Инициализация репозиториев с общей сессией
         self.attorney_repo = AttorneyRepository(session)
         self.case_repo = CaseRepository(session)
         self.client_repo = ClientRepository(session)
