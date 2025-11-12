@@ -12,7 +12,7 @@ async def persisted_case(case_repo, sample_case):
 
 
 @pytest.fixture
-async def sample_case(persisted_attorney_id, persisted_client_id, fixed_now):
+async def sample_case(persisted_attorney_id, persisted_client_id):
     '''Фикстура для дефолтного дела с реальными attorney_id и client_id.'''
     return Case(
         id=None,
@@ -21,12 +21,11 @@ async def sample_case(persisted_attorney_id, persisted_client_id, fixed_now):
         attorney_id=persisted_attorney_id,  # Реальный ID из БД
         status=CaseStatus.IN_PROGRESS,
         description='Описание дела о краже',
-        created_at=fixed_now,
     )
 
 
 @pytest.fixture
-async def sample_update_case(persisted_attorney_id, persisted_client_id, fixed_now):
+async def sample_update_case(persisted_attorney_id, persisted_client_id):
     '''Фикстура для дела, которое будет обновляться.'''
     return Case(
         id=None,
@@ -35,12 +34,11 @@ async def sample_update_case(persisted_attorney_id, persisted_client_id, fixed_n
         attorney_id=persisted_attorney_id,  # Реальный ID из БД
         status=CaseStatus.ON_HOLD,
         description='Описание обновленного дела о мошенничестве',
-        created_at=fixed_now,
     )
 
 
 @pytest.fixture
-async def cases_list(persisted_attorney_id, persisted_client_id, fixed_now):
+async def cases_list(persisted_attorney_id, persisted_client_id):
     '''
     Фикстура: список дел для тестирования.
     Использует одних и тех же attorney и client для всех дел.
@@ -53,7 +51,6 @@ async def cases_list(persisted_attorney_id, persisted_client_id, fixed_now):
             attorney_id=persisted_attorney_id,  # Реальный ID из БД
             status=CaseStatus.NEW,
             description='Описание дела о краже',
-            created_at=fixed_now,
         ),
         Case(
             id=None,
@@ -70,7 +67,6 @@ async def cases_list(persisted_attorney_id, persisted_client_id, fixed_now):
             attorney_id=persisted_attorney_id,  # Реальный ID из БД
             status=CaseStatus.NEW,
             description='Описание дела о нападении',
-            created_at=fixed_now,
         ),
         Case(
             id=None,
@@ -79,7 +75,6 @@ async def cases_list(persisted_attorney_id, persisted_client_id, fixed_now):
             attorney_id=persisted_attorney_id,  # Реальный ID из БД
             status=CaseStatus.CANCELLED,
             description='Описание дела о разбирательстве',
-            created_at=fixed_now,
         ),
         Case(
             id=None,
@@ -88,6 +83,5 @@ async def cases_list(persisted_attorney_id, persisted_client_id, fixed_now):
             attorney_id=persisted_attorney_id,  # Реальный ID из БД
             status=CaseStatus.ARCHIVED,
             description='Описание дела о ДТП',
-            created_at=fixed_now,
         ),
     ]

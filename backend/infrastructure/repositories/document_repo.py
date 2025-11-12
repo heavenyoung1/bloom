@@ -1,16 +1,13 @@
-from typing import TYPE_CHECKING, List, Optional
-from pathlib import Path
-from datetime import datetime
-import aiofiles
-from sqlalchemy import select
+from typing import TYPE_CHECKING, List
+
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from backend.core.logger import logger
 from backend.core.exceptions import (
     DatabaseErrorException,
     EntityNotFoundException,
-    FileStorageException,
 )
 from backend.domain.entities.document import Document
 from backend.infrastructure.mappers import DocumentMapper
@@ -19,7 +16,6 @@ from backend.infrastructure.repositories.interfaces import IDocumentMetadataRepo
 
 if TYPE_CHECKING:
     from backend.domain.entities.document import Document
-
 
 class DocumentMetadataRepository(IDocumentMetadataRepository):
     '''

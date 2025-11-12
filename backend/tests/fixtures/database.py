@@ -10,15 +10,6 @@ def test_db_url():
     '''URL тестовой БД'''
     return 'postgresql+asyncpg://postgres:1234@192.168.175.129:5436/test_db'
 
-
-# @pytest.fixture(scope='session')
-# def event_loop():
-#     '''Создаёт единый event loop для всей сессии тестов.'''
-#     loop = asyncio.new_event_loop()
-#     yield loop
-#     loop.close()
-
-
 @pytest.fixture(scope='session')
 async def engine(test_db_url):
     '''

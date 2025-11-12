@@ -7,7 +7,7 @@ from backend.domain.entities.contact import (
 
 # Фикстура для дефолтного контакта
 @pytest.fixture
-def sample_contact(fixed_now, persisted_case):
+def sample_contact(persisted_case):
     '''Фикстура для дефолтного контакта.'''
     return Contact(
         id=None,  # Позволяем БД генерировать ID
@@ -21,7 +21,7 @@ def sample_contact(fixed_now, persisted_case):
 
 # Фикстура для контакта, который будет обновляться
 @pytest.fixture
-def sample_update_contact(fixed_now, persisted_case):
+def sample_update_contact(persisted_case):
     '''Фикстура для обновленного контакта.'''
     return Contact(
         id=None,  # Позволяем БД генерировать ID
@@ -35,7 +35,7 @@ def sample_update_contact(fixed_now, persisted_case):
 
 # Фикстура для списка контактов
 @pytest.fixture
-def contacts_list(fixed_now, persisted_case):
+def contacts_list(persisted_case):
     '''Фикстура: список контактов для тестирования.'''
     return [
         Contact(
