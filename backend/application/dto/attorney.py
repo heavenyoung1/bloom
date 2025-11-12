@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, SecretStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 from typing import Optional
 from datetime import datetime
 
@@ -21,8 +21,8 @@ class CreateAttorneyDTO(BaseModel):
     )
     password: SecretStr = Field(..., min_length=8, description='Минимум 8 символов')
 
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             'example': {
                 'attorney_id': '153/3232',
                 'first_name': 'Иван',
@@ -33,6 +33,7 @@ class CreateAttorneyDTO(BaseModel):
                 'password': 'SecurePass123!',
             }
         }
+    )
 
 
 class UpdateAttorneyDTO(BaseModel):
@@ -48,8 +49,8 @@ class UpdateAttorneyDTO(BaseModel):
     email: Optional[EmailStr] = Field(default=None)
     phone: Optional[str] = Field(default=None, regex=r'^\+7\d{10}$')
 
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra = {
             'example': {
                 'attorney_id': '153/3232',
                 'first_name': 'Иван',
@@ -59,6 +60,7 @@ class UpdateAttorneyDTO(BaseModel):
                 'phone': '+79991234567',
             }
         }
+    )
 
 
 class AttorneyResponseDTO(BaseModel):
@@ -75,9 +77,9 @@ class AttorneyResponseDTO(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
-        schema_extra = {
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
             'example': {
                 'id': 123,
                 'license_id': '153/3232',
@@ -91,7 +93,7 @@ class AttorneyResponseDTO(BaseModel):
                 'updated_at': '2025-10-01T15:30:00',
             }
         }
-
+    )
 
 # В текущей реализации ПОКА НЕ НУЖНО!
 class AttorneyListItemDTO(BaseModel):
@@ -105,8 +107,9 @@ class AttorneyListItemDTO(BaseModel):
     phone: str
     is_active: bool
 
-    class Config:
+    model_config = ConfigDict(
         from_attributes = True
+    )
 
 
 class LoginDTO(BaseModel):

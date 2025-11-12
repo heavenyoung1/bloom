@@ -1,6 +1,6 @@
 from backend.infrastructure.models.client import Messenger
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from typing import Optional
 
 # Первый аргумент в Field (...) - эллипсис - что поле обязательно
@@ -34,8 +34,8 @@ class CreateClientDTO(BaseModel):
         ..., description='ID юриста, ответственного за клиента'
     )
 
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             'example': {
                 'name': 'Иванов Иван Иванович',
                 'type': True,
@@ -48,6 +48,7 @@ class CreateClientDTO(BaseModel):
                 'owner_attorney_id': 1,
             }
         }
+    )
 
 
 class UpdateClientDTO(BaseModel):
@@ -91,5 +92,6 @@ class ClientListItemDTO(BaseModel):
     phone: str
     messenger_handle: str
 
-    class Config:
+    model_config = ConfigDict(
         from_attributes = True
+    )

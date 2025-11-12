@@ -20,13 +20,13 @@ if TYPE_CHECKING:
 class CaseStatus(str, Enum):
     '''Перечисление возможных статусов дела.'''
 
-    NEW = 'Новое'  # Дело только создано, в работу ещё не принято
-    IN_PROGRESS = 'В работе'  # Адвокат/юрист ведёт дело
-    ON_HOLD = 'На паузе'  # Временная приостановка (ожидание клиента, документов и т.п.)
-    COMPLETED = 'Завершено'  # Успешно завершено
-    CLOSED = 'Закрыто'  # Закрыто без результата (например, по инициативе клиента)
-    CANCELLED = 'Отменено'  # Отменено до начала работы
-    ARCHIVED = 'Архивировано'  # Перемещено в архив (историческое дело)
+    NEW = 'Новое'               # Дело только создано, в работу ещё не принято
+    IN_PROGRESS = 'В работе'    # Адвокат/юрист ведёт дело
+    ON_HOLD = 'На паузе'        # Временная приостановка (ожидание клиента, документов и т.п.)
+    COMPLETED = 'Завершено'     # Успешно завершено
+    CLOSED = 'Закрыто'          # Закрыто без результата (например, по инициативе клиента)
+    CANCELLED = 'Отменено'      # Отменено до начала работы
+    ARCHIVED = 'Архивировано'   # Перемещено в архив (историческое дело)
 
 
 class CaseORM(TimeStampMixin, Base):
@@ -41,8 +41,9 @@ class CaseORM(TimeStampMixin, Base):
         ForeignKey('attorneys.id', ondelete='RESTRICT'), nullable=False, index=True
     )
     status: Mapped[str] = mapped_column(String(50), nullable=False)
-    description: Mapped[str | None] = mapped_column(String(500))
+    description: Mapped[str | None] = mapped_column(String(255))
 
+    # Отношения
     attorney: Mapped['AttorneyORM'] = relationship(back_populates='cases')
     client: Mapped['ClientORM'] = relationship(back_populates='cases')
 
