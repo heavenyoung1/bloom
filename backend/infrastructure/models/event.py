@@ -1,5 +1,6 @@
 from __future__ import annotations
 from datetime import datetime
+from enum import Enum
 from sqlalchemy import String, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.infrastructure.models._base import Base
@@ -8,6 +9,15 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from backend.infrastructure.models import AttorneyORM, CaseORM
+
+class EventType(str, Enum):
+    '''Типы событий'''
+    meeting = 'Встреча'
+    task = 'Задача'
+    court_hearing = 'Судебное заседание'
+    deadline = 'Дедлайн'
+    important = 'Важное'
+    other = 'Другое'
 
 
 class EventORM(TimeStampMixin, Base):
