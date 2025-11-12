@@ -17,6 +17,7 @@ from backend.infrastructure.repositories.interfaces import IDocumentMetadataRepo
 if TYPE_CHECKING:
     from backend.domain.entities.document import Document
 
+
 class DocumentMetadataRepository(IDocumentMetadataRepository):
     '''
     Репозиторий для работы с информацией о документах в БД.

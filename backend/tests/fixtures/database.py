@@ -10,6 +10,7 @@ def test_db_url():
     '''URL тестовой БД'''
     return 'postgresql+asyncpg://postgres:1234@192.168.175.129:5436/test_db'
 
+
 @pytest.fixture(scope='session')
 async def engine(test_db_url):
     '''

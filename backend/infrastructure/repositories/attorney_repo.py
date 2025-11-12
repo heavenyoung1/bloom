@@ -114,7 +114,9 @@ class AttorneyRepository(IAttorneyRepository):
             logger.error(
                 f'Ошибка БД при обновлении ЮРИСТА ID={updated_attorney.id}: {e}'
             )
-            raise DatabaseErrorException(f'Ошибка при обновлении данных ЮРИСТА: {str(e)}')
+            raise DatabaseErrorException(
+                f'Ошибка при обновлении данных ЮРИСТА: {str(e)}'
+            )
 
     async def delete(self, id: int) -> bool:
         try:
