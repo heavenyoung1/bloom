@@ -1,5 +1,6 @@
 import pytest
 from sqlalchemy import text
+from backend.core.logger import logger
 
 
 class TestDatabaseConnection:
@@ -7,9 +8,14 @@ class TestDatabaseConnection:
     @pytest.mark.asyncio
     async def test_db_connection(self, session):
         '''Проверка базового подключения к базе данных'''
-        result = await session.execute(text('SELECT 1'))
-        value = result.scalar()
-        assert value == 1
+        try:
+            result = await session.execute(text('SELECT 1'))
+            value = result.scalar()
+            assert value == 1
+            logger.info(f'✅ Подключение к БД успешно. Результат запроса: {value}')
+        except Exception as e:
+            logger.error(f'❌  Ошибка подключения к БД: {e}')
+            raise
 
     # Тест на проверку версии PostgreSQL
     @pytest.mark.asyncio
