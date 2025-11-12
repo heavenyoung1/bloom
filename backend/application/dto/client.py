@@ -92,6 +92,4 @@ class ClientListItemDTO(BaseModel):
     phone: str
     messenger_handle: str
 
-    model_config = ConfigDict(
-        from_attributes = True
-    )
+    model_config = ConfigDict(from_attributes=True)

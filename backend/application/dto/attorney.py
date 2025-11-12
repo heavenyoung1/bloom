@@ -50,7 +50,7 @@ class UpdateAttorneyDTO(BaseModel):
     phone: Optional[str] = Field(default=None, regex=r'^\+7\d{10}$')
 
     model_config = ConfigDict(
-        json_schema_extra = {
+        json_schema_extra={
             'example': {
                 'attorney_id': '153/3232',
                 'first_name': 'Иван',
@@ -92,8 +92,9 @@ class AttorneyResponseDTO(BaseModel):
                 'created_at': '2025-01-01T10:00:00',
                 'updated_at': '2025-10-01T15:30:00',
             }
-        }
+        },
     )
+
 
 # В текущей реализации ПОКА НЕ НУЖНО!
 class AttorneyListItemDTO(BaseModel):
@@ -107,9 +108,7 @@ class AttorneyListItemDTO(BaseModel):
     phone: str
     is_active: bool
 
-    model_config = ConfigDict(
-        from_attributes = True
-    )
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LoginDTO(BaseModel):

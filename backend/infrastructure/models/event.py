@@ -10,8 +10,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from backend.infrastructure.models import AttorneyORM, CaseORM
 
+
 class EventType(str, Enum):
     '''Типы событий'''
+
     meeting = 'Встреча'
     task = 'Задача'
     court_hearing = 'Судебное заседание'

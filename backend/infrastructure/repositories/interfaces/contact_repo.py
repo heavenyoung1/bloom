@@ -1,5 +1,8 @@
-from abc import ABC, abstractmethod
+from backend.infrastructure.repositories.interfaces.base_repo import IBaseRepository
+from backend.domain.entities.contact import Contact
 
 
-class IContactRepository(ABC):
+class IContactRepository(IBaseRepository[Contact]):
+    '''Специфичный интерфейс для Contact'''
+
     pass

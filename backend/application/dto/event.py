@@ -9,6 +9,7 @@ from typing import Optional
 
 class CreateEventDTO(BaseModel):
     '''DTO для создания события'''
+
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=2000)
     event_type: EventType
@@ -24,13 +25,14 @@ class CreateEventDTO(BaseModel):
                 'event_type': 'court_hearing',
                 'event_date': '2024-12-15T10:00:00Z',
                 'case_id': 1,
-                'attorney_id': 1
+                'attorney_id': 1,
             }
         }
 
 
 class UpdateEventDTO(BaseModel):
     '''DTO для обновления события'''
+
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=2000)
     event_type: Optional[EventType] = None
@@ -39,6 +41,7 @@ class UpdateEventDTO(BaseModel):
 
 class EventResponseDTO(BaseModel):
     '''DTO для ответа: полная информация о событии'''
+
     id: int
     name: str
     description: Optional[str]
@@ -49,19 +52,16 @@ class EventResponseDTO(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes = True
-    )
+    model_config = ConfigDict(from_attributes=True)
 
 
 class EventListItemDTO(BaseModel):
     '''DTO для списка событий'''
+
     id: int
     name: str
     event_type: EventType
     event_date: datetime
     case_id: int
 
-    model_config = ConfigDict(
-        from_attributes = True
-    )
+    model_config = ConfigDict(from_attributes=True)

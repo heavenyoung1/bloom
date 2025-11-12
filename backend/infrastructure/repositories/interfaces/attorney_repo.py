@@ -1,5 +1,8 @@
-from abc import ABC, abstractmethod
+from backend.infrastructure.repositories.interfaces.base_repo import IBaseRepository
+from backend.domain.entities.attorney import Attorney
 
 
-class IAttorneyRepository(ABC):
+class IAttorneyRepository(IBaseRepository[Attorney]):
+    '''Специфичный интерфейс для Attorney'''
+
     pass

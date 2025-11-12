@@ -4,16 +4,18 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 from typing import Optional
 from datetime import datetime
 
+
 class CreateCaseDTO(BaseModel):
     '''DTO для создания нового дела'''
+
     name: str = Field(..., max_length=255, description='Название дела')
     client_id: int = Field(
-        ..., 
+        ...,
         gt=0,
         description='ID клиента, прикрепленного к делу',
     )
     attorney_id: int = Field(
-        ..., 
+        ...,
         gt=0,
         description='ID юриста, ответственного за клиента',
     )
@@ -28,7 +30,7 @@ class CreateCaseDTO(BaseModel):
             ' - Закрыто: закрыто без результата\n'
             ' - Отменено: отменено до начала работы\n'
             ' - Архивировано: перемещено в архив'
-        )
+        ),
     )
     description: str = Field(
         ...,
@@ -36,7 +38,7 @@ class CreateCaseDTO(BaseModel):
         description=(
             'Подробное описание сути дела: ключевые вопросы, требования, '
             'участники, правовые основания'
-        )
+        ),
     )
 
     model_config = ConfigDict(
@@ -46,10 +48,11 @@ class CreateCaseDTO(BaseModel):
                 'client_id': 1,
                 'attorney_id': 1,
                 'status': 'Новое',
-                'description': 'Разрешение спора о праве собственности на квартиру'
+                'description': 'Разрешение спора о праве собственности на квартиру',
             }
         }
     )
+
 
 class UpdateCaseDTO(BaseModel):
     '''DTO для частичного обновления дела (PATCH)'''
@@ -71,7 +74,7 @@ class UpdateCaseDTO(BaseModel):
             ' - Закрыто: закрыто без результата\n'
             ' - Отменено: отменено до начала работы\n'
             ' - Архивировано: перемещено в архив'
-        )
+        ),
     )
     description: Optional[str] = Field(
         ...,
@@ -80,13 +83,13 @@ class UpdateCaseDTO(BaseModel):
         description=(
             'Подробное описание сути дела: ключевые вопросы, требования, '
             'участники, правовые основания'
-        )
+        ),
     )
-
 
 
 class UpdateCaseStatusDTO(BaseModel):
     '''DTO для частичного обновления дела (PATCH)'''
+
     status: CaseStatus = Field(
         ...,
         description=(
@@ -98,11 +101,13 @@ class UpdateCaseStatusDTO(BaseModel):
             ' - Закрыто: закрыто без результата\n'
             ' - Отменено: отменено до начала работы\n'
             ' - Архивировано: перемещено в архив'
-        )
+        ),
     )
+
 
 class CaseResponseDTO(BaseModel):
     '''DTO для ответа: полная информация о деле'''
+
     id: int
     name: str
     client_id: int
@@ -112,12 +117,12 @@ class CaseResponseDTO(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes = True
-    )
+    model_config = ConfigDict(from_attributes=True)
+
 
 class CaseListItemDTO(BaseModel):
     '''DTO для списка дел'''
+
     id: int
     name: str
     client_id: int
