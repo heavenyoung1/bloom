@@ -8,7 +8,7 @@ class TestContactMapper:
     @pytest.fixture
     def sample_contact_domain(self, persisted_case):
         return Contact(
-            id=789,
+            id=None,
             name='Иван Иванович Петров',
             personal_info='1234567890',
             phone='+79991234567',
@@ -19,7 +19,7 @@ class TestContactMapper:
     @pytest.fixture
     def sample_contact_orm(self, persisted_case):
         return ContactORM(
-            id=789,
+            id=None,
             name='Иван Иванович Петров',
             personal_info='1234567890',
             phone='+79991234567',
