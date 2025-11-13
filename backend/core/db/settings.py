@@ -13,6 +13,13 @@ class Settings(BaseSettings):
     password: str
     db_name: str
 
+    # Параметры БД для тестирования
+    test_host: str
+    test_port: int
+    test_user: str
+    test_password: str
+    test_db_name: str
+
     # SQLAlchemy параметры
     driver: str = 'postgresql+asyncpg'
     echo: bool = False
@@ -49,3 +56,16 @@ class Settings(BaseSettings):
         '''Строка для подключения к БД ТОЛЬКО для выполнения Alembic миграций.'''
         url = f'{self._sync_driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
         return url
+    
+    def test_url(self) -> str:
+        '''URL для тестовой БД — переопределяется через переменные окружения.'''
+        return str(
+            URL.create(
+                drivername=self.driver,
+                username=self.test_user,
+                password=self.test_password,
+                host=self.test_host,
+                port=self.test_port,
+                database=self.test_db_name,
+            )
+        )
