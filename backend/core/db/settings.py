@@ -56,7 +56,7 @@ class Settings(BaseSettings):
         '''Строка для подключения к БД ТОЛЬКО для выполнения Alembic миграций.'''
         url = f'{self._sync_driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
         return url
-    
+
     # def test_url(self) -> str:
     #     '''URL для тестовой БД — переопределяется через переменные окружения.'''
     #     return str(

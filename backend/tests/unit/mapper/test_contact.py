@@ -3,6 +3,7 @@ from backend.infrastructure.mappers.contact_mapper import ContactMapper
 from backend.domain.entities.contact import Contact
 from backend.infrastructure.models import ContactORM
 
+
 class TestContactMapper:
 
     @pytest.fixture
@@ -13,7 +14,7 @@ class TestContactMapper:
             personal_info='1234567890',
             phone='+79991234567',
             email='ivan@example.com',
-            case_id=persisted_case
+            case_id=persisted_case,
         )
 
     @pytest.fixture
@@ -24,7 +25,7 @@ class TestContactMapper:
             personal_info='1234567890',
             phone='+79991234567',
             email='ivan@example.com',
-            case_id=persisted_case
+            case_id=persisted_case,
         )
 
     def test_to_orm(self, sample_contact_domain):

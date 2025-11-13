@@ -4,6 +4,7 @@ from backend.domain.entities.client import Client
 from backend.infrastructure.models import ClientORM
 from backend.infrastructure.models.client import Messenger
 
+
 class TestClientMapper:
 
     @pytest.fixture
@@ -18,7 +19,7 @@ class TestClientMapper:
             address='Москва, ул. Тверская, 1',
             messenger=Messenger.TG,
             messenger_handle='ivan123',
-            owner_attorney_id=persisted_attorney_id
+            owner_attorney_id=persisted_attorney_id,
         )
 
     @pytest.fixture
@@ -33,7 +34,7 @@ class TestClientMapper:
             address='Москва, ул. Тверская, 1',
             messenger=Messenger.TG,
             messenger_handle='ivan123',
-            owner_attorney_id=persisted_attorney_id
+            owner_attorney_id=persisted_attorney_id,
         )
 
     def test_to_orm(self, sample_client_domain):

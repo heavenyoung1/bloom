@@ -101,7 +101,7 @@ class TestAttorneyRepository:
 
         except SQLAlchemyError as e:
             raise DatabaseErrorException(f'Ошибка при удалении ЮРИСТА: {str(e)}')
-        
+
     # -------- GET BY EMAIL --------
     @pytest.mark.asyncio
     async def test_get_by_email(self, attorney_repo, sample_attorney):

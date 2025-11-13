@@ -1,5 +1,6 @@
 from backend.domain.entities.attorney import Attorney
 
+
 class AttorneyFactory:
     @staticmethod
     def create(
@@ -21,5 +22,5 @@ class AttorneyFactory:
             email=email,
             phone=phone,
             password_hash=password_hash,
-            is_active=True, 
+            is_active=True,
         )

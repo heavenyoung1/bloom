@@ -72,7 +72,7 @@ class AttorneyRepository(IAttorneyRepository):
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении ЮРИСТА ID={id}: {e}')
             raise DatabaseErrorException(f'Ошибка БД при получении ЮРИСТА: {str(e)}')
-        
+
     async def get_by_email(self, email: str) -> Optional['Attorney']:
         try:
             # 1. Получение записи из базы данных
@@ -83,14 +83,18 @@ class AttorneyRepository(IAttorneyRepository):
             # 2. Проверка существования записи в БД
             if orm_attorney:
                 attorney = AttorneyMapper.to_domain(orm_attorney)
-                logger.info(f'ЮРИСТ успешно получен по email. ID - {attorney.id}. Email - {attorney.email}.')
+                logger.info(
+                    f'ЮРИСТ успешно получен по email. ID - {attorney.id}. Email - {attorney.email}.'
+                )
                 return attorney
             else:
                 return None
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении ЮРИСТА по email={email}: {e}')
-            raise DatabaseErrorException(f'Ошибка БД при получении ЮРИСТА по email: {str(e)}')
-        
+            raise DatabaseErrorException(
+                f'Ошибка БД при получении ЮРИСТА по email: {str(e)}'
+            )
+
     async def get_by_license_id(self, license_id: str) -> Optional['Attorney']:
         try:
             # 1. Получение записи из базы данных
@@ -101,13 +105,19 @@ class AttorneyRepository(IAttorneyRepository):
             # 2. Проверка существования записи в БД
             if orm_attorney:
                 attorney = AttorneyMapper.to_domain(orm_attorney)
-                logger.info(f'ЮРИСТ успешно получен по license_id. ID - {attorney.id}. license_id - {attorney.license_id}.')
+                logger.info(
+                    f'ЮРИСТ успешно получен по license_id. ID - {attorney.id}. license_id - {attorney.license_id}.'
+                )
                 return attorney
             else:
                 return None
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении ЮРИСТА по license_id={license_id}: {e}')
-            raise DatabaseErrorException(f'Ошибка БД при получении ЮРИСТА по license_id: {str(e)}')
+            logger.error(
+                f'Ошибка БД при получении ЮРИСТА по license_id={license_id}: {e}'
+            )
+            raise DatabaseErrorException(
+                f'Ошибка БД при получении ЮРИСТА по license_id: {str(e)}'
+            )
 
     async def get_by_phone(self, phone_number: str) -> Optional['Attorney']:
         try:
@@ -119,13 +129,19 @@ class AttorneyRepository(IAttorneyRepository):
             # 2. Проверка существования записи в БД
             if orm_attorney:
                 attorney = AttorneyMapper.to_domain(orm_attorney)
-                logger.info(f'ЮРИСТ успешно получен по номеру телефона. ID - {attorney.id}. phone_number - {attorney.phone}.')
+                logger.info(
+                    f'ЮРИСТ успешно получен по номеру телефона. ID - {attorney.id}. phone_number - {attorney.phone}.'
+                )
                 return attorney
             else:
                 return None
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении ЮРИСТА по phone_number = {phone_number}: {e}')
-            raise DatabaseErrorException(f'Ошибка БД при получении ЮРИСТА по license_id: {str(e)}')
+            logger.error(
+                f'Ошибка БД при получении ЮРИСТА по phone_number = {phone_number}: {e}'
+            )
+            raise DatabaseErrorException(
+                f'Ошибка БД при получении ЮРИСТА по license_id: {str(e)}'
+            )
 
     async def update(self, updated_attorney: Attorney) -> 'Attorney':
         '''

@@ -5,6 +5,7 @@ from backend.infrastructure.models import EventORM
 
 from datetime import datetime
 
+
 class TestEventMapper:
 
     @pytest.fixture

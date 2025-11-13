@@ -11,4 +11,3 @@ class Event:
     event_date: datetime
     case_id: int
     attorney_id: int
-

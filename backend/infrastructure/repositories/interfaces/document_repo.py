@@ -7,8 +7,8 @@ from backend.domain.entities.document import Document
 
 class IDocumentMetadataRepository(IBaseRepository['Document']):
     '''Специфичный интерфейс для Contact'''
+
     pass
 
     @abstractmethod
-    async def get_all_for_case(self, id: int) -> Sequence['Document']:
-        ...
+    async def get_all_for_case(self, id: int) -> Sequence['Document']: ...

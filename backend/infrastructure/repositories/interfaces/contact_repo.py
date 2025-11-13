@@ -7,8 +7,8 @@ from backend.domain.entities.contact import Contact
 
 class IContactRepository(IBaseRepository['Contact']):
     '''Специфичный интерфейс для Contact'''
+
     pass
 
     @abstractmethod
-    async def get_all_for_case(self, id: int) -> Sequence['Contact']:
-        ...
+    async def get_all_for_case(self, id: int) -> Sequence['Contact']: ...
