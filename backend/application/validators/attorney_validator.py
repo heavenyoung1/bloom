@@ -1,5 +1,5 @@
 from backend.infrastructure.repositories.interfaces.attorney_repo import (
-    IAttorneyRepository,
+    IAttorneyRepository
 )
 from backend.application.dto.attorney import CreateAttorneyDTO
 from backend.core.exceptions import ValidationException
@@ -11,7 +11,7 @@ class AttorneyValidator:
         self.repo = repo
 
     async def validate_on_create(self, dto: CreateAttorneyDTO) -> None:
-
+        '''Валидировать данные при создании юриста'''
         if await self.repo.get_by_email(dto.email):
             logger(f'Email {dto.email} уже занят')
             raise ValidationException(f'Email {dto.email} уже занят')
