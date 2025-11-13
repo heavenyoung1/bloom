@@ -49,4 +49,11 @@ class AttorneyService:
         # 3. Сохраняем в БД
         saved_attorney = await self.uow.attorney_repo.save(attorney)
 
-        return AttorneyResponseDTO.model_validate
+        # ТУТ ВОПРОСИКИ!! ПРОВЕРИТЬ ЧТО ВОЗВРАЩАЕТ!!!!
+        return AttorneyResponseDTO.model_validate(saved_attorney)
+
+    async def get_attorney(self, attorney_id: int) -> AttorneyResponseDTO:
+        '''Получить Юриста по ID.'''
+        attorney = await self.uow.attorney_repo.get(attorney_id)
+        # КАК ВАЛИДИРОВАТЬ ТО?
+        await self.validator.validate_on_create()
