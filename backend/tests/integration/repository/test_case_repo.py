@@ -1,22 +1,8 @@
 import pytest
 from backend.domain.entities.case import Case
-from backend.infrastructure.mappers import CaseMapper
 from backend.core import logger
 from backend.core.exceptions import (
     DatabaseErrorException,
-    EntityNotFoundException,
-    EntityAlreadyExistsError,
-)
-
-from sqlalchemy.exc import (
-    SQLAlchemyError,
-    IntegrityError,
-    OperationalError,
-    ProgrammingError,
-    DataError,
-    NoResultFound,
-    MultipleResultsFound,
-    InvalidRequestError,
 )
 
 

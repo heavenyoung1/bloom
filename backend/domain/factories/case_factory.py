@@ -4,7 +4,7 @@ from backend.infrastructure.models.case import CaseStatus
 
 class CaseFactory:
     '''Фабрика для создания Case'''
-    
+
     @staticmethod
     def create(
         *,

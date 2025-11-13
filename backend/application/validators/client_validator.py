@@ -8,9 +8,10 @@ from backend.application.dto.client import CreateClientDTO
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
+
 class ClientValidator:
     '''Валидатор для клиентов'''
-    
+
     def __init__(
         self,
         client_repo: IClientRepository,
@@ -21,7 +22,7 @@ class ClientValidator:
 
     async def validate_on_create(self, dto: CreateClientDTO) -> None:
         '''Валидировать данные при создании клиента'''
-        
+
         # Юрист должен существовать
         attorney = await self.attorney_repo.get(dto.owner_attorney_id)
         if not attorney:
@@ -29,7 +30,7 @@ class ClientValidator:
             raise EntityNotFoundException(
                 f'Юрист с ID {dto.owner_attorney_id} не найден'
             )
-        
+
         # Email должен быть уникален (если указан)
         if dto.email:
             existing = await self.client_repo.get_by_email(dto.email)
@@ -38,7 +39,7 @@ class ClientValidator:
                 raise ValidationException(
                     f'Email {dto.email} уже используется этим юристом'
                 )
-        
+
         # Номер телефона должен быть уникален (если указан)
         if dto.phone:
             existing = await self.client_repo.get_by_phone(dto.phone)

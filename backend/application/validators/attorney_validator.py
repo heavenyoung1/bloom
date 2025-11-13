@@ -1,5 +1,5 @@
 from backend.infrastructure.repositories.interfaces.attorney_repo import (
-    IAttorneyRepository
+    IAttorneyRepository,
 )
 from backend.application.dto.attorney import CreateAttorneyDTO
 from backend.core.exceptions import ValidationException

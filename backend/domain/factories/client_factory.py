@@ -4,7 +4,7 @@ from backend.infrastructure.models.client import Messenger
 
 class ClientFactory:
     '''Фабрика для создания Client'''
-    
+
     @staticmethod
     def create(
         *,

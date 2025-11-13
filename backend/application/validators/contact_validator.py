@@ -12,7 +12,7 @@ from backend.core.logger import logger
 
 class ContactValidator:
     '''Валидатор для контактов'''
-    
+
     def __init__(
         self,
         contact_repo: IContactRepository,
@@ -23,10 +23,9 @@ class ContactValidator:
 
     async def validate_on_create(self, dto: CreateContactDTO) -> None:
         '''Валидировать данные при создании контакта'''
-        
+
         # Дело должно существовать
         case = await self.case_repo.get(dto.case_id)
         if not case:
             logger.warning(f'Дело {dto.case_id} не найдено')
             raise EntityNotFoundException(f'Дело с ID {dto.case_id} не найдено')
-        

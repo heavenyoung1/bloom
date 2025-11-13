@@ -4,10 +4,9 @@ from backend.domain.entities.event import Event
 from backend.infrastructure.models.event import EventType
 
 
-
 class EventFactory:
     '''Фабрика для создания Event'''
-    
+
     @staticmethod
     def create(
         *,

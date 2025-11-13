@@ -1,8 +1,9 @@
 from backend.domain.entities.contact import Contact
 
+
 class ContactFactory:
     '''Фабрика для создания Contact'''
-    
+
     @staticmethod
     def create(
         *,

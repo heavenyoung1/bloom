@@ -16,7 +16,7 @@ from backend.core.logger import logger
 
 class DocumentValidator:
     '''Валидатор для документов'''
-    
+
     def __init__(
         self,
         document_repo: IDocumentRepository,
@@ -29,14 +29,14 @@ class DocumentValidator:
 
     async def validate_on_create(self, dto: CreateDocumentDTO) -> None:
         '''Валидировать данные при создании документа'''
-        
+
         # Дело должно существовать (если указано)
         if dto.case_id:
             case = await self.case_repo.get(dto.case_id)
             if not case:
                 logger.warning(f'Дело {dto.case_id} не найдено')
                 raise EntityNotFoundException(f'Дело с ID {dto.case_id} не найдено')
-        
+
         # Юрист должен существовать (если указан)
         if dto.attorney_id:
             attorney = await self.attorney_repo.get(dto.attorney_id)

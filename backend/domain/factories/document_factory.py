@@ -3,7 +3,7 @@ from backend.domain.entities.document import Document
 
 class DocumentFactory:
     '''Фабрика для создания Document'''
-    
+
     @staticmethod
     def create(
         *,
