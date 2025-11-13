@@ -1,4 +1,4 @@
-from backend.infrastructure.uow import AsyncUnitOfWork
+from backend.infrastructure.tools.uow import AsyncUnitOfWork
 from backend.application.dto.attorney import (
     CreateAttorneyDTO,
     UpdateAttorneyDTO,
@@ -16,6 +16,7 @@ class AttorneyService:
 
     def __init__(self, uow: AsyncUnitOfWork):
         self.uow = uow
+        self.uow
 
     async def create_attorney(self, data: CreateAttorneyDTO) -> 'AttorneyResponseDTO':
         '''Создать юриста'''
