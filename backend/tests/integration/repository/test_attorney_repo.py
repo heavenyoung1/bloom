@@ -101,3 +101,51 @@ class TestAttorneyRepository:
 
         except SQLAlchemyError as e:
             raise DatabaseErrorException(f'Ошибка при удалении ЮРИСТА: {str(e)}')
+        
+    # -------- GET BY EMAIL --------
+    @pytest.mark.asyncio
+    async def test_get_by_email(self, attorney_repo, sample_attorney):
+        '''Тест: сохранение нового юриста'''
+        save_result = await attorney_repo.save(sample_attorney)
+        assert save_result is not None
+        logger.debug(f'Сохранен ЮРИСТ {save_result}. Email - {save_result.email}')
+        email = save_result.email
+
+        attorney = await attorney_repo.get_by_email(email)
+        assert email == attorney.email
+
+    # -------- GET BY LICENSE ID --------
+    @pytest.mark.asyncio
+    async def test_get_by_license_id(self, attorney_repo, sample_attorney):
+        '''Тест: сохранение нового юриста'''
+        save_result = await attorney_repo.save(sample_attorney)
+        assert save_result is not None
+        logger.debug(f'Сохранен ЮРИСТ {save_result}')
+        license_id = save_result.license_id
+
+        attorney = await attorney_repo.get_by_license_id(license_id)
+        assert license_id == attorney.license_id
+
+    # -------- GET BY LICENSE ID --------
+    @pytest.mark.asyncio
+    async def test_get_by_license_id(self, attorney_repo, sample_attorney):
+        '''Тест: сохранение нового юриста'''
+        save_result = await attorney_repo.save(sample_attorney)
+        assert save_result is not None
+        logger.debug(f'Сохранен ЮРИСТ {save_result}')
+        license_id = save_result.license_id
+
+        attorney = await attorney_repo.get_by_license_id(license_id)
+        assert license_id == attorney.license_id
+
+    # -------- GET BY LICENSE ID --------
+    @pytest.mark.asyncio
+    async def test_get_by_phone(self, attorney_repo, sample_attorney):
+        '''Тест: сохранение нового юриста'''
+        save_result = await attorney_repo.save(sample_attorney)
+        assert save_result is not None
+        logger.debug(f'Сохранен ЮРИСТ {save_result}')
+        phone_number = save_result.phone
+
+        attorney = await attorney_repo.get_by_phone(phone_number)
+        assert phone_number == attorney.phone

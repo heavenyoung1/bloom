@@ -29,7 +29,7 @@ class AttorneyORM(TimeStampMixin, Base):
     email: Mapped[str] = mapped_column(
         String(50), nullable=False, unique=True, index=True
     )
-    phone: Mapped[str] = mapped_column(String(20))
+    phone: Mapped[str] = mapped_column(String(20), unique=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
