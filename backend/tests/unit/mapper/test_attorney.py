@@ -10,7 +10,7 @@ class TestAttorneyMapper:
     def sampleattorney_domain(self):
         return Attorney(
             id=None,
-            attorney_id='322/4767',
+            license_id='322/4767',
             first_name='Иван',
             last_name='Петров',
             patronymic='Сергеевич',
@@ -24,7 +24,7 @@ class TestAttorneyMapper:
     def sampleattorney_orm(self):
         return AttorneyORM(
             id=None,
-            attorney_id='322/4767',
+            license_id='322/4767',
             first_name='Иван',
             last_name='Петров',
             patronymic='Сергеевич',
@@ -37,7 +37,7 @@ class TestAttorneyMapper:
     def test_to_orm(self, sampleattorney_domain):
         orm = AttorneyMapper.to_orm(sampleattorney_domain)
         assert orm.id == sampleattorney_domain.id
-        assert orm.attorney_id == sampleattorney_domain.attorney_id
+        assert orm.license_id == sampleattorney_domain.license_id
         assert orm.first_name == sampleattorney_domain.first_name
         assert orm.last_name == sampleattorney_domain.last_name
         assert orm.patronymic == sampleattorney_domain.patronymic
@@ -50,7 +50,7 @@ class TestAttorneyMapper:
     def test_to_domain(self, sampleattorney_orm):
         domain = AttorneyMapper.to_domain(sampleattorney_orm)
         assert domain.id == sampleattorney_orm.id
-        assert domain.attorney_id == sampleattorney_orm.attorney_id
+        assert domain.license_id == sampleattorney_orm.license_id
         assert domain.first_name == sampleattorney_orm.first_name
         assert domain.last_name == sampleattorney_orm.last_name
         assert domain.patronymic == sampleattorney_orm.patronymic

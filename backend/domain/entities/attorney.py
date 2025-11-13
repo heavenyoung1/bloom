@@ -5,8 +5,8 @@ from typing import Optional
 
 @dataclass
 class Attorney:
-    id: str
-    attorney_id: str
+    id: int
+    license_id: str
     first_name: str
     last_name: str
     patronymic: str

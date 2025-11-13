@@ -20,7 +20,7 @@ class AttorneyORM(TimeStampMixin, Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # НУЖНО НАЗВАНИЕ ПОМЕНЯТЬ!!!
-    attorney_id: Mapped[str] = mapped_column(
+    license_id: Mapped[str] = mapped_column(
         String(50), nullable=False, unique=True
     )  # номер удостоверения
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)

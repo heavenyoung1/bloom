@@ -24,7 +24,7 @@ class CreateAttorneyDTO(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             'example': {
-                'attorney_id': '153/3232',
+                'license_id': '153/3232',
                 'first_name': 'Иван',
                 'last_name': 'Петров',
                 'patronymic': 'Сергеевич',

@@ -24,7 +24,8 @@ class TestAttorneyRepository:
         '''Тест: сохранение нового юриста'''
         save_result = await attorney_repo.save(sample_attorney)
         assert save_result is not None
-        assert save_result.attorney_id == sample_attorney.attorney_id
+        assert save_result.id == sample_attorney.id
+        assert save_result.license_id == sample_attorney.license_id
 
     # -------- SAVE AND GET --------
     @pytest.mark.asyncio
@@ -36,7 +37,7 @@ class TestAttorneyRepository:
         id = save_result.id
 
         attorney = await attorney_repo.get(id)
-        assert attorney.attorney_id == sample_attorney.attorney_id
+        assert attorney.license_id == sample_attorney.license_id
 
     # -------- SAVE DUPLICATE --------
     @pytest.mark.asyncio

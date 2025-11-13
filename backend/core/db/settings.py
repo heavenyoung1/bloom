@@ -14,11 +14,11 @@ class Settings(BaseSettings):
     db_name: str
 
     # Параметры БД для тестирования
-    test_host: str
-    test_port: int
-    test_user: str
-    test_password: str
-    test_db_name: str
+    # test_host: str
+    # test_port: int
+    # test_user: str
+    # test_password: str
+    # test_db_name: str
 
     # SQLAlchemy параметры
     driver: str = 'postgresql+asyncpg'
@@ -57,15 +57,15 @@ class Settings(BaseSettings):
         url = f'{self._sync_driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
         return url
     
-    def test_url(self) -> str:
-        '''URL для тестовой БД — переопределяется через переменные окружения.'''
-        return str(
-            URL.create(
-                drivername=self.driver,
-                username=self.test_user,
-                password=self.test_password,
-                host=self.test_host,
-                port=self.test_port,
-                database=self.test_db_name,
-            )
-        )
+    # def test_url(self) -> str:
+    #     '''URL для тестовой БД — переопределяется через переменные окружения.'''
+    #     return str(
+    #         URL.create(
+    #             drivername=self.driver,
+    #             username=self.test_user,
+    #             password=self.test_password,
+    #             host=self.test_host,
+    #             port=self.test_port,
+    #             database=self.test_db_name,
+    #         )
+    #     )

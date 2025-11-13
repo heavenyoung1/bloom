@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -72,6 +72,43 @@ class AttorneyRepository(IAttorneyRepository):
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении ЮРИСТА ID={id}: {e}')
             raise DatabaseErrorException(f'Ошибка БД при получении ЮРИСТА: {str(e)}')
+        
+    async def get_by_email(self, email: str) -> Optional['Attorney']:
+        try:
+            # 1. Получение записи из базы данных
+            stmt = select(AttorneyORM).where(AttorneyORM.email == email)
+            result = await self.session.execute(stmt)
+            orm_attorney = result.scalars().first()
+
+            # 2. Проверка существования записи в БД
+            if orm_attorney:
+                attorney = AttorneyMapper.to_domain(orm_attorney)
+                logger.info(f'ЮРИСТ успешно получен по email. ID - {attorney.id}. Email - {attorney.email}.')
+                return attorney
+            else:
+                return None
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка БД при получении ЮРИСТА по email={email}: {e}')
+            raise DatabaseErrorException(f'Ошибка БД при получении ЮРИСТА по email: {str(e)}')
+        
+    async def get_by_at(self, email: str) -> Optional['Attorney']:
+        try:
+            # 1. Получение записи из базы данных
+            stmt = select(AttorneyORM).where(AttorneyORM.email == email)
+            result = await self.session.execute(stmt)
+            orm_attorney = result.scalars().first()
+
+            # 2. Проверка существования записи в БД
+            if orm_attorney:
+                attorney = AttorneyMapper.to_domain(orm_attorney)
+                logger.info(f'ЮРИСТ успешно получен по email. ID - {attorney.id}. Email - {attorney.email}.')
+                return attorney
+            if not orm_attorney:
+                return None
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка БД при получении ЮРИСТА по email={email}: {e}')
+            raise DatabaseErrorException(f'Ошибка БД при получении ЮРИСТА по email: {str(e)}')
+
 
     async def update(self, updated_attorney: Attorney) -> 'Attorney':
         '''

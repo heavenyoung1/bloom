@@ -16,7 +16,7 @@ async def persisted_attorney_id(attorney_repo, sample_attorney):
 def sample_attorney():
     return Attorney(
         id=None,  # Позволяем БД генерировать ID
-        attorney_id='322/4767',
+        license_id='322/4767',
         first_name='Иван',
         last_name='Петров',
         patronymic='Сергеевич',
@@ -28,10 +28,10 @@ def sample_attorney():
 
 
 @pytest.fixture
-def sample_update_attorney(fixed_now):
+def sample_update_attorney():
     return Attorney(
         id=None,  # Позволяем БД генерировать ID
-        attorney_id='322/4767',
+        license_id='322/4767',
         first_name='Иван',
         last_name='Петров',
         patronymic='Сергеевич',
@@ -43,12 +43,12 @@ def sample_update_attorney(fixed_now):
 
 
 @pytest.fixture
-def attorneys_list(fixed_now):
+def attorneys_list():
     '''Фикстура: список юристов для тестирования'''
     return [
         Attorney(
             id=None,  # Позволяем БД генерировать ID
-            attorney_id='322/4767',
+            license_id='322/4767',
             first_name='Иван',
             last_name='Петров',
             patronymic='Сергеевич',
@@ -59,7 +59,7 @@ def attorneys_list(fixed_now):
         ),
         Attorney(
             id=None,
-            attorney_id='111/2222',
+            license_id='111/2222',
             first_name='Александр',
             last_name='Иванов',
             patronymic='Дмитриевич',
@@ -70,7 +70,7 @@ def attorneys_list(fixed_now):
         ),
         Attorney(
             id=None,
-            attorney_id='333/7777',
+            license_id='333/7777',
             first_name='Мария',
             last_name='Смирнова',
             patronymic='Петровна',
@@ -81,7 +81,7 @@ def attorneys_list(fixed_now):
         ),
         Attorney(
             id=None,
-            attorney_id='444/8888',
+            license_id='444/8888',
             first_name='Екатерина',
             last_name='Васильева',
             patronymic='Сергеевна',
@@ -92,7 +92,7 @@ def attorneys_list(fixed_now):
         ),
         Attorney(
             id=None,
-            attorney_id='555/9999',
+            license_id='555/9999',
             first_name='Дмитрий',
             last_name='Александров',
             patronymic='Вячеславович',
