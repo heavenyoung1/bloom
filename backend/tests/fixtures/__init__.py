@@ -9,7 +9,7 @@ from .repositories import (
     event_repo,
 )
 from .database import (
-    test_db_url,
+    # test_db_url,
     engine,
     SessionLocal,
     session,
@@ -24,7 +24,7 @@ __all__ = [
     'contact_repo',
     'document_repo',
     'event_repo',
-    'test_db_url',
+    #'test_db_url',
     'engine',
     'SessionLocal',
     'session',

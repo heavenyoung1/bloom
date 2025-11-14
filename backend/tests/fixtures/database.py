@@ -1,27 +1,31 @@
 import pytest
 import asyncio
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine import URL
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.infrastructure.models._base import Base
+from backend.core.logger import logger
+
+
+# @pytest.fixture(scope='session')
+# def test_db_url():
+#     '''URL тестовой БД'''
+#     return 'postgresql+asyncpg://postgres:1234@192.168.31.203:5436/test_db'
 
 
 @pytest.fixture(scope='session')
-def test_db_url():
-    '''URL тестовой БД'''
-    return 'postgresql+asyncpg://postgres:1234@192.168.175.129:5436/test_db'
-
-
-@pytest.fixture(scope='session')
-async def engine(test_db_url):
+async def engine(test_settings):
     '''
     Создание engine для тестовой БД.
 
     scope='session' - engine существует на протяжении ВСЕХ тестов
     Это экономит время на создание/удаление таблиц
     '''
+    logger.info(f'БД ПОДКЛЮЧЕНИЕ {test_settings.url()}')
     engine = create_async_engine(
-        test_db_url,
+        test_settings.url(),
         echo=False,
         pool_pre_ping=True,
         pool_size=5,
