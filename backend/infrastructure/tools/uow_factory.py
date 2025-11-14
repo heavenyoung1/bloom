@@ -1,5 +1,5 @@
 from backend.core.db.database import DataBaseConnection
-from backend.infrastructure.uow import AsyncUnitOfWork
+from backend.infrastructure.tools.uow import AsyncUnitOfWork
 from backend.core.logger import logger
 from typing import AsyncGenerator
 from contextlib import asynccontextmanager
