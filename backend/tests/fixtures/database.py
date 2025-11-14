@@ -2,7 +2,6 @@ import pytest
 import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
-from unittest.mock import AsyncMock
 
 from backend.infrastructure.models._base import Base
 
@@ -68,11 +67,3 @@ async def session(SessionLocal):
         finally:
             await sess.rollback()  # ← откатываем
             # ← НИКАКОГО close()!
-
-
-@pytest.fixture
-def uow_mock(attorney_repo_mock):
-    '''Мок Unit of Work'''
-    uow = AsyncMock()
-    uow.attorney_repo = attorney_repo_mock
-    return uow
