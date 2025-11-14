@@ -14,17 +14,17 @@ class AttorneyValidator:
         '''Валидировать данные при создании юриста'''
         attorney_email = await self.repo.get_by_email(dto.email)
         if attorney_email:
-            logger(f'Email {dto.email} уже занят')
+            logger.info(f'Email {dto.email} уже занят')
             raise ValidationException(f'Email {dto.email} уже занят')
 
         attorney_license = await self.repo.get_by_license_id(dto.license_id)
         if attorney_license:
-            logger(f'Номер Удостоверения адвоката {dto.license_id} уже занят')
+            logger.info(f'Номер Удостоверения адвоката {dto.license_id} уже занят')
             raise ValidationException(
                 f'Номер Удостоверения адвоката {dto.license_id} уже занят'
             )
 
         attorney_phone = await self.repo.get_by_phone(dto.phone)
         if attorney_phone:
-            logger(f'Номер телефона {dto.phone} уже занят')
+            logger.info(f'Номер телефона {dto.phone} уже занят')
             raise ValidationException(f'Номер телефона {dto.phone} уже занят')

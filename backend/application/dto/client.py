@@ -20,7 +20,7 @@ class CreateClientDTO(BaseModel):
         default=None, to_lowercase=True, description='Email (необязательно)'
     )
     phone: str = Field(
-        ..., regex=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
+        ..., pattern=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
     )
     personal_info: str = Field(
         ...,
@@ -67,7 +67,7 @@ class UpdateClientDTO(BaseModel):
         default=None, to_lowercase=True, description='Email (необязательно)'
     )
     phone: Optional[str] = Field(
-        default=None, regex=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
+        default=None, pattern=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
     )
     personal_info: Optional[str] = Field(
         default=None,
