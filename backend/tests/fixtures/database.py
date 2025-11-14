@@ -9,12 +9,6 @@ from backend.infrastructure.models._base import Base
 from backend.core.logger import logger
 
 
-# @pytest.fixture(scope='session')
-# def test_db_url():
-#     '''URL тестовой БД'''
-#     return 'postgresql+asyncpg://postgres:1234@192.168.31.203:5436/test_db'
-
-
 @pytest.fixture(scope='session')
 async def engine(test_settings):
     '''

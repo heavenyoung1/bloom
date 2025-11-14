@@ -18,9 +18,9 @@ class AttorneyService:
 
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory  # Используем фабрику для создания UoW
-        self.validator = AttorneyValidator(
-            uow_factory.attorney_repo
-        )  # Валидатор использует репозиторий из фабрики
+        # self.validator = AttorneyValidator(
+        #     uow_factory.attorney_repo
+        # )  # Валидатор использует репозиторий из фабрики
         self.factory = AttorneyFactory()  # Фабрика для создания сущностей
 
     async def create_attorney(self, data: CreateAttorneyDTO) -> 'AttorneyResponseDTO':
@@ -28,38 +28,45 @@ class AttorneyService:
         Создать нового юриста.
 
         Шаги:
-        1. Валидируем данные (Validator)
-        2. Создаём Entity (Factory)
-        3. Сохраняем через Repository (UoW)
-        4. Возвращаем DTO
+        1. Создаём UoW через фабрику
+        2. Валидируем данные
+        3. Хешируем пароль
+        4. Создаём Entity
+        5. Сохраняем в БД
+        6. Возвращаем DTO
         '''
 
-        # 1. Валидация через Validator
-        await self.validator.validate_on_create(data)
-
-        # 1.1 ТУТ ДОЛЖНА БЫТЬ ХЕШИРОВАНИЕ ПАРОЛЯ
-
-        # 3. Создание Entity через Factory
-        attorney = self.factory.create(
-            license_id=data.license_id,
-            first_name=data.first_name,
-            last_name=data.last_name,
-            patronymic=data.patronymic,
-            email=data.email,
-            phone=data.phone,
-            password_hash=data.password,  #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        )
-
-        # 4. Используем фабрику для создания UoW и работы с репозиториями
+        # 1. Создаём UoW через фабрику (получаем все репозитории)
         async with self.uow_factory.create() as uow:
-            # Сохраняем юриста в БД через репозиторий из UoW
+
+            # 2. Инициализируем валидатор с репозиторием из UoW
+            validator = AttorneyValidator(uow.attorney_repo)
+
+            # 3. Валидируем данные
+            await validator.validate_on_create(data)
+
+            # 4 ТУТ ДОЛЖНА БЫТЬ ХЕШИРОВАНИЕ ПАРОЛЯ
+
+            # 5. Создаём Entity через Factory
+            attorney = self.factory.create(
+                license_id=data.license_id,
+                first_name=data.first_name,
+                last_name=data.last_name,
+                patronymic=data.patronymic,
+                email=data.email,
+                phone=data.phone,
+                password_hash=data.password,  # Здесь мы будем передавать захешированный пароль
+            )
+
+            # 6. Сохраняем в БД
             saved_attorney = await uow.attorney_repo.save(attorney)
 
-        # ТУТ ВОПРОСИКИ!! ПРОВЕРИТЬ ЧТО ВОЗВРАЩАЕТ!!!!
-        logger.info(
-            f'Юрист создан: ID={saved_attorney.id}, Email={saved_attorney.email}'
-        )
-        return AttorneyResponseDTO.model_validate(saved_attorney)
+            logger.info(
+                f'Юрист создан: ID={saved_attorney.id}, Email={saved_attorney.email}'
+            )
+
+            # 7. Преобразуем в DTO и возвращаем
+            return AttorneyResponseDTO.model_validate(saved_attorney)
 
     async def get_attorney(self, attorney_id: int) -> AttorneyResponseDTO:
         '''Получить Юриста по ID.'''

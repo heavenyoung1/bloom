@@ -28,7 +28,7 @@ class TestSettings(BaseSettings):
     )
 
     def url(self) -> str:
-        '''Строка для подключения к БД ТОЛЬКО для выполнения Alembic миграций.'''
+        '''Строка для подключения к БД для тестов'''
         url = f'{self.driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
         return url
 

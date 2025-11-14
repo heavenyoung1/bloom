@@ -41,7 +41,7 @@ class AsyncUnitOfWork:
 
     async def __aenter__(self):
         '''Вход в async context manager.'''
-        logger.info('🏗️ AsyncUnitOfWork инициализирован')
+        logger.info('✅ AsyncUnitOfWork инициализирован')
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):

@@ -33,32 +33,32 @@ class DataBaseConnection:
             autoflush=False,  # Контролирует, когда SQLAlchemy отправляет изменения в БД
         )
 
-        @asynccontextmanager
-        async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
-            '''
-            Async context manager для создания сессии БД.
+    @asynccontextmanager
+    async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
+        '''
+        Async context manager для создания сессии БД.
 
-            ⚠️ ВАЖНО: Коммит/откат управляются UnitOfWork, НЕ здесь!
+        ⚠️ ВАЖНО: Коммит/откат управляются UnitOfWork, НЕ здесь!
 
-            Эта функция ТОЛЬКО:
-            - Создаёт async сессию из фабрики
-            - Закрывает сессию после использования
+        Эта функция ТОЛЬКО:
+        - Создаёт async сессию из фабрики
+        - Закрывает сессию после использования
 
-            UnitOfWork сам решает: коммитить или откатывать.
+        UnitOfWork сам решает: коммитить или откатывать.
 
-            Использование:
-                async with db.get_session() as session:
-                    # Передаём сессию в UnitOfWork
-                    uow = UnitOfWork(session)
-                    with uow:
-                        await uow.users.create(...)
-            '''
+        Использование:
+            async with db.get_session() as session:
+                # Передаём сессию в UnitOfWork
+                uow = UnitOfWork(session)
+                with uow:
+                    await uow.users.create(...)
+        '''
 
-            session = self.AsyncSessionLocal()
-            try:
-                yield session
-            finally:
-                await session.close()
+        session = self.AsyncSessionLocal()
+        try:
+            yield session
+        finally:
+            await session.close()
 
     async def dispose(self) -> None:
         '''Корректно закрыть соединения пула (например, при завершении приложения/тестов).'''
