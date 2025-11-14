@@ -1,12 +1,6 @@
 from backend.domain.entities.attorney import Attorney
-from backend.application.dto.attorney import (
-    CreateAttorneyDTO, 
-    UpdateAttorneyDTO,
-)
 
 import pytest
-
-# from .fixed_data import fixed_now
 
 
 @pytest.fixture
@@ -106,15 +100,3 @@ def attorneys_list():
             is_active=True,
         ),
     ]
-
-@pytest.fixture
-async def valid_attorney_dto():
-    return CreateAttorneyDTO(
-        license_id= '153/3232',
-        first_name= 'Иван',
-        last_name= 'Петров',
-        patronymic= 'Сергеевич',
-        email= 'ivan@example.com',
-        phone= '+79991234567',
-        password= 'SecurePass123!',  
-    )

@@ -67,7 +67,9 @@ class UpdateClientDTO(BaseModel):
         default=None, to_lowercase=True, description='Email (необязательно)'
     )
     phone: Optional[str] = Field(
-        default=None, pattern=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
+        default=None,
+        pattern=r'^\+7\d{10}$',
+        description='Телефон в формате +7XXXXXXXXXX',
     )
     personal_info: Optional[str] = Field(
         default=None,

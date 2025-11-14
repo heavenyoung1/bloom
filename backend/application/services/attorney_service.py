@@ -58,7 +58,9 @@ class AttorneyService:
         # )
 
         # ТУТ ВОПРОСИКИ!! ПРОВЕРИТЬ ЧТО ВОЗВРАЩАЕТ!!!!
-        logger.info(f'Юрист создан: ID={saved_attorney.id}, Email={saved_attorney.email}')
+        logger.info(
+            f'Юрист создан: ID={saved_attorney.id}, Email={saved_attorney.email}'
+        )
         return AttorneyResponseDTO.model_validate(saved_attorney)
 
     async def get_attorney(self, attorney_id: int) -> AttorneyResponseDTO:
@@ -76,16 +78,16 @@ class AttorneyService:
     async def get_all_attorneys(self) -> list[AttorneyListItemDTO]:
         '''
         Получить всех юристов.
-        
+
         Returns:
             Список AttorneyListItemDTO (облегчённая версия)
         '''
         # Получаем всех юристов
         attorneys = await self.uow.attorney_repo.get_all()
-        
+
         # Преобразуем каждого в DTO
         return [AttorneyListItemDTO.model_validate(a) for a in attorneys]
-    
+
     # async def update_attorney(
     #         self,
     #         attorney_id: int,

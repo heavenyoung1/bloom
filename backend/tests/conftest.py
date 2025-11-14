@@ -8,6 +8,7 @@ from backend.tests.fixtures.contacts import *
 from backend.tests.fixtures.clients import *
 from backend.tests.fixtures.documents import *
 from backend.tests.fixtures.validators import *
+from backend.tests.fixtures.dto import *
 
 
 def pytest_configure(config):

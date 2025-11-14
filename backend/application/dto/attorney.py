@@ -15,7 +15,9 @@ class CreateAttorneyDTO(BaseModel):
     first_name: str = Field(..., min_length=3, max_length=20, description='Имя')
     last_name: str = Field(..., min_length=3, max_length=20, description='Фамилия')
     patronymic: str = Field(..., min_length=3, max_length=20, description='Отчество')
-    email: EmailStr = Field(...,  description='Email') #to_lowercase=True, -> deprecated
+    email: EmailStr = Field(
+        ..., description='Email'
+    )  # to_lowercase=True, -> deprecated
     phone: str = Field(
         ..., pattern=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
     )

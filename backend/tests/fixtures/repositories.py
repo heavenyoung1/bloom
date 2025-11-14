@@ -20,7 +20,8 @@ from backend.infrastructure.repositories import (
     EventRepository,
 )
 
-# =============== ДЛЯ ИНТЕГРАЦИОННЫХ ТЕСТОВ РЕПОЗИТОРИИ С СЕССИЕЙ РЕАЛЬНОЙ БД =============== 
+# =============== ДЛЯ ИНТЕГРАЦИОННЫХ ТЕСТОВ РЕПОЗИТОРИИ С СЕССИЕЙ РЕАЛЬНОЙ БД ===============
+
 
 @pytest.fixture
 def attorney_repo(session):
@@ -57,9 +58,11 @@ def event_repo(session):
     '''Репозиторий с тестовой сессией'''
     return EventRepository(session)
 
+
 # =========================================================================================
 # =============== ЗАМОКАННЫЕ РЕПОЗИТОРИИ ДЛЯ ЮНИТ - ТЕСТИРОВАНИЯ ==========================
 # AsyncMock, чтобы можно было await'ить методы
+
 
 @pytest.fixture
 def attorney_repo_mock():
@@ -69,24 +72,30 @@ def attorney_repo_mock():
     mock.get_by_phone = AsyncMock(return_value=None)
     return mock
 
+
 @pytest.fixture
 def case_repo_mock():
     return AsyncMock(spec=ICaseRepository)
+
 
 @pytest.fixture
 def client_repo_mock():
     return AsyncMock(spec=IClientRepository)
 
+
 @pytest.fixture
 def contact_repo_mock():
     return AsyncMock(spec=IContactRepository)
+
 
 @pytest.fixture
 def document_repo_mock():
     return AsyncMock(spec=IDocumentMetadataRepository)
 
+
 @pytest.fixture
 def event_repo_mock():
     return AsyncMock(spec=IEventRepository)
+
 
 # =========================================================================================
