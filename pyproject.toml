@@ -12,6 +12,7 @@ dependencies = [
     "mypy>=1.18.2",
     "psycopg2-binary>=2.9.11",
     "pydantic-settings>=2.11.0",
+    "pydantic[email]>=2.12.3",
     "pylint>=4.0.2",
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",

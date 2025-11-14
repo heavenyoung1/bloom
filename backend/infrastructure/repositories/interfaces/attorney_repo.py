@@ -8,8 +8,6 @@ from backend.domain.entities.attorney import Attorney
 class IAttorneyRepository(IBaseRepository[Attorney]):
     '''Специфичный интерфейс для Attorney'''
 
-    pass
-
     @abstractmethod
     async def get_by_email(self, email: str) -> Optional['Attorney']: ...
 

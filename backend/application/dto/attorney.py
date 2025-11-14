@@ -15,9 +15,9 @@ class CreateAttorneyDTO(BaseModel):
     first_name: str = Field(..., min_length=3, max_length=20, description='Имя')
     last_name: str = Field(..., min_length=3, max_length=20, description='Фамилия')
     patronymic: str = Field(..., min_length=3, max_length=20, description='Отчество')
-    email: EmailStr = Field(..., to_lowercase=True, description='Email')
+    email: EmailStr = Field(...,  description='Email') #to_lowercase=True, -> deprecated
     phone: str = Field(
-        ..., regex=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
+        ..., pattern=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
     )
     password: SecretStr = Field(..., min_length=8, description='Минимум 8 символов')
 
@@ -47,12 +47,12 @@ class UpdateAttorneyDTO(BaseModel):
     last_name: Optional[str] = Field(default=None, min_length=3, max_length=20)
     patronymic: Optional[str] = Field(default=None, min_length=3, max_length=20)
     email: Optional[EmailStr] = Field(default=None)
-    phone: Optional[str] = Field(default=None, regex=r'^\+7\d{10}$')
+    phone: Optional[str] = Field(default=None, pattern=r'^\+7\d{10}$')
 
     model_config = ConfigDict(
         json_schema_extra={
             'example': {
-                'attorney_id': '153/3232',
+                'license_id': '153/3232',
                 'first_name': 'Иван',
                 'last_name': 'Петров',
                 'patronymic': 'Сергеевич',

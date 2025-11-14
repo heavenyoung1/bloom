@@ -63,7 +63,11 @@ def event_repo(session):
 
 @pytest.fixture
 def attorney_repo_mock():
-    return AsyncMock(spec=IAttorneyRepository)
+    mock = AsyncMock()
+    mock.get_by_email = AsyncMock(return_value=None)
+    mock.get_by_license_id = AsyncMock(return_value=None)
+    mock.get_by_phone = AsyncMock(return_value=None)
+    return mock
 
 @pytest.fixture
 def case_repo_mock():
