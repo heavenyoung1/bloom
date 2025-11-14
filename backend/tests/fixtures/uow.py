@@ -3,6 +3,9 @@ from unittest.mock import AsyncMock
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from backend.infrastructure.tools.uow import AsyncUnitOfWork
+from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
+from backend.core.db.database import DataBaseConnection
+
 
 @pytest.fixture
 def uow_mock(
@@ -15,15 +18,15 @@ def uow_mock(
 ):
     '''
     Mock Unit of Work для unit тестов.
-    
+
     Все repositories — mock объекты.
-    
+
     Использование:
         async def test_create_attorney(uow_mock):
             # Настраиваем поведение mock
             uow_mock.attorney_repo.get_by_email.return_value = None
             uow_mock.attorney_repo.save.return_value = attorney_obj
-            
+
             # Тестируем Service
             service = AttorneyService(uow_mock)
             result = await service.create_attorney(data)
@@ -39,24 +42,12 @@ def uow_mock(
 
 
 @pytest.fixture
-async def test_uow(session) -> AsyncGenerator[AsyncUnitOfWork, None]:
-    '''Реальный UoW с тестовой сессией + откатом'''
-    uow = AsyncUnitOfWork(session)
-    async with uow:
-        yield uow
+async def uow_factory(test_db_url):
+    '''Тестовая фабрика UoW с тестовой базой данных.'''
+    # Подключаемся к тестовой базе данных
+    db_connection = DataBaseConnection(url=test_db_url)
+    uow_factory = UnitOfWorkFactory(db_connection)
 
-
-@pytest.fixture
-@asynccontextmanager
-async def test_uow_factory(session) -> AsyncGenerator[AsyncUnitOfWork, None]:
-    '''
-    Тестовая фабрика UoW — НЕ использует DataBaseConnection и Settings!
-    
-    Использование:
-        async def test_something(test_uow_factory):
-            async with test_uow_factory() as uow:
-                ...
-    '''
-    uow = AsyncUnitOfWork(session)
-    async with uow:
+    # Возвращаем фабрику для создания UnitOfWork
+    async with uow_factory.create() as uow:
         yield uow

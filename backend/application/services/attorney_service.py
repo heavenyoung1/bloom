@@ -1,4 +1,3 @@
-from backend.infrastructure.tools.uow import AsyncUnitOfWork
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.attorney import (
     CreateAttorneyDTO,
