@@ -30,7 +30,7 @@ from backend.core.db.database import DataBaseConnection
 async def test_uow(session) -> 'AsyncUnitOfWork':
     """
     Создаёт директный UnitOfWork с тестовой сессией.
-    
+
     Использование (если нужно работать с UoW напрямую):
         async def test_something(test_uow):
             attorney = await test_uow.attorney_repo.get(1)
@@ -38,6 +38,7 @@ async def test_uow(session) -> 'AsyncUnitOfWork':
     uow = AsyncUnitOfWork(session)
     async with uow:
         yield uow
+
 
 @pytest.fixture
 async def uow_factory(test_settings):
@@ -52,7 +53,6 @@ async def uow_factory(test_settings):
     # async with uow_factory.create() as uow:
     #     yield uow
     yield uow_factory
-    
+
     # Cleanup
     await uow_factory.close()
-

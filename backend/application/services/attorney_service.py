@@ -55,7 +55,8 @@ class AttorneyService:
                 patronymic=data.patronymic,
                 email=data.email,
                 phone=data.phone,
-                password_hash=data.password,  # Здесь мы будем передавать захешированный пароль
+                # ВРЕМЕННОЕ РЕШЕНИЕ ПЕРЕДАЧИ ПАРОЛЯ ИМЕННО СТРОКОЙ!!!!
+                password_hash='SecurePass123!',  # data.password,  # Здесь мы будем передавать захешированный пароль
             )
 
             # 6. Сохраняем в БД

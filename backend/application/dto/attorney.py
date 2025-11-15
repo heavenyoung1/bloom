@@ -76,8 +76,8 @@ class AttorneyResponseDTO(BaseModel):
     email: str
     phone: str
     is_active: bool
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime]  # Делаем эти поля опциональными
+    updated_at: Optional[datetime]  # Делаем эти поля опциональными
 
     model_config = ConfigDict(
         from_attributes=True,
