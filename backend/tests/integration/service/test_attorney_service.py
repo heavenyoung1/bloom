@@ -4,9 +4,8 @@ from backend.application.services.attorney_service import AttorneyService
 from backend.core.logger import logger
 
 
-@pytest.mark.asyncio
 class TestAttorneyService:
-
+    @pytest.mark.asyncio
     async def test_create_attorney(self, attorney_service, valid_attorney_dto):
 
         # Создание юриста через сервис
