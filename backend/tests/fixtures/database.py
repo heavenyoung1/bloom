@@ -51,17 +51,21 @@ def SessionLocal(engine):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 async def session(SessionLocal):
     '''Сессия для отдельного теста.
 
     scope='function' (по умолчанию) - НОВАЯ сессия для каждого теста
-    Это гарантирует чистоту данных между тестами
+    Это гарантирует чистоту данных между тестами.
+    Все изменения будут откатываться после выполнения теста.
     '''
     async with SessionLocal() as sess:
+        logger.info(f'SessionLocal() BEGIN')
         await sess.begin()  # ← начинаем транзакцию
         try:
+            logger.info(f'YIELD SESSION')
             yield sess
         finally:
+            logger.info(f'ROLLBACK РАБОТАЕТ??')
             await sess.rollback()  # ← откатываем
             # ← НИКАКОГО close()!

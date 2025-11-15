@@ -27,14 +27,14 @@ from backend.core.db.database import DataBaseConnection
 
 
 @pytest.fixture
-async def test_uow(session) -> 'AsyncUnitOfWork':
-    """
+async def test_uow(session) -> AsyncGenerator[AsyncUnitOfWork, None]:
+    '''
     Создаёт директный UnitOfWork с тестовой сессией.
 
     Использование (если нужно работать с UoW напрямую):
         async def test_something(test_uow):
             attorney = await test_uow.attorney_repo.get(1)
-    """
+    '''
     uow = AsyncUnitOfWork(session)
     async with uow:
         yield uow
