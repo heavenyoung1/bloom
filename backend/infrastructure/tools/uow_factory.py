@@ -29,4 +29,4 @@ class UnitOfWorkFactory:
     async def close(self) -> None:
         '''Закрытие соединений с БД при завершении приложения.'''
         await self.db.dispose()
-        logger.info('🛑 DataBaseConnection закрыта')
+        logger.info('DataBaseConnection закрыта')

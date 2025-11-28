@@ -12,5 +12,5 @@ class TestAttorneyService:
         created_attorney = await attorney_service.create_attorney(valid_attorney_dto)
 
         # Проверка, что юрист был создан
-        logger.info(f'ЮРИСТ СОЗ')
+        logger.info(f'TestAttorneyService -> Юрист создан.')
         assert created_attorney.id is not None
