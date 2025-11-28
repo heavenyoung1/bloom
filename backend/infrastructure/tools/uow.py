@@ -41,7 +41,7 @@ class AsyncUnitOfWork:
 
     async def __aenter__(self):
         '''Вход в async context manager.'''
-        logger.info('✅ AsyncUnitOfWork инициализирован')
+        logger.info('AsyncUnitOfWork инициализирован')
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -56,14 +56,14 @@ class AsyncUnitOfWork:
                 await self.commit()
         finally:
             # Не закрываем сессию! Database отвечает за это
-            logger.info('✅ AsyncUnitOfWork завершил работу')
+            logger.info('AsyncUnitOfWork завершил работу')
 
     async def commit(self) -> None:
         '''Фиксация изменений.'''
         if self.session:
             try:
                 await self.session.commit()
-                logger.info('✅ Транзакция зафиксирована')
+                logger.info('Транзакция зафиксирована')
             except Exception as e:
                 logger.error(f'❌ Ошибка при коммите: {e}')
                 raise
@@ -73,7 +73,7 @@ class AsyncUnitOfWork:
         if self.session:
             try:
                 await self.session.rollback()
-                logger.info('🔄 Транзакция откачена')
+                logger.info('Транзакция откачена')
             except Exception as e:
-                logger.error(f'❌ КРИТИЧЕСКАЯ ОШИБКА при rollback: {e}')
+                logger.error(f'КРИТИЧЕСКАЯ ОШИБКА при rollback: {e}')
                 raise

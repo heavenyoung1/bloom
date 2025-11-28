@@ -10,7 +10,7 @@ class UnitOfWorkFactory:
 
     def __init__(self, db: DataBaseConnection):
         self.db = db
-        logger.info('✅ UnitOfWorkFactory инициализирована')
+        logger.info('UnitOfWorkFactory инициализирована')
 
     @asynccontextmanager
     async def create(self) -> AsyncGenerator[AsyncUnitOfWork, None]:
