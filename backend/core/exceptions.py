@@ -16,7 +16,7 @@ class EntityNotFoundException(BaseCustomException):
     '''Ошибка, когда сущность не найдена.'''
 
     def __init__(self, entity: str):
-        self.message = f'{entity} не найдено'
+        self.message = f'{entity} не найден.'
         super().__init__(self.message)
 
 

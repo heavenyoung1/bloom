@@ -77,8 +77,8 @@ class AttorneyService:
             attorney = await uow.attorney_repo.get(attorney_id)
 
         if not attorney:
-            logger.warning(f'Юрист ID {attorney_id} не найден')
-            raise EntityNotFoundException(f'Юрист с ID {attorney_id} не найден')
+            logger.warning(f'Юрист ID {attorney_id} не найден.')
+            raise EntityNotFoundException(f'Юрист с ID {attorney_id}')
 
         # Преобразуем в DTO и возвращаем
         return AttorneyResponseDTO.model_validate(attorney)

@@ -20,7 +20,7 @@ def sample_attorney():
         patronymic='Сергеевич',
         email='ivan@example.com',
         phone='+79991234567',
-        password_hash='hash123',
+        password_hash='hash12345678',
         is_active=True,
     )
 
