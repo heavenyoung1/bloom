@@ -3,7 +3,7 @@ from backend.application.dto.attorney import (
     CreateAttorneyDTO,
     UpdateAttorneyDTO,
     AttorneyResponseDTO,
-    AttorneyListItemDTO,
+    # AttorneyListItemDTO,
 )
 from backend.domain.entities.attorney import Attorney
 from backend.application.validators.attorney_validator import AttorneyValidator
@@ -83,20 +83,20 @@ class AttorneyService:
         # Преобразуем в DTO и возвращаем
         return AttorneyResponseDTO.model_validate(attorney)
 
-    async def get_all_attorneys(self) -> list[AttorneyListItemDTO]:
-        '''
-        Получить всех юристов.
+    # async def get_all_attorneys(self) -> list[AttorneyResponseDTO]:
+    #     '''
+    #     Получить всех юристов.
 
-        Returns:
-            Список AttorneyListItemDTO (облегчённая версия)
-        '''
-        # Используем фабрику для создания UoW и работы с репозиториями
-        async with self.uow_factory.create() as uow:
-            # Получаем всех юристов через репозиторий из UoW
-            attorneys = await uow.attorney_repo.get_all()
+    #     Returns:
+    #         Список AttorneyListItemDTO (облегчённая версия)
+    #     '''
+    #     # Используем фабрику для создания UoW и работы с репозиториями
+    #     async with self.uow_factory.create() as uow:
+    #         # Получаем всех юристов через репозиторий из UoW
+    #         attorneys = await uow.attorney_repo.get_all()
 
-        # Преобразуем каждого в DTO
-        return [AttorneyListItemDTO.model_validate(a) for a in attorneys]
+    #     # Преобразуем каждого в DTO
+    #     return [AttorneyResponseDTO.model_validate(a) for a in attorneys]
 
     async def update_attorney(
         self, attorney_id: int, data: UpdateAttorneyDTO
@@ -115,6 +115,7 @@ class AttorneyService:
             pass
 
             # Обновляем поля юриста
+            attorney.license_id = data.license_id
             attorney.first_name = data.first_name
             attorney.last_name = data.last_name
             attorney.patronymic = data.patronymic
@@ -122,7 +123,7 @@ class AttorneyService:
             attorney.phone = data.phone
 
             # Сохраняем изменения
-            saved_attorney = await uow.attorney_repo.save(attorney)
+            saved_attorney = await uow.attorney_repo.update(attorney)
 
             # Возвращаем обновленный DTO
             return AttorneyResponseDTO.model_validate(saved_attorney)

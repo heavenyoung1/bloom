@@ -166,6 +166,7 @@ class AttorneyRepository(IAttorneyRepository):
                 )
 
             # 3. Прямое обновление полей ORM-объекта
+            orm_attorney.license_id = updated_attorney.license_id
             orm_attorney.first_name = updated_attorney.first_name
             orm_attorney.last_name = updated_attorney.last_name
             orm_attorney.patronymic = updated_attorney.patronymic

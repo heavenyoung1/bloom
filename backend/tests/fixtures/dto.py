@@ -30,3 +30,15 @@ async def valid_attorney_dto_second():
         phone='+79998887766',
         password='hash232343244',
     )
+
+
+@pytest.fixture
+async def update_attorney_dto():
+    return UpdateAttorneyDTO(
+        license_id='321/4767',
+        first_name='Иван',
+        last_name='Петров',
+        patronymic='Сергеевич',
+        email='ivan12231@example.com',
+        phone='+79991234567',
+    )

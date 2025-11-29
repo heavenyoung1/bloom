@@ -99,18 +99,18 @@ class AttorneyResponseDTO(BaseModel):
 
 
 # В текущей реализации ПОКА НЕ НУЖНО!
-class AttorneyListItemDTO(BaseModel):
-    '''DTO для списка юристов.'''
+# class AttorneyListItemDTO(BaseModel):
+#     '''DTO для списка юристов.'''
 
-    id: int
-    license_id: str
-    first_name: str
-    last_name: str
-    email: str
-    phone: str
-    is_active: bool
+#     id: int
+#     license_id: str
+#     first_name: str
+#     last_name: str
+#     email: str
+#     phone: str
+#     is_active: bool
 
-    model_config = ConfigDict(from_attributes=True)
+#     model_config = ConfigDict(from_attributes=True)
 
 
 class LoginDTO(BaseModel):
