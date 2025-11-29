@@ -18,6 +18,7 @@ async def valid_attorney_dto():
         password='SecurePass123!',
     )
 
+
 @pytest.fixture
 async def valid_attorney_dto_second():
     return CreateAttorneyDTO(

@@ -19,6 +19,7 @@ from backend.infrastructure.repositories import (
 
 # =============== ОПРЕДЕЛЕНИЯ КЛАССОВ  ===============
 
+
 class TestUnitOfWork:
     def __init__(self, session):
         self.session = session
@@ -37,6 +38,7 @@ class TestUnitOfWork:
     async def __aexit__(self, exc_type, exc, tb):
         pass
 
+
 class TestUoWFactory:
     def __init__(self, uow: TestUnitOfWork):
         self._uow = uow
@@ -47,7 +49,9 @@ class TestUoWFactory:
         # а просто отдавать уже существующий
         yield self._uow
 
+
 # =============== РЕАЛИЗАЦИЯ ФИКСТУР НА ОСНОВЕ КЛАССОВ, ДЛЯ ИСПОЛЬЗОВАНИЯ В ТЕСТАХ  ===============
+
 
 @pytest.fixture
 async def test_uow(session):
