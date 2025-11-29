@@ -106,13 +106,13 @@ class AttorneyService:
             # Получаем существующего юриста
             attorney = await uow.attorney_repo.get(attorney_id)
 
-        if not attorney:
-            logger.warning(f'Юрист ID {attorney_id} не найден')
-            raise EntityNotFoundException(f'Юрист с ID {attorney_id} не найден')
-        # 2. Проверка существования происходит в репозитории!
-        # 3. Валидируем изменения (если меняем email - проверяем уникальность)
-        if data.email != attorney.email:
-            pass
+            if not attorney:
+                logger.warning(f'Юрист ID {attorney_id} не найден')
+                raise EntityNotFoundException(f'Юрист с ID {attorney_id} не найден')
+            # 2. Проверка существования происходит в репозитории!
+            # 3. Валидируем изменения (если меняем email - проверяем уникальность)
+            if data.email != attorney.email:
+                pass
 
             # Обновляем поля юриста
             attorney.license_id = data.license_id

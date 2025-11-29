@@ -52,7 +52,7 @@ class AttorneyRepository(IAttorneyRepository):
             logger.error(f'Ошибка при сохранении ЮРИСТА: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при сохранении ЮРИСТА: {str(e)}')
 
-    async def get(self, id: int) -> 'Attorney':
+    async def get(self, id: int) -> Optional['Attorney']:
         try:
             # 1. Получение записи из базы данных
             stmt = select(AttorneyORM).where(AttorneyORM.id == id)
