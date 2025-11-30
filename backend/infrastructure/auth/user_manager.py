@@ -17,9 +17,10 @@ class AttorneyUserManager(IntegerIDMixin, BaseUserManager[AttorneyORM, int]):
     Управляет регистрацией, сбросом пароля, верификацией email.
     '''
 
-    # Секреты для токенов сброса и верификации
-    reset_password_token_secret = settings.secret_key
-    verification_token_secret = settings.secret_key
+    def __init__(self, user_db):
+        super().__init__(user_db)
+        self.reset_password_token_secret = settings.secret_key
+        self.verification_token_secret = settings.secret_key
 
     # ==== HOOKИ ИЗ ДОКУМЕНТАЦИИ FASTAPIUSERS ====
 

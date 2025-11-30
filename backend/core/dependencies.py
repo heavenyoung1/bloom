@@ -3,7 +3,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.db.database import DataBaseConnection
-from backend.core.settings import Settings
+from backend.core.config import settings
 
 
 # Singleton
@@ -18,7 +18,6 @@ def get_db_connection() -> DataBaseConnection:
     '''
     global _db_connection
     if _db_connection is None:
-        settings = Settings()
         _db_connection = DataBaseConnection(settings)
     return _db_connection
 

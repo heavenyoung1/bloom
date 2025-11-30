@@ -1,8 +1,8 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.attorney import (
-    CreateAttorneyDTO,
-    UpdateAttorneyDTO,
-    AttorneyResponseDTO,
+    #CreateAttorneyDTO,
+    #UpdateAttorneyDTO,
+    #AttorneyResponseDTO,
     # AttorneyListItemDTO,
 )
 from backend.domain.entities.attorney import Attorney
