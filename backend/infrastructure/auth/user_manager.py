@@ -18,15 +18,13 @@ class AttorneyUserManager(IntegerIDMixin, BaseUserManager[AttorneyORM, int]):
     '''
 
     # Секреты для токенов сброса и верификации
-    reset_password_token_secret = settings.SECRET_KEY
-    verification_token_secret = settings.SECRET_KEY
+    reset_password_token_secret = settings.secret_key
+    verification_token_secret = settings.secret_key
 
     # ==== HOOKИ ИЗ ДОКУМЕНТАЦИИ FASTAPIUSERS ====
 
     async def on_after_register(
-        self, 
-        user: AttorneyORM, 
-        request: Optional[Request] = None
+        self, user: AttorneyORM, request: Optional[Request] = None
     ):
         '''Колбэк после успешной регистрации'''
         logger.info(f'Юрист зарегистрирован: {user.email} (ID: {user.id})')
@@ -34,10 +32,7 @@ class AttorneyUserManager(IntegerIDMixin, BaseUserManager[AttorneyORM, int]):
         # await send_password_reset_email(user.email, token)
 
     async def on_after_forgot_password(
-        self, 
-        user: AttorneyORM, 
-        token: str, 
-        request: Optional[Request] = None
+        self, user: AttorneyORM, token: str, request: Optional[Request] = None
     ):
         '''Колбэк при запросе сброса пароля'''
         logger.info(f'Запрос сброса пароля для: {user.email}')
@@ -45,22 +40,20 @@ class AttorneyUserManager(IntegerIDMixin, BaseUserManager[AttorneyORM, int]):
         # await send_reset_password_email(user.email, token)
 
     async def on_after_request_verify(
-        self, 
-        user: AttorneyORM, 
-        token: str, 
-        request: Optional[Request] = None
+        self, user: AttorneyORM, token: str, request: Optional[Request] = None
     ):
         '''Колбэк при запросе верификации email'''
         logger.info(f'Запрос верификации: {user.email}')
         # TODO: Отправить email с токеном верификации
         # await send_verification_email(user.email, token)
 
+
 async def get_user_manager(
     user_db: SQLAlchemyUserDatabase[AttorneyORM, int] = Depends(get_user_db),
 ):
     '''
     Dependency для получения UserManager.
-    
+
     Используется FastAPI Users для создания роутеров аутентификации.
     '''
     yield AttorneyUserManager(user_db)

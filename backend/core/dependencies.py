@@ -13,8 +13,8 @@ _db_connection: DataBaseConnection | None = None
 def get_db_connection() -> DataBaseConnection:
     '''
     Получить singleton подключения к БД.
-    
-    Создаётся один раз при первом вызове.    
+
+    Создаётся один раз при первом вызове.
     '''
     global _db_connection
     if _db_connection is None:
@@ -24,14 +24,14 @@ def get_db_connection() -> DataBaseConnection:
 
 
 async def get_async_session(
-    db: DataBaseConnection = Depends(get_db_connection)
+    db: DataBaseConnection = Depends(get_db_connection),
 ) -> AsyncGenerator[AsyncSession, None]:
     '''
     FastAPI Dependency для получения async сессии SQLAlchemy.
-    
+
     ⚠️ ВАЖНО: Эта функция - мост между вашим DataBaseConnection
     и FastAPI системой зависимостей.
-    
+
     Использование:
         @app.get("/attorneys/{id}")
         async def get_attorney(
@@ -40,7 +40,7 @@ async def get_async_session(
         ):
             result = await session.execute(select(AttorneyORM).where(...))
             return result.scalar_one()
-    
+
     Почему нужна обёртка:
     - DataBaseConnection.get_session() - это async context manager
     - FastAPI Depends() требует generator function

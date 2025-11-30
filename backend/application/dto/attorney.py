@@ -8,6 +8,7 @@ from fastapi_users.schemas import BaseUser, BaseUserCreate, BaseUserUpdate
 
 # ============= FastAPI Users схемы =============
 
+
 class AttorneyCreate(BaseUserCreate):
     '''Схема для регистрации нового юриста'''
 
@@ -43,8 +44,10 @@ class AttorneyCreate(BaseUserCreate):
         }
     )
 
+
 class AttorneyRead(BaseUser[int]):
     '''Схема для чтения данных юриста (после авторизации)'''
+
     license_id: str
     first_name: str
     last_name: str
@@ -70,11 +73,13 @@ class AttorneyRead(BaseUser[int]):
                 'created_at': '2025-01-01T10:00:00',
                 'updated_at': '2025-01-01T10:00:00',
             }
-        }
+        },
     )
+
 
 class AttorneyUpdate(BaseUserUpdate):
     '''Схема для обновления профиля юриста'''
+
     license_id: Optional[str] = Field(default=None, min_length=3, max_length=12)
     first_name: Optional[str] = Field(default=None, min_length=2, max_length=20)
     last_name: Optional[str] = Field(default=None, min_length=3, max_length=20)
@@ -189,11 +194,13 @@ class AttorneyUpdate(BaseUserUpdate):
 
 # ============= Дополнительные схемы =============
 
+
 class ChangePasswordDTO(BaseModel):
     '''DTO для смены пароля'''
+
     current_password: str = Field(..., min_length=8)
     new_password: str = Field(..., min_length=8)
-    
+
     # ✅ Валидация нового пароля
     @field_validator('new_password')
     @classmethod
@@ -212,12 +219,16 @@ class ChangePasswordDTO(BaseModel):
         }
     )
 
+
 # ПОЧЕМУ СБРАСЫВАЕМ ЧЕРЕЗ EMAIL
 class ResetPasswordRequestDTO(BaseModel):
     '''DTO для запроса сброса пароля через email'''
+
     email: EmailStr
+
 
 class ResetPasswordConfirmDTO(BaseModel):
     '''DTO для подтверждения сброса пароля'''
+
     token: str = Field(..., description='Токен из письма')
     new_password: str = Field(..., min_length=8, description='Новый пароль')

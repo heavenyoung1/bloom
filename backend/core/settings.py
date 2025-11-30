@@ -14,19 +14,19 @@ class Settings(BaseSettings):
     db_name: str
 
     # Безопасность
-    secret_key: str = "your-secret-key-change-in-production-please"
-    algorithm: str = "HS256"
+    secret_key: str = 'your-secret-key-change-in-production-please'
+    algorithm: str = 'HS256'
     access_token_expire_minutes: int = 60 * 24  # 24 часа
 
     # Email (для сброса пароля)
-    SMTP_HOST: str = "smtp.gmail.com"
-    SMTP_PORT: int = 587
-    SMTP_USER: str = ""
-    SMTP_PASSWORD: str = ""
-    SMTP_FROM: str = "noreply@attorney-crm.com"
+    smtp_host: str = 'smtp.gmail.com'
+    smtp_port: int = 587
+    smtp_user: str = ''
+    smtp_password: str = ''
+    smtp_from: str = 'noreply@attorney-crm.com'
 
     # Application
-    DEBUG: bool = True
+    debug: bool = True
 
     # SQLAlchemy параметры
     driver: str = 'postgresql+asyncpg'
