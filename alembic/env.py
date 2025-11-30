@@ -1,15 +1,15 @@
-from backend.core.db.settings import Settings
-from backend.infrastructure.models import *
-from backend.core.logger import logger
-from backend.infrastructure.models._base import Base
-
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool, create_engine
 from alembic import context
 
-# === Импортируем Settings и модели ===
-from backend.core.db.settings import Settings
+from backend.core.logger import logger
+
+# === Настройки приложения ===
+from backend.core.settings import Settings
+
+# === Импортируем модели ===
+from backend.infrastructure.models._base import Base
 from backend.infrastructure.models.attorney import AttorneyORM
 from backend.infrastructure.models.client import ClientORM
 from backend.infrastructure.models.case import CaseORM
@@ -19,10 +19,6 @@ from backend.infrastructure.models.event import EventORM
 
 # === Настройка ===
 config = context.config
-# if config.config_file_name is not None:
-#     fileConfig(config.config_file_name)
-
-
 target_metadata = Base.metadata
 
 

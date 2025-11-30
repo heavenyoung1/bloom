@@ -9,7 +9,8 @@ dependencies = [
     "alembic>=1.17.1",
     "asyncpg>=0.30.0",
     "black>=25.9.0",
-    "fastapi-users>=15.0.1",
+    "fastapi-users[sqlalchemy]>=15.0.1",
+    "fastapi-users-db-sqlalchemy>=7.0.0",
     "mypy>=1.18.2",
     "psycopg2-binary>=2.9.11",
     "pydantic-settings>=2.11.0",
@@ -19,6 +20,7 @@ dependencies = [
     "pytest-asyncio>=1.2.0",
     "pytest-cov>=7.0.0",
     "sqlalchemy>=2.0.44",
+    "uvicorn>=0.38.0",
 ]
 
 [tool.black]

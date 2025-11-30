@@ -13,12 +13,20 @@ class Settings(BaseSettings):
     password: str
     db_name: str
 
-    # Параметры БД для тестирования
-    # test_host: str
-    # test_port: int
-    # test_user: str
-    # test_password: str
-    # test_db_name: str
+    # Безопасность
+    secret_key: str = "your-secret-key-change-in-production-please"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60 * 24  # 24 часа
+
+    # Email (для сброса пароля)
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM: str = "noreply@attorney-crm.com"
+
+    # Application
+    DEBUG: bool = True
 
     # SQLAlchemy параметры
     driver: str = 'postgresql+asyncpg'
@@ -56,16 +64,3 @@ class Settings(BaseSettings):
         '''Строка для подключения к БД ТОЛЬКО для выполнения Alembic миграций.'''
         url = f'{self._sync_driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
         return url
-
-    # def test_url(self) -> str:
-    #     '''URL для тестовой БД — переопределяется через переменные окружения.'''
-    #     return str(
-    #         URL.create(
-    #             drivername=self.driver,
-    #             username=self.test_user,
-    #             password=self.test_password,
-    #             host=self.test_host,
-    #             port=self.test_port,
-    #             database=self.test_db_name,
-    #         )
-    #     )
