@@ -1,33 +1,17 @@
-from backend.core.config import settings
-
-print("URL (async):", settings.url())
-print("URL (alembic):", settings.alembic_url())
-print("host:", settings.host)
-print("port:", settings.port)
-print("user:", settings.user)
-print("password:", settings.password)
-print("db_name:", settings.db_name)
-
 import asyncio
 import asyncpg
-from backend.core.config import settings
 
 async def main():
-    print("TRY CONNECT:")
-    print(
-        f"{settings.user=}, {settings.password=}, "
-        f"{settings.host=}, {settings.port=}, {settings.db_name=}"
-    )
-
     conn = await asyncpg.connect(
-        user=settings.user,
-        password=settings.password,
-        host=settings.host,
-        port=settings.port,
-        database=settings.db_name,
+        host='192.168.175.129',
+        port=5436,
+        user='postgres',
+        password='1234',
+        database='test_db',
     )
-    print("CONNECTED OK:", conn)
+    row = await conn.fetchrow('SELECT 1')
+    print('RESULT:', row)
     await conn.close()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     asyncio.run(main())

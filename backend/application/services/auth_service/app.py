@@ -35,7 +35,7 @@ app = FastAPI(lifespan=lifespan, title='Auth Service')
 # Логин / логаут (JWT)
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
-    prefix='/auth/jwt',
+    prefix='/auth',
     tags=['auth'],
 )
 

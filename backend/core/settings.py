@@ -47,18 +47,23 @@ class Settings(BaseSettings):
         case_sensitive=True,
     )
 
+# ============= 🧪 ВОТ ТУТ ПАРОЛЬ ПЕРЕДАЕТСЯ КАК *** 🧪 ================
+    # def url(self) -> str:
+    #     '''Собрать URL подключения безопасно (защита от SQL injection).'''
+    #     return str(
+    #         URL.create(
+    #             drivername=self.driver,
+    #             username=self.user,
+    #             password=self.password,
+    #             host=self.host,
+    #             port=self.port,
+    #             database=self.db_name,
+    #         )
+    #     )
+# ============= 🧪 ================================= 🧪 ================
+
     def url(self) -> str:
-        '''Собрать URL подключения безопасно (защита от SQL injection).'''
-        return str(
-            URL.create(
-                drivername=self.driver,
-                username=self.user,
-                password=self.password,
-                host=self.host,
-                port=self.port,
-                database=self.db_name,
-            )
-        )
+        return f'{self.driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
 
     def alembic_url(self) -> str:
         '''Строка для подключения к БД ТОЛЬКО для выполнения Alembic миграций.'''
