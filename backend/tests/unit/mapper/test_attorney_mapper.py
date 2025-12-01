@@ -18,6 +18,8 @@ class TestAttorneyMapper:
             phone='+79991112233',
             hashed_password='hashed_password_123',
             is_active=True,
+            is_superuser=False,
+            is_verified=True,
         )
 
     @pytest.fixture
@@ -32,6 +34,8 @@ class TestAttorneyMapper:
             phone='+79991112233',
             hashed_password='hashed_password_123',
             is_active=True,
+            is_superuser=False,
+            is_verified=True,
         )
 
     def test_to_orm(self, sampleattorney_domain):
@@ -45,7 +49,10 @@ class TestAttorneyMapper:
         assert orm.phone == sampleattorney_domain.phone
         assert orm.hashed_password == sampleattorney_domain.hashed_password
         assert orm.is_active == sampleattorney_domain.is_active
+        assert orm.is_superuser == sampleattorney_domain.is_superuser
+        assert orm.is_verified == sampleattorney_domain.is_verified
         assert orm.created_at == sampleattorney_domain.created_at
+
 
     def test_to_domain(self, sampleattorney_orm):
         domain = AttorneyMapper.to_domain(sampleattorney_orm)
@@ -58,4 +65,6 @@ class TestAttorneyMapper:
         assert domain.phone == sampleattorney_orm.phone
         assert domain.hashed_password == sampleattorney_orm.hashed_password
         assert domain.is_active == sampleattorney_orm.is_active
+        assert domain.is_superuser == sampleattorney_orm.is_superuser
+        assert domain.is_verified == sampleattorney_orm.is_active
         assert domain.created_at == sampleattorney_orm.created_at
