@@ -12,8 +12,10 @@ class Attorney:
     patronymic: str
     email: str  # Как валидировать email
     phone: str
-    password_hash: str
-    is_active: bool
+    hashed_password: str
+    is_active: bool  # Можно ли юзеру логиниться
+    is_superuser: bool  # Админ?
+    is_verified: bool  # Подтвердил ли email
 
     # Необязательные атрибуты
     created_at: Optional[datetime] = None

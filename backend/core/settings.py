@@ -42,12 +42,12 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='.env',
         env_file_encoding='utf-8',
-        env_prefix='', # <- Без префикса
+        env_prefix='',  # <- Без префикса
         extra='ignore',
         case_sensitive=True,
     )
 
-# ============= 🧪 ВОТ ТУТ ПАРОЛЬ ПЕРЕДАЕТСЯ КАК *** 🧪 ================
+    # ============= 🧪 ВОТ ТУТ ПАРОЛЬ ПЕРЕДАЕТСЯ КАК *** 🧪 ================
     # def url(self) -> str:
     #     '''Собрать URL подключения безопасно (защита от SQL injection).'''
     #     return str(
@@ -60,7 +60,7 @@ class Settings(BaseSettings):
     #             database=self.db_name,
     #         )
     #     )
-# ============= 🧪 ================================= 🧪 ================
+    # ============= 🧪 ================================= 🧪 ================
 
     def url(self) -> str:
         return f'{self.driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
@@ -69,6 +69,7 @@ class Settings(BaseSettings):
         '''Строка для подключения к БД ТОЛЬКО для выполнения Alembic миграций.'''
         url = f'{self._sync_driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
         return url
+
 
 # Singleton - Единственный экземпляр настроек на всё приложение
 settings = Settings()

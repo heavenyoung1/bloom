@@ -14,20 +14,20 @@ class DataBaseConnection:
     - Async context manager для безопасной работы с сессией
     '''
 
-    def __init__(self): #, settings: Settings):
+    def __init__(self):  # , settings: Settings):
         self.engine = create_async_engine(
             settings.url(),
-            echo=settings.echo,                     # Логгирование SQL-запросов для отладки
-            pool_pre_ping=settings.pool_pre_ping,   # Лечит «мертвые» коннекты (проверять соединение перед использованием (защита от dead connections))
-            pool_size=settings.pool_size,           # Тюнинг пула по ситуации (сколько соединений держать в пуле)
-            max_overflow=settings.max_overflow,     # Сколько дополнительных можно создать при пиках
+            echo=settings.echo,  # Логгирование SQL-запросов для отладки
+            pool_pre_ping=settings.pool_pre_ping,  # Лечит «мертвые» коннекты (проверять соединение перед использованием (защита от dead connections))
+            pool_size=settings.pool_size,  # Тюнинг пула по ситуации (сколько соединений держать в пуле)
+            max_overflow=settings.max_overflow,  # Сколько дополнительных можно создать при пиках
         )
 
         self.AsyncSessionLocal = async_sessionmaker(
-            self.engine,                            # Откуда брать соединения
-            class_=AsyncSession,                    # Указывает, какой класс сессии использовать, без этого параметра используется обычная Session
-            expire_on_commit=False,                 # Контролирует, что происходит с объектами после commit(). SQLAlchemy отслеживает объекты в памяти (Identity Map)
-            autoflush=False,                        # Контролирует, когда SQLAlchemy отправляет изменения в БД
+            self.engine,  # Откуда брать соединения
+            class_=AsyncSession,  # Указывает, какой класс сессии использовать, без этого параметра используется обычная Session
+            expire_on_commit=False,  # Контролирует, что происходит с объектами после commit(). SQLAlchemy отслеживает объекты в памяти (Identity Map)
+            autoflush=False,  # Контролирует, когда SQLAlchemy отправляет изменения в БД
         )
 
     @asynccontextmanager

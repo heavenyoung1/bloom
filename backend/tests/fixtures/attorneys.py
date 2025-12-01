@@ -20,8 +20,10 @@ def sample_attorney():
         patronymic='Сергеевич',
         email='ivan@example.com',
         phone='+79991234567',
-        password_hash='hash12345678',
+        hashed_password='some_hash',
         is_active=True,
+        is_superuser=False,
+        is_verified=True,
     )
 
 
@@ -35,8 +37,10 @@ def sample_update_attorney():
         patronymic='Сергеевич',
         email='ivanov3232@example.com',
         phone='+79914873567',
-        password_hash='hash123567853',
+        hashed_password='some_hash',
         is_active=True,
+        is_superuser=False,
+        is_verified=True,
     )
 
 
@@ -52,8 +56,10 @@ def attorneys_list():
             patronymic='Сергеевич',
             email='ivan@example.com',
             phone='+79991234567',
-            password_hash='hash123',
+            hashed_password='hash123',
             is_active=True,
+            is_superuser=False,
+            is_verified=True,
         ),
         Attorney(
             id=None,
@@ -63,8 +69,10 @@ def attorneys_list():
             patronymic='Дмитриевич',
             email='alexander@example.com',
             phone='+79998887766',
-            password_hash='hash234',
+            hashed_password='hash234',
             is_active=True,
+            is_superuser=False,
+            is_verified=True,
         ),
         Attorney(
             id=None,
@@ -74,8 +82,10 @@ def attorneys_list():
             patronymic='Петровна',
             email='maria@example.com',
             phone='+79993332211',
-            password_hash='hash345',
+            hashed_password='hash345',
             is_active=True,
+            is_superuser=False,
+            is_verified=True,
         ),
         Attorney(
             id=None,
@@ -85,8 +95,10 @@ def attorneys_list():
             patronymic='Сергеевна',
             email='ekaterina@example.com',
             phone='+79992223344',
-            password_hash='hash456',
+            hashed_password='hash456',
             is_active=True,
+            is_superuser=False,
+            is_verified=True,
         ),
         Attorney(
             id=None,
@@ -96,7 +108,9 @@ def attorneys_list():
             patronymic='Вячеславович',
             email='dmitry@example.com',
             phone='+79995556677',
-            password_hash='hash567',
+            hashed_password='hash567',
             is_active=True,
+            is_superuser=False,
+            is_verified=True,
         ),
     ]

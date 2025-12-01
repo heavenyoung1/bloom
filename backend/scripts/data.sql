@@ -1,4 +1,4 @@
-INSERT INTO attorneys (attorney_id, first_name, last_name, patronymic, email, phone, password_hash)
+INSERT INTO attorneys (attorney_id, first_name, last_name, patronymic, email, phone, hashed_password)
 VALUES
     ('32/142-в', 'Иван', 'Иванов', 'Иванович', 'ivanov@example.com', '1234567890', 'hashed_password_1'),
     ('45/56-г', 'Петр', 'Петров', 'Петрович', 'petrov@example.com', '0987654321', 'hashed_password_2'),

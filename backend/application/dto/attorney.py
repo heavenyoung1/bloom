@@ -39,7 +39,7 @@ class AttorneyCreate(BaseUserCreate):
                 'patronymic': 'Сергеевич',
                 'email': 'ivan@example.com',
                 'phone': '+79991234567',
-                'password': 'SecurePass123!',
+                'hashed_password': 'SecurePass123!',
             }
         }
     )

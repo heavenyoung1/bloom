@@ -19,7 +19,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AttorneyORM, int]):
     # Секретный код для сброса пароля
     reset_password_token_secret = settings.secret_key
 
-    # Секретный код для кодирования токена подтверждения 
+    # Секретный код для кодирования токена подтверждения
     verification_token_secret = settings.secret_key
 
     # ==== ХУКИ ИЗ ДОКУМЕНТАЦИИ FASTAPIUSERS ====

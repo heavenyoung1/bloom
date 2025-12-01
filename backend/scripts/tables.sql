@@ -9,7 +9,7 @@ CREATE TABLE attorneys (
     patronymic VARCHAR(100),
     email VARCHAR(100) UNIQUE,
     phone VARCHAR(20),
-    password_hash VARCHAR(255),
+    hashed_password VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP

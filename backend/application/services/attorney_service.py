@@ -1,9 +1,8 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.attorney import (
-    #CreateAttorneyDTO,
-    #UpdateAttorneyDTO,
-    #AttorneyResponseDTO,
-    # AttorneyListItemDTO,
+    AttorneyCreate,
+    AttorneyRead,
+    AttorneyUpdate,
 )
 from backend.domain.entities.attorney import Attorney
 from backend.application.validators.attorney_validator import AttorneyValidator
@@ -23,7 +22,7 @@ class AttorneyService:
         # )  # Валидатор использует репозиторий из фабрики
         self.factory = AttorneyFactory()  # Фабрика для создания сущностей
 
-    async def create_attorney(self, data: CreateAttorneyDTO) -> 'AttorneyResponseDTO':
+    async def create_attorney(self, data: AttorneyCreate) -> 'AttorneyRead':
         '''
         Создать нового юриста.
 
@@ -55,8 +54,7 @@ class AttorneyService:
                 patronymic=data.patronymic,
                 email=data.email,
                 phone=data.phone,
-                # ВРЕМЕННОЕ РЕШЕНИЕ ПЕРЕДАЧИ ПАРОЛЯ ИМЕННО СТРОКОЙ!!!!
-                password_hash='SecurePass123!',  # data.password,  # Здесь мы будем передавать захешированный пароль
+                hashed_password=data.hashed_password,
             )
 
             # 6. Сохраняем в БД
@@ -67,9 +65,9 @@ class AttorneyService:
             )
 
             # 7. Преобразуем в DTO и возвращаем
-            return AttorneyResponseDTO.model_validate(saved_attorney)
+            return AttorneyRead.model_validate(saved_attorney)
 
-    async def get_attorney(self, attorney_id: int) -> AttorneyResponseDTO:
+    async def get_attorney(self, attorney_id: int) -> AttorneyRead:
         '''Получить Юриста по ID.'''
         # Используем фабрику для создания UoW и работы с репозиториями
         async with self.uow_factory.create() as uow:
@@ -81,7 +79,7 @@ class AttorneyService:
             raise EntityNotFoundException(f'Юрист с ID {attorney_id}')
 
         # Преобразуем в DTO и возвращаем
-        return AttorneyResponseDTO.model_validate(attorney)
+        return AttorneyRead.model_validate(attorney)
 
     # async def get_all_attorneys(self) -> list[AttorneyResponseDTO]:
     #     '''
@@ -99,8 +97,8 @@ class AttorneyService:
     #     return [AttorneyResponseDTO.model_validate(a) for a in attorneys]
 
     async def update_attorney(
-        self, attorney_id: int, data: UpdateAttorneyDTO
-    ) -> AttorneyResponseDTO:
+        self, attorney_id: int, data: AttorneyUpdate
+    ) -> AttorneyRead:
         # Используем фабрику для создания UoW и работы с репозиториями
         async with self.uow_factory.create() as uow:
             # Получаем существующего юриста
@@ -126,4 +124,4 @@ class AttorneyService:
             saved_attorney = await uow.attorney_repo.update(attorney)
 
             # Возвращаем обновленный DTO
-            return AttorneyResponseDTO.model_validate(saved_attorney)
+            return AttorneyRead.model_validate(saved_attorney)

@@ -1,6 +1,7 @@
 import asyncio
 import asyncpg
 
+
 async def main():
     conn = await asyncpg.connect(
         host='192.168.175.129',
@@ -12,6 +13,7 @@ async def main():
     row = await conn.fetchrow('SELECT 1')
     print('RESULT:', row)
     await conn.close()
+
 
 if __name__ == '__main__':
     asyncio.run(main())

@@ -11,7 +11,7 @@ class AttorneyFactory:
         patronymic: str | None,
         email: str,
         phone: str | None,
-        password_hash: str,
+        hashed_password: str,
     ) -> Attorney:
         return Attorney(
             id=None,
@@ -21,6 +21,6 @@ class AttorneyFactory:
             patronymic=patronymic,
             email=email,
             phone=phone,
-            password_hash=password_hash,
+            hashed_password=hashed_password,
             is_active=True,
         )

@@ -16,7 +16,7 @@ class TestAttorneyMapper:
             patronymic='Сергеевич',
             email='ivan.petrov@example.com',
             phone='+79991112233',
-            password_hash='hashed_password_123',
+            hashed_password='hashed_password_123',
             is_active=True,
         )
 
@@ -30,7 +30,7 @@ class TestAttorneyMapper:
             patronymic='Сергеевич',
             email='ivan.petrov@example.com',
             phone='+79991112233',
-            password_hash='hashed_password_123',
+            hashed_password='hashed_password_123',
             is_active=True,
         )
 
@@ -43,7 +43,7 @@ class TestAttorneyMapper:
         assert orm.patronymic == sampleattorney_domain.patronymic
         assert orm.email == sampleattorney_domain.email
         assert orm.phone == sampleattorney_domain.phone
-        assert orm.password_hash == sampleattorney_domain.password_hash
+        assert orm.hashed_password == sampleattorney_domain.hashed_password
         assert orm.is_active == sampleattorney_domain.is_active
         assert orm.created_at == sampleattorney_domain.created_at
 
@@ -56,6 +56,6 @@ class TestAttorneyMapper:
         assert domain.patronymic == sampleattorney_orm.patronymic
         assert domain.email == sampleattorney_orm.email
         assert domain.phone == sampleattorney_orm.phone
-        assert domain.password_hash == sampleattorney_orm.password_hash
+        assert domain.hashed_password == sampleattorney_orm.hashed_password
         assert domain.is_active == sampleattorney_orm.is_active
         assert domain.created_at == sampleattorney_orm.created_at

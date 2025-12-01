@@ -16,6 +16,7 @@ def get_jwt_strategy() -> JWTStrategy:
         algorithm=settings.algorithm,
     )
 
+
 # ВАЖНО: должен совпадать с роутом логина
 bearer_transport = BearerTransport(tokenUrl='auth/login')
 
