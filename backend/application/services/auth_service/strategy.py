@@ -4,13 +4,11 @@ from fastapi_users.authentication import (
     JWTStrategy,
 )
 
-from backend.core.config import settings
+from backend.core.settings import settings
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    '''
-    JWT-стратегия для FastAPI Users.
-    '''
+    '''JWT-стратегия для FastAPI Users.'''
     return JWTStrategy(
         secret=settings.secret_key,
         lifetime_seconds=settings.access_token_expire_minutes * 60,
@@ -18,7 +16,7 @@ def get_jwt_strategy() -> JWTStrategy:
         algorithm=settings.algorithm,
     )
 
-
+# ВАЖНО: должен совпадать с роутом логина
 bearer_transport = BearerTransport(tokenUrl='auth/login')
 
 auth_backend = AuthenticationBackend(

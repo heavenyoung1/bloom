@@ -12,42 +12,42 @@ from backend.application.dto.attorney import (
 )
 from backend.infrastructure.models.attorney import AttorneyORM
 
-router = APIRouter(tags=["Authentication"])
+router = APIRouter(tags=['Authentication'])
 
 # Register
 router.include_router(
     fastapi_users.get_register_router(AttorneyRead, AttorneyCreate),
-    prefix="/auth",
+    prefix='/auth',
 )
 
 # Login/Logout
 router.include_router(
     fastapi_users.get_auth_router(auth_backend),
-    prefix="/auth",
+    prefix='/auth',
 )
 
 # Reset password
 router.include_router(
     fastapi_users.get_reset_password_router(),
-    prefix="/auth",
+    prefix='/auth',
 )
 
 # Verify email
 router.include_router(
     fastapi_users.get_verify_router(AttorneyRead),
-    prefix="/auth",
+    prefix='/auth',
 )
 
 # User profile management
 router.include_router(
     fastapi_users.get_users_router(AttorneyRead, AttorneyUpdate),
-    prefix="/users",
+    prefix='/users',
 )
 
 
-@router.get("/users/me", response_model=AttorneyRead)
+@router.get('/users/me', response_model=AttorneyRead)
 async def get_current_user(
     user: AttorneyORM = Depends(current_active_user),
 ):
-    """Получить данные текущего авторизованного юриста"""
+    '''Получить данные текущего авторизованного юриста'''
     return user

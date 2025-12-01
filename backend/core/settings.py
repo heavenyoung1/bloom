@@ -6,27 +6,12 @@ from backend.core.logger import logger
 class Settings(BaseSettings):
     '''Конфигурация приложения (читается из .env файла).'''
 
-    # Параметры БД
+    # === PostgreSQL параметры ===
     host: str = 'localhost'
     port: int = 5432
     user: str
     password: str
     db_name: str
-
-    # Безопасность
-    secret_key: str = 'your-secret-key-change-in-production-please'
-    algorithm: str = 'HS256'
-    access_token_expire_minutes: int = 60 * 24  # 24 часа
-
-    # Email (для сброса пароля)
-    smtp_host: str = 'smtp.gmail.com'
-    smtp_port: int = 587
-    smtp_user: str = ''
-    smtp_password: str = ''
-    smtp_from: str = 'noreply@attorney-crm.com'
-
-    # Application
-    debug: bool = True
 
     # SQLAlchemy параметры
     driver: str = 'postgresql+asyncpg'
@@ -35,14 +20,29 @@ class Settings(BaseSettings):
     max_overflow: int = 10
     pool_pre_ping: bool = True
 
-    # === Нужен для синхронного движка Alembic миграций. Не использовать! ===
+    # === Драйвер для синхронного движка Alembic миграций. ===
     _sync_driver: str = 'postgresql'
     # === === === === === === === === === === === === === ====== === === ====
+
+    # === Безопасность и FastAPI Users ===
+    secret_key: str = 'your-secret-key-change-in-production-please'
+    algorithm: str = 'HS256'
+    access_token_expire_minutes: int = 60 * 24  # 24 часа
+
+    # === Email (для сброса пароля) ===
+    smtp_host: str = 'smtp.gmail.com'
+    smtp_port: int = 587
+    smtp_user: str = ''
+    smtp_password: str = ''
+    smtp_from: str = 'noreply@attorney-crm.com'
+
+    # === Application ===
+    debug: bool = True
 
     model_config = SettingsConfigDict(
         env_file='.env',
         env_file_encoding='utf-8',
-        env_prefix='pg_',
+        env_prefix='', # <- Без префикса
         extra='ignore',
         case_sensitive=True,
     )
@@ -64,3 +64,6 @@ class Settings(BaseSettings):
         '''Строка для подключения к БД ТОЛЬКО для выполнения Alembic миграций.'''
         url = f'{self._sync_driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
         return url
+
+# Singleton - Единственный экземпляр настроек на всё приложение
+settings = Settings()

@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from backend.core.settings import Settings
+from backend.core.settings import settings
 
 
 class DataBaseConnection:
@@ -14,8 +14,10 @@ class DataBaseConnection:
     - Async context manager для безопасной работы с сессией
     '''
 
-    def __init__(self, settings: Settings):
-        self.settings = settings
+    def __init__(self): #, settings: Settings):
+        # для дебага — увидим, что именно использует приложение
+        print('DB URL IN ENGINE:', settings.url())
+        #self.settings = settings
 
         self.engine = create_async_engine(
             settings.url(),
