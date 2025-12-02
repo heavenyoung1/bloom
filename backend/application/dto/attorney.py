@@ -53,8 +53,8 @@ class AttorneyResponse(BaseUser[int]):
     last_name: str
     patronymic: str
     phone: str
-    created_at: datetime  # ✅ Не Optional (БД гарантирует значение)
-    updated_at: datetime  # ✅ Не Optional
+    created_at: Optional[datetime]  # ✅ Не Optional (БД гарантирует значение)
+    updated_at: Optional[datetime]  # ✅ Не Optional
 
     model_config = ConfigDict(
         from_attributes=True,

@@ -44,8 +44,8 @@ class SignUpUseCase:
                 hashed_password=hashed_password,
             )
 
-        # 5. Сохранить в БД
-        attorney = await uow.attorney_repo.save(attorney)
+            # 5. Сохранить в БД
+            attorney = await uow.attorney_repo.save(attorney)
 
         # 6. Сгенерировать код верификации (в реальности - случайный)
         verification_code = '123456'  # В реальности генерируется случайно

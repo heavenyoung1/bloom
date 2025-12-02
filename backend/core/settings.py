@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     # === === === === === === === === === === === === === ====== === === ====
 
     # Redis
-    redis_url: str = Field(default='redis://localhost:6379')
+    redis_url: str = Field(default='redis://192.168.175.129:6379')
     redis_default_ttl: int = 3600  # 1 час
 
     # === JWT ===

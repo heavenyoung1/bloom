@@ -32,6 +32,8 @@ services:
 volumes:
   postgres_data_dev:
     driver: local
+  redis_data_dev:
+    driver: local
 
 networks:
   pricely_network:
