@@ -3,6 +3,7 @@ from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.security import SecurityService
 from backend.domain.factories.attorney_factory import AttorneyFactory
 from backend.application.validators.attorney_validator import AttorneyValidator
+from backend.application.services.verification_service import VerificationService
 from backend.infrastructure.redis.client import redis_client
 from backend.infrastructure.redis.keys import RedisKeys
 
@@ -48,13 +49,10 @@ class SignUpUseCase:
             attorney = await uow.attorney_repo.save(attorney)
 
         # 6. Сгенерировать код верификации (в реальности - случайный)
-        verification_code = '123456'  # В реальности генерируется случайно
-        await redis_client.set(
-            RedisKeys.email_verification_code(request.email),
-            verification_code,
-            ttl=900,  # 15 минут Что это?
+        await VerificationService.send_verification_code(
+            email=request.email, first_name=request.first_name
         )
 
-        logger.info(f'Юрист зарегистрирован: {attorney.email}')
+        logger.info(f'Юрист зарегистрирован: {attorney.email}. Ожидание верификации...')
 
         return AttorneyResponse.model_validate(attorney)
