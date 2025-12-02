@@ -3,9 +3,9 @@ services:
     image: postgres:16
     container_name: bloom_postgres_dev
     environment:
-      POSTGRES_USER: ${pg_user}           # Переменная из .env
-      POSTGRES_PASSWORD: ${pg_password}   # Переменная из .env
-      POSTGRES_DB: ${pg_db_name}          # Переменная из .env
+      POSTGRES_USER: ${user}           # Переменная из .env
+      POSTGRES_PASSWORD: ${password}   # Переменная из .env
+      POSTGRES_DB: ${db_name}          # Переменная из .env
     ports:
       - "5436:5432"
     volumes:

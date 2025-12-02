@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from backend.core.db.settings import Settings
+from backend.core.settings import settings
 
 
 class DataBaseConnection:
@@ -14,16 +14,13 @@ class DataBaseConnection:
     - Async context manager для безопасной работы с сессией
     '''
 
-    def __init__(self, settings: Settings):
-        self.settings = settings
-
+    def __init__(self):  # , settings: Settings):
         self.engine = create_async_engine(
             settings.url(),
             echo=settings.echo,  # Логгирование SQL-запросов для отладки
             pool_pre_ping=settings.pool_pre_ping,  # Лечит «мертвые» коннекты (проверять соединение перед использованием (защита от dead connections))
             pool_size=settings.pool_size,  # Тюнинг пула по ситуации (сколько соединений держать в пуле)
             max_overflow=settings.max_overflow,  # Сколько дополнительных можно создать при пиках
-            future=True,  # ?????????????????????
         )
 
         self.AsyncSessionLocal = async_sessionmaker(

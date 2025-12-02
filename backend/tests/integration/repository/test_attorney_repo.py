@@ -79,7 +79,7 @@ class TestAttorneyRepository:
         assert update_attorney.patronymic == sample_update_attorney.patronymic
         assert update_attorney.email == sample_update_attorney.email
         assert update_attorney.phone == sample_update_attorney.phone
-        assert update_attorney.password_hash == sample_update_attorney.password_hash
+        assert update_attorney.hashed_password == sample_update_attorney.hashed_password
 
     @pytest.mark.asyncio
     async def test_update_nonexistent(self, attorney_repo, sample_update_attorney):

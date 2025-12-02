@@ -172,7 +172,7 @@ class AttorneyRepository(IAttorneyRepository):
             orm_attorney.patronymic = updated_attorney.patronymic
             orm_attorney.email = updated_attorney.email
             orm_attorney.phone = updated_attorney.phone
-            orm_attorney.password_hash = updated_attorney.password_hash
+            orm_attorney.hashed_password = updated_attorney.hashed_password
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция

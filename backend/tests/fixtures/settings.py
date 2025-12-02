@@ -22,7 +22,7 @@ class TestSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='.env.test',  # указываем отдельный файл конфигурации для тестов
         env_file_encoding='utf-8',
-        env_prefix='pg_',
+        env_prefix='',
         extra='ignore',
         case_sensitive=True,
     )
