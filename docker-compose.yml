@@ -17,6 +17,18 @@ services:
       retries: 10
     restart: unless-stopped
 
+  redis_dev:
+    image: redis:7.4-alpine  # легковесный образ
+    container_name: bloom_redis_dev
+    ports:
+      - "6379:6379"  # стандартный порт Redis
+    volumes:
+      - redis_data_dev:/data  # монтируем объём для данных
+    command: redis-server --appendonly yes  # включаем сохранение на диск
+    restart: unless-stopped
+    networks:
+      - pricely_network
+
 volumes:
   postgres_data_dev:
     driver: local
