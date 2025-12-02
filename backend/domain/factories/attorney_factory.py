@@ -23,4 +23,6 @@ class AttorneyFactory:
             phone=phone,
             hashed_password=hashed_password,
             is_active=True,
+            is_superuser=False,
+            is_verified=False,
         )

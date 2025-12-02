@@ -53,7 +53,6 @@ class TestAttorneyMapper:
         assert orm.is_verified == sampleattorney_domain.is_verified
         assert orm.created_at == sampleattorney_domain.created_at
 
-
     def test_to_domain(self, sampleattorney_orm):
         domain = AttorneyMapper.to_domain(sampleattorney_orm)
         assert domain.id == sampleattorney_orm.id

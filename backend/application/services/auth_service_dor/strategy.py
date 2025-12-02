@@ -17,11 +17,11 @@ def get_jwt_strategy() -> JWTStrategy:
     )
 
 
-# ВАЖНО: должен совпадать с роутом логина
-bearer_transport = BearerTransport(tokenUrl='auth/login')
+# # ВАЖНО: должен совпадать с роутом логина
+# bearer_transport = BearerTransport(tokenUrl='auth/login')
 
-auth_backend = AuthenticationBackend(
-    name='jwt',
-    transport=bearer_transport,
-    get_strategy=get_jwt_strategy,
-)
+# auth_backend = AuthenticationBackend(
+#     name='jwt',
+#     transport=bearer_transport,
+#     get_strategy=get_jwt_strategy,
+# )

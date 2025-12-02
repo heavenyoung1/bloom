@@ -9,7 +9,7 @@ from fastapi_users.schemas import BaseUser, BaseUserCreate, BaseUserUpdate
 # ============= FastAPI Users схемы =============
 
 
-class AttorneyCreate(BaseUserCreate):
+class RegisterRequest(BaseUserCreate):
     '''Схема для регистрации нового юриста'''
 
     license_id: str = Field(
@@ -45,7 +45,7 @@ class AttorneyCreate(BaseUserCreate):
     )
 
 
-class AttorneyRead(BaseUser[int]):
+class AttorneyResponse(BaseUser[int]):
     '''Схема для чтения данных юриста (после авторизации)'''
 
     license_id: str
@@ -77,7 +77,7 @@ class AttorneyRead(BaseUser[int]):
     )
 
 
-class AttorneyUpdate(BaseUserUpdate):
+class UpdateRequest(BaseUserUpdate):
     '''Схема для обновления профиля юриста'''
 
     license_id: Optional[str] = Field(default=None, min_length=3, max_length=12)
@@ -99,6 +99,18 @@ class AttorneyUpdate(BaseUserUpdate):
             }
         }
     )
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = 'bearer'
+    expires_in: int  # секунды
 
 
 # ============= ОРИГИНАЛЬНЫЕ DTO (оставляем для внутренней логики) =============

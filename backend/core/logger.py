@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger("Bloom")
+logger = logging.getLogger('Bloom')
 logger.setLevel(logging.DEBUG)
 
 # Консольный обработчик
@@ -11,7 +11,7 @@ console_handler.setFormatter(
 )
 
 # Файловый обработчик
-file_handler = logging.FileHandler("app.log")
+file_handler = logging.FileHandler('app.log')
 # ПОТОМ ВЫВЕСТИ В INFO
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(

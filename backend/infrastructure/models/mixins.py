@@ -25,13 +25,13 @@ class TimeStampMixin:
 
     @classmethod
     def __declare_last__(cls):
-        @event.listens_for(cls, "before_insert", propagate=True)
+        @event.listens_for(cls, 'before_insert', propagate=True)
         def _set_created(mapper, connection, target):
             now = datetime.now(timezone.utc)
-            if getattr(target, "created_at", None) is None:
+            if getattr(target, 'created_at', None) is None:
                 target.created_at = now
             target.updated_at = now
 
-        @event.listens_for(cls, "before_update", propagate=True)
+        @event.listens_for(cls, 'before_update', propagate=True)
         def _set_updated(mapper, connection, target):
             target.updated_at = datetime.now(timezone.utc)
