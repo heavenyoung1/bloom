@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.logger import logger
-from backend.application.services.auth_service_dor.dependencies import get_uow_factory
+from backend.core.dependencies import get_uow_factory
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.usecases.auth.sign_in import SignInUseCase
 from backend.application.usecases.auth.sign_up import SignUpUseCase
 from backend.application.services.auth_service import AuthService
-#from backend.application.services.auth_service_dor.database import get_user_db
+
+# from backend.application.services.auth_service_dor.database import get_user_db
 from backend.application.dto.attorney import (
     AttorneyResponse,
     RegisterRequest,

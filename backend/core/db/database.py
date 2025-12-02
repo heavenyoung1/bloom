@@ -78,5 +78,6 @@ class DataBaseConnection:
             logger.error(f'[DATABASE] Ошибка при закрытии: {e}')
             raise
 
+
 # Глобальный экземпляр
 database = DataBaseConnection()
