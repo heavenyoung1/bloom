@@ -112,7 +112,7 @@ class VerifyEmailRequest(BaseModel):
     '''Запрос на верификацию email'''
 
     email: EmailStr
-    code: str = Field(..., min_length=6, max_length=6, pattern=r'^\d{6}$')
+    code: str = Field(..., min_length=4, max_length=6, pattern=r'^\d{6}$')
 
 
 class AttorneyVerificationUpdateRequest(BaseModel):
