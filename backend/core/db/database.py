@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from backend.core.settings import settings
+from backend.core.logger import logger
 
 
 class DataBaseConnection:
@@ -57,6 +58,26 @@ class DataBaseConnection:
         finally:
             await session.close()
 
+    async def connect(self) -> None:
+        '''Подключиться к БД (для lifespan startup).'''
+        try:
+            # Проверяем соединение с БД
+            async with self.engine.begin() as conn:
+                await conn.execute(__import__('sqlalchemy').text('SELECT 1'))
+            logger.info('[DATABASE] Успешно подключились к PostgreSQL')
+        except Exception as e:
+            logger.error(f'[DATABASE] Ошибка подключения: {e}')
+            raise
+
     async def dispose(self) -> None:
-        '''Корректно закрыть соединения пула (например, при завершении приложения/тестов).'''
-        await self.engine.dispose()
+        '''Корректно закрыть соединения пула (при завершении приложения).'''
+        try:
+            await self.engine.dispose()
+            logger.info('[DATABASE] Пул соединений закрыт')
+        except Exception as e:
+            logger.error(f'[DATABASE] Ошибка при закрытии: {e}')
+            raise
+
+
+# Глобальный экземпляр
+database = DataBaseConnection()

@@ -21,6 +21,8 @@ dependencies = [
     "pytest-cov>=7.0.0",
     "sqlalchemy>=2.0.44",
     "uvicorn>=0.38.0",
+    "redis>=7.1.0",
+    "passlib>=1.7.4",
 ]
 
 [tool.black]

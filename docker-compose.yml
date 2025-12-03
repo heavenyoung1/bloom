@@ -11,14 +11,28 @@ services:
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${pg_user} -d ${pg_db_name}"]
+      test: ["CMD-SHELL", "pg_isready -U ${user} -d ${db_name}"]
       interval: 5s
       timeout: 3s
       retries: 10
     restart: unless-stopped
 
+  redis_dev:
+    image: redis:7.4-alpine  # легковесный образ
+    container_name: bloom_redis_dev
+    ports:
+      - "6379:6379"  # стандартный порт Redis
+    volumes:
+      - redis_data_dev:/data  # монтируем объём для данных
+    command: redis-server --appendonly yes  # включаем сохранение на диск
+    restart: unless-stopped
+    networks:
+      - pricely_network
+
 volumes:
   postgres_data_dev:
+    driver: local
+  redis_data_dev:
     driver: local
 
 networks:

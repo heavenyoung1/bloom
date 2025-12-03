@@ -1,10 +1,14 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL
 from backend.core.logger import logger
+from pydantic import Field
 
 
 class Settings(BaseSettings):
     '''Конфигурация приложения (читается из .env файла).'''
+
+    project_name: str = 'CRM'
+    debug: bool = True
 
     # === PostgreSQL параметры ===
     host: str = 'localhost'
@@ -24,10 +28,20 @@ class Settings(BaseSettings):
     _sync_driver: str = 'postgresql'
     # === === === === === === === === === === === === === ====== === === ====
 
-    # === Безопасность и FastAPI Users ===
-    secret_key: str = 'your-secret-key-change-in-production-please'
+    # Redis
+    redis_url: str = Field(default='redis://192.168.175.129:6379')
+    redis_default_ttl: int = 3600  # 1 час
+
+    # === JWT ===
     algorithm: str = 'HS256'
-    access_token_expire_minutes: int = 60 * 24  # 24 часа
+    secret_key: str = Field(default='your-secret-key-change-in-production')
+    access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 7
+
+    # Security
+    password_min_length: int = 8
+    max_login_attempts: int = 5
+    lockout_duration_minutes: int = 15
 
     # === Email (для сброса пароля) ===
     smtp_host: str = 'smtp.gmail.com'
@@ -35,9 +49,6 @@ class Settings(BaseSettings):
     smtp_user: str = ''
     smtp_password: str = ''
     smtp_from: str = 'noreply@attorney-crm.com'
-
-    # === Application ===
-    debug: bool = True
 
     model_config = SettingsConfigDict(
         env_file='.env',

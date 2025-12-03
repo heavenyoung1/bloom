@@ -9,8 +9,8 @@ from fastapi_users.schemas import BaseUser, BaseUserCreate, BaseUserUpdate
 # ============= FastAPI Users схемы =============
 
 
-class AttorneyCreate(BaseUserCreate):
-    '''Схема для регистрации нового юриста'''
+class RegisterRequest(BaseUserCreate):
+    '''Запрос на регистрацию'''
 
     license_id: str = Field(
         ..., min_length=3, max_length=12, description='Номер удостоверения'
@@ -45,16 +45,16 @@ class AttorneyCreate(BaseUserCreate):
     )
 
 
-class AttorneyRead(BaseUser[int]):
-    '''Схема для чтения данных юриста (после авторизации)'''
+class AttorneyResponse(BaseUser[int]):
+    '''Ответ с данными юриста'''
 
     license_id: str
     first_name: str
     last_name: str
     patronymic: str
     phone: str
-    created_at: datetime  # ✅ Не Optional (БД гарантирует значение)
-    updated_at: datetime  # ✅ Не Optional
+    created_at: Optional[datetime]  # ✅ Не Optional (БД гарантирует значение)
+    updated_at: Optional[datetime]  # ✅ Не Optional
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -77,7 +77,7 @@ class AttorneyRead(BaseUser[int]):
     )
 
 
-class AttorneyUpdate(BaseUserUpdate):
+class UpdateRequest(BaseUserUpdate):
     '''Схема для обновления профиля юриста'''
 
     license_id: Optional[str] = Field(default=None, min_length=3, max_length=12)
@@ -101,96 +101,32 @@ class AttorneyUpdate(BaseUserUpdate):
     )
 
 
-# ============= ОРИГИНАЛЬНЫЕ DTO (оставляем для внутренней логики) =============
-# ============= УДАЛИТЬ ПОСЛЕ ПРОВЕРОК!!! =============
+class LoginRequest(BaseModel):
+    '''Запрос на логин'''
 
-# class CreateAttorneyDTO(BaseModel):
-#     '''DTO для внутреннего использования в сервисах'''
-
-#     license_id: str = Field(
-#         ..., min_length=3, max_length=12, description='Номер удостоверения'
-#     )
-#     first_name: str = Field(..., min_length=3, max_length=20, description='Имя')
-#     last_name: str = Field(..., min_length=3, max_length=20, description='Фамилия')
-#     patronymic: str = Field(..., min_length=3, max_length=20, description='Отчество')
-#     email: EmailStr = Field(
-#         ..., description='Email'
-#     )  # to_lowercase=True, -> deprecated
-#     phone: str = Field(
-#         ..., pattern=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
-#     )
-#     password: SecretStr = Field(..., min_length=8, description='Минимум 8 символов')
-
-#     model_config = ConfigDict(
-#         json_schema_extra={
-#             'example': {
-#                 'license_id': '153/3232',
-#                 'first_name': 'Иван',
-#                 'last_name': 'Петров',
-#                 'patronymic': 'Сергеевич',
-#                 'email': 'ivan@example.com',
-#                 'phone': '+79991234567',
-#                 'password': 'SecurePass123!',
-#             }
-#         }
-#     )
+    email: EmailStr
+    password: str
 
 
-# class UpdateAttorneyDTO(BaseModel):
-#     '''DTO для обновления (внутреннее)'''
+class VerifyEmailRequest(BaseModel):
+    '''Запрос на верификацию email'''
 
-#     license_id: Optional[str] = Field(default=None, min_length=3, max_length=12)
-#     first_name: Optional[str] = Field(default=None, min_length=3, max_length=20)
-#     last_name: Optional[str] = Field(default=None, min_length=3, max_length=20)
-#     patronymic: Optional[str] = Field(default=None, min_length=3, max_length=20)
-#     email: Optional[EmailStr] = Field(default=None)
-#     phone: Optional[str] = Field(default=None, pattern=r'^\+7\d{10}$')
-
-#     model_config = ConfigDict(
-#         json_schema_extra={
-#             'example': {
-#                 'license_id': '153/3232',
-#                 'first_name': 'Иван',
-#                 'last_name': 'Петров',
-#                 'patronymic': 'Сергеевич',
-#                 'email': 'ivan@example.com',
-#                 'phone': '+79991234567',
-#             }
-#         }
-#     )
+    email: EmailStr
+    code: str = Field(..., min_length=6, max_length=6, pattern=r'^\d{6}$')
 
 
-# class AttorneyResponseDTO(BaseModel):
-#     '''DTO для ответа (внутреннее)'''
+class ResendVerificationRequest(BaseModel):
+    '''Повторная отправка кода'''
 
-#     id: int
-#     license_id: str
-#     first_name: str
-#     last_name: str
-#     patronymic: str
-#     email: str
-#     phone: str
-#     is_active: bool
-#     created_at: Optional[datetime]  # Делаем эти поля опциональными
-#     updated_at: Optional[datetime]  # Делаем эти поля опциональными
+    email: EmailStr
 
-#     model_config = ConfigDict(
-#         from_attributes=True,
-#         json_schema_extra={
-#             'example': {
-#                 'id': 123,
-#                 'license_id': '153/3232',
-#                 'first_name': 'Иван',
-#                 'last_name': 'Петров',
-#                 'patronymic': 'Сергеевич',
-#                 'email': 'ivan@example.com',
-#                 'phone': '+79991234567',
-#                 'is_active': True,
-#                 'created_at': '2025-01-01T10:00:00',
-#                 'updated_at': '2025-10-01T15:30:00',
-#             }
-#         },
-#     )
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = 'bearer'
+    expires_in: int  # секунды
+
 
 # ============= Дополнительные схемы =============
 
@@ -220,7 +156,6 @@ class ChangePasswordDTO(BaseModel):
     )
 
 
-# ПОЧЕМУ СБРАСЫВАЕМ ЧЕРЕЗ EMAIL
 class ResetPasswordRequestDTO(BaseModel):
     '''DTO для запроса сброса пароля через email'''
 
