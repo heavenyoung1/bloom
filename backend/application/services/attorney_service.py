@@ -1,5 +1,3 @@
-from backend.application.validators.attorney_validator import AttorneyValidator
-from backend.domain.factories.attorney_factory import AttorneyFactory
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.logger import logger
 
@@ -10,34 +8,20 @@ from backend.application.dto.attorney import (
 
 from backend.core.exceptions import NotFoundException, VerificationError
 
-
-# from backend.application.dto.attorney import (
-#     AttorneyCreate,
-#     AttorneyRead,
-#     AttorneyUpdate,
-# )
-# from backend.domain.entities.attorney import Attorney
-
-
-# from backend.core.exceptions import EntityNotFoundException, ValidationException
-# from backend.core.logger import logger
-# import hashlib
-
-
 class AttorneyService:
     '''Service для работы с юристами'''
 
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory  # Используем фабрику для создания UoW
 
-    async def to_verify(self, dto: AttorneyVerificationUpdateRequest):
+    async def set_verified(self, email: str) -> AttorneyVerificationResponse:
         '''Установить флаг верификации для юриста по email.'''
         # 1. Создаём UoW через фабрику (получаем все репозитории)
         async with self.uow_factory.create() as uow:
-            attorney = await uow.attorney_repo.get_by_email(dto.email)
+            attorney = await uow.attorney_repo.get_by_email(email)
             if attorney is None:
                 logger.warning(
-                    f'Попытка изменить статус верификации несуществующего юриста: {dto.email}'
+                    f'Попытка изменить статус верификации несуществующего юриста: {email}'
                 )
                 raise NotFoundException('Юрист с таким email не найден')
             if attorney.is_verified == True:
