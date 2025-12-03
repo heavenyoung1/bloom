@@ -1,9 +1,9 @@
-import pytest
+# import pytest
 
-from backend.application.services.attorney_service import AttorneyService
-from backend.core.logger import logger
+# from backend.application.services.attorney_service import AttorneyService
+# from backend.core.logger import logger
 
-from backend.core.exceptions import EntityNotFoundException, ValidationException
+# from backend.core.exceptions import EntityNotFoundException, ValidationException
 
 
 # class TestAttorneyService:
