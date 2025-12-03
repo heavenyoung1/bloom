@@ -123,9 +123,11 @@ class EmailService:
 
                 # Подключаемся к SMTP серверу
                 with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
-                    server.starttls()  # Шифрование
-                    server.login(settings.smtp_user, settings.smtp_password)
-                    server.send_message(msg)
+                    server.starttls()  # Включаем шифрование TLS
+                    server.login(
+                        settings.smtp_user, settings.smtp_password
+                    )  # Аутентификация
+                    server.send_message(msg)  # Отправка
 
                 logger.info(f'[EMAIL] Письмо отправлено на {to_email}')
                 return True
@@ -136,4 +138,5 @@ class EmailService:
 
         # Запустить в отдельном потоке (не блокирует async)
         loop = asyncio.get_event_loop()
+        # Запускает синхронный код (send_sync) в отдельном потоке, чтобы не блокировать асинхронный цикл.
         return await loop.run_in_executor(None, send_sync)

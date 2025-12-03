@@ -11,8 +11,8 @@ class VerificationService:
     '''Сервис для управления верификацией email'''
 
     @staticmethod
-    def generate_code(length: int = 6) -> str:
-        '''Сгенерировать 6-значный код'''
+    def generate_code(length: int = 4) -> str:
+        '''Сгенерировать код'''
         return ''.join(random.choices(string.digits, k=length))
 
     @staticmethod
