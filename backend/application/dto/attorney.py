@@ -115,6 +115,21 @@ class VerifyEmailRequest(BaseModel):
     code: str = Field(..., min_length=6, max_length=6, pattern=r'^\d{6}$')
 
 
+class AttorneyVerificationUpdateRequest(BaseModel):
+    '''Запрос на изменение статуса верификации юриста.'''
+
+    email: EmailStr
+    is_verified: bool
+
+
+class AttorneyVerificationResponse(BaseModel):
+    '''Ответ по обновлённому статусу юриста.'''
+
+    id: int
+    email: EmailStr
+    is_verified: bool
+
+
 class ResendVerificationRequest(BaseModel):
     '''Повторная отправка кода'''
 

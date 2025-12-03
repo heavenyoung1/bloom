@@ -12,6 +12,14 @@ class EntityAlreadyExistsError(BaseCustomException):
     pass
 
 
+class VerificationError(BaseCustomException):
+    '''Ошибка, когда пользователь уже верифицирован.'''
+
+
+class NotFoundException(BaseCustomException):
+    '''Ошибка, когда сущность не найдена.'''
+
+
 class EntityNotFoundException(BaseCustomException):
     '''Ошибка, когда сущность не найдена.'''
 

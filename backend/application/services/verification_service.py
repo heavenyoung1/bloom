@@ -3,7 +3,8 @@ import string
 from backend.infrastructure.redis.client import redis_client
 from backend.infrastructure.redis.keys import RedisKeys
 from backend.infrastructure.email.email_service import EmailService
-from backend.infrastructure.repositories.attorney_repo import AttorneyRepository
+from backend.core.exceptions import NotFoundException, VerificationError
+from backend.application.services.attorney_service import AttorneyService
 from backend.core.logger import logger
 
 
@@ -12,8 +13,13 @@ class VerificationService:
 
     @staticmethod
     def generate_code(length: int = 6) -> str:
-        '''Сгенерировать 6-значный код'''
+        '''Сгенерировать код'''
         return ''.join(random.choices(string.digits, k=length))
+
+    # ====== ВНЕДРИТЬ ПОЗЖЕ!!!!
+    # import secrets
+    # return ''.join(str(secrets.randbelow(10)) for _ in range(length))
+    # ============================
 
     @staticmethod
     async def send_verification_code(email: str, first_name: str) -> bool:
@@ -40,12 +46,16 @@ class VerificationService:
 
         # Получаем код из Redis
         stored_code = await redis_client.get(RedisKeys.email_verification_code(email))
-
+        logger.info(f'[DEBUGAUTH] STORED CODE = {stored_code}!')
         if stored_code is None:
             logger.warning(f'[VERIFICATION] Код не найден для {email}')
             return False
 
-        if stored_code != code:
+        # НОРМАЛИЗАЦИЯ ТИПОВ
+        stored_code = str(stored_code)
+        code = str(code)
+
+        if str(stored_code) != str(code):
             logger.warning(f'[VERIFICATION] Неправильный код для {email}')
             return False
 
@@ -54,22 +64,12 @@ class VerificationService:
 
     @staticmethod
     async def mark_email_as_verified(
-        attorney_repo: AttorneyRepository, email: str
+        service: AttorneyService,
+        email: str,
     ) -> None:
-        '''Отметить email как подтвержденный'''
-
-        attorney = await attorney_repo.get_by_email(email)
-        if attorney:
-            # ⚠️ Нужно обновить ORM напрямую, т.к. domain entity не изменяет БД
-            # Это временное решение - лучше создать метод update в репозитории
-            attorney.is_verified = True
-
-            # ХУЙНЯЯЯ!!!⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-            # ХУЙНЯЯЯ!!!⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-            # ХУЙНЯЯЯ!!!⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-            # ХУЙНЯЯЯ!!!⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-            await attorney_repo.session.commit()
-            logger.info(f'[VERIFICATION] Email подтвержден для {email}')
+        '''Отметить email как подтвержденный.'''
+        response = await service.set_verified(email)
+        logger.info(f'Верификация пользователя {response.email} выполнена успешно')
 
     @staticmethod
     async def cleanup_code(email: str) -> None:

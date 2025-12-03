@@ -29,6 +29,17 @@ services:
     networks:
       - pricely_network
 
+  redis_commander:
+    image: rediscommander/redis-commander:latest
+    container_name: bloom_redis_commander
+    environment:
+      - REDIS_HOSTS=local:redis_dev:6379
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    networks:
+      - pricely_network
+
 volumes:
   postgres_data_dev:
     driver: local
