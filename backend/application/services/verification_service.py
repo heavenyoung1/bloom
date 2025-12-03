@@ -12,13 +12,14 @@ class VerificationService:
     '''Сервис для управления верификацией email'''
 
     @staticmethod
-    def generate_code(length: int = 4) -> str:
+    def generate_code(length: int = 6) -> str:
         '''Сгенерировать код'''
         return ''.join(random.choices(string.digits, k=length))
+
     # ====== ВНЕДРИТЬ ПОЗЖЕ!!!!
-        # import secrets
-        # return ''.join(str(secrets.randbelow(10)) for _ in range(length))
-    #============================
+    # import secrets
+    # return ''.join(str(secrets.randbelow(10)) for _ in range(length))
+    # ============================
 
     @staticmethod
     async def send_verification_code(email: str, first_name: str) -> bool:
@@ -45,12 +46,16 @@ class VerificationService:
 
         # Получаем код из Redis
         stored_code = await redis_client.get(RedisKeys.email_verification_code(email))
-
+        logger.info(f'[DEBUGAUTH] STORED CODE = {stored_code}!')
         if stored_code is None:
             logger.warning(f'[VERIFICATION] Код не найден для {email}')
             return False
 
-        if stored_code != code:
+        # НОРМАЛИЗАЦИЯ ТИПОВ
+        stored_code = str(stored_code)
+        code = str(code)
+
+        if str(stored_code) != str(code):
             logger.warning(f'[VERIFICATION] Неправильный код для {email}')
             return False
 
@@ -65,7 +70,6 @@ class VerificationService:
         '''Отметить email как подтвержденный.'''
         response = await service.set_verified(email)
         logger.info(f'Верификация пользователя {response.email} выполнена успешно')
-        
 
     @staticmethod
     async def cleanup_code(email: str) -> None:

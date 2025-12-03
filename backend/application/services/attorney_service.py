@@ -8,6 +8,7 @@ from backend.application.dto.attorney import (
 
 from backend.core.exceptions import NotFoundException, VerificationError
 
+
 class AttorneyService:
     '''Service для работы с юристами'''
 
@@ -30,11 +31,11 @@ class AttorneyService:
                     f'Пользователь {attorney.email} уже верифицирован'
                 )
 
-            # 2. Меняем флаг в доменной сущности
-            attorney.is_verified = True
-
-            # 3. Сохраняем изменения через репозиторий
-            await uow.attorney_repo.update(attorney)
+            # 2. Обновляем только флаг в БД через отдельный метод
+            updated_attorney = await uow.attorney_repo.change_verify(
+                attorney_id=attorney.id,
+                is_verified=True,
+            )
 
             logger.info(
                 f'Статус верификации изменён: email={attorney.email}, '
