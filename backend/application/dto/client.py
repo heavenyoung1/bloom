@@ -1,13 +1,14 @@
-from backend.infrastructure.models.client import Messenger
-
+from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from typing import Optional
+
+from backend.infrastructure.models.client import Messenger
 
 # Первый аргумент в Field (...) - эллипсис - что поле обязательно
 # Если данные не заполнены, будет ошибка валидации.
 
 
-class CreateClientDTO(BaseModel):
+class ClientCreateRequest(BaseModel):
     '''DTO для создания нового клиента'''
 
     name: str = Field(
@@ -51,7 +52,7 @@ class CreateClientDTO(BaseModel):
     )
 
 
-class UpdateClientDTO(BaseModel):
+class ClientUpdateRequest(BaseModel):
     '''DTO для частичного обновления клиента (PATCH)'''
 
     name: Optional[str] = Field(
@@ -85,6 +86,25 @@ class UpdateClientDTO(BaseModel):
         default=None, ge=1, description='ID юриста, ответственного за клиента '
     )
 
+class ClientResponse(BaseModel):
+    '''DTO для ответа: полная информация о деле'''
+
+    id: int
+    name: str
+    type: bool
+    email: str
+    phone: str
+    personal_info: str  # ИНН/ПАСПОРТ
+    address: str
+    messenger: Messenger
+    messenger_handle: str
+    owner_attorney_id: int
+
+    # Необязательные атрибуты
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 class ClientListItemDTO(BaseModel):
     '''DTO для списка клиентов'''

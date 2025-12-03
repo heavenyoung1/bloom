@@ -5,7 +5,7 @@ from typing import Optional
 from datetime import datetime
 
 
-class CreateCaseDTO(BaseModel):
+class CaseCreateRequest(BaseModel):
     '''DTO для создания нового дела'''
 
     name: str = Field(..., max_length=255, description='Название дела')
@@ -54,7 +54,7 @@ class CreateCaseDTO(BaseModel):
     )
 
 
-class UpdateCaseDTO(BaseModel):
+class CaseUpdateRequest(BaseModel):
     '''DTO для частичного обновления дела (PATCH)'''
 
     name: Optional[str] = Field(
@@ -105,7 +105,7 @@ class UpdateCaseStatusDTO(BaseModel):
     )
 
 
-class CaseResponseDTO(BaseModel):
+class CaseResponse(BaseModel):
     '''DTO для ответа: полная информация о деле'''
 
     id: int
