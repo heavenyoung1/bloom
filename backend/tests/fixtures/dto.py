@@ -1,15 +1,15 @@
 import pytest
 
 from backend.application.dto.attorney import (
-    AttorneyCreate,
-    AttorneyUpdate,
-    AttorneyRead,
+    RegisterRequest,
+    UpdateRequest,
+    AttorneyResponse,
 )
 
 
 @pytest.fixture
 async def valid_attorney_dto():
-    return AttorneyCreate(
+    return RegisterRequest(
         license_id='322/4767',
         first_name='Иван',
         last_name='Петров',
@@ -22,7 +22,7 @@ async def valid_attorney_dto():
 
 @pytest.fixture
 async def valid_attorney_dto_second():
-    return AttorneyCreate(
+    return RegisterRequest(
         license_id='111/2222',
         first_name='Александр',
         last_name='Иванов',
@@ -35,7 +35,7 @@ async def valid_attorney_dto_second():
 
 @pytest.fixture
 async def update_attorney_dto():
-    return AttorneyUpdate(
+    return UpdateRequest(
         license_id='321/4767',
         first_name='Иван',
         last_name='Петров',
