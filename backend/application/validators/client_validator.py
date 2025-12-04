@@ -4,13 +4,20 @@ from backend.infrastructure.repositories.interfaces.client_repo import (
 from backend.infrastructure.repositories.interfaces.attorney_repo import (
     IAttorneyRepository,
 )
-from backend.application.dto.client import ClientCreateRequest
+from backend.application.dto.client import ClientCreateRequest, ClientUpdateRequest
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
 
 class ClientValidator:
-    '''Валидатор для клиентов.'''
+    '''
+    Валидатор для клиентов.
+    
+    Ответственность:
+    - Проверка существования владельца (адвоката)
+    - Проверка уникальности полей (email, phone, personal_info)
+    - Проверка корректности данных
+    '''
 
     def __init__(
         self,
@@ -22,50 +29,100 @@ class ClientValidator:
 
     async def on_create(
         self,
-        dto: ClientCreateRequest,
+        request: ClientCreateRequest,
         owner_attorney_id: int,  # Из JWT, не из DTO!
     ) -> None:
-        '''Валидировать данные при создании клиента.'''
+        '''
+        Валидировать данные при создании клиента.
+        
+        Проверки:
+        1. Адвокат существует и активен
+        2. Email уникален для этого адвоката (если указан)
+        3. Телефон уникален для этого адвоката
+        4. Personal_info (ИНН/паспорт) уникален для этого адвоката
+        
+        Args:
+            request: ClientCreateRequest
+            owner_attorney_id: ID владельца (адвоката)
+            
+        Raises:
+            EntityNotFoundException: Адвокат не найден
+            ValidationException: Нарушение бизнес-правил
+        '''
 
         # 1. Юрист должен существовать
         attorney = await self.attorney_repo.get(owner_attorney_id)
+
         if not attorney:
             logger.warning(f'Юрист {owner_attorney_id} не найден')
             raise EntityNotFoundException(f'Юрист с ID {owner_attorney_id} не найден')
 
-        # 2. Email должен быть уникален для этого юриста
-        if dto.email:
+        # Проверить что юрист активен
+        if not attorney.is_active:
+            logger.warning(f"Attorney is not active: ID={owner_attorney_id}")
+            raise ValidationException(
+                "Attorney account is not active"
+            )
+        
+        # Проверить что адвокат верифицирован
+        if not attorney.is_verified:
+            logger.warning(f"Attorney is not verified: ID={owner_attorney_id}")
+            raise ValidationException(
+                "Attorney account is not verified"
+            )
+
+        # ========== ПРОВЕРКА 2: Email уникален (если указан) ==========
+        if request.email:
             existing = await self.client_repo.get_by_email_for_owner(
-                dto.email, owner_attorney_id
+                request.email, owner_attorney_id
             )
             if existing:
                 logger.warning(
-                    f'Email {dto.email} уже используется клиентом ID={existing.id} у юриста {owner_attorney_id}'
+                    f'Email {request.email} уже используется клиентом ID={existing.id} у юриста {owner_attorney_id}'
                 )
                 raise ValidationException(
-                    f'Email {dto.email} уже используется другим клиентом этого юриста'
+                    f'Email {request.email} уже используется другим клиентом этого юриста'
                 )
 
-        # 3. Телефон должен быть уникален для этого юриста
+        # ========== ПРОВЕРКА 3: Телефон уникален ==========
         existing = await self.client_repo.get_by_phone_for_owner(
-            dto.phone, owner_attorney_id
+            request.phone, 
+            owner_attorney_id,
         )
         if existing:
             logger.warning(
-                f'Телефон {dto.phone} уже используется клиентом ID={existing.id} у юриста {owner_attorney_id}'
+                f'Телефон {request.phone} уже используется клиентом ID={existing.id} у юриста {owner_attorney_id}'
             )
             raise ValidationException(
-                f'Телефон {dto.phone} уже используется другим клиентом этого юриста'
+                f'Телефон {request.phone} уже используется другим клиентом этого юриста'
             )
 
-        # 4. personal_info должен быть уникален для этого юриста
+        # ========== ПРОВЕРКА 4: Personal_info (ИНН/паспорт) уникален ==========
         existing = await self.client_repo.get_by_personal_info_for_owner(
-            dto.personal_info, owner_attorney_id
+            request.personal_info, 
+            owner_attorney_id,
         )
         if existing:
             logger.warning(
-                f'personal_info {dto.personal_info} уже используется клиентом ID={existing.id} у юриста {owner_attorney_id}'
+                f'personal_info {request.personal_info} уже используется клиентом ID={existing.id} у юриста {owner_attorney_id}'
             )
             raise ValidationException(
-                f'Документ/ИНН {dto.personal_info} уже используется другим клиентом этого юриста'
+                f'Документ/ИНН {request.personal_info} уже используется другим клиентом этого юриста'
             )
+        
+    
+    async def on_update(
+        self,
+        request: ClientUpdateRequest,
+        owner_attorney_id: int,
+        client_id: int,  # Исключить текущего клиента
+    ) -> None:
+        """Валидировать при обновлении (проверить уникальность)"""
+        # Проверить только поля которые изменяются
+        if request.phone:
+            existing = await self.client_repo.get_by_phone_for_owner(
+                request.phone, owner_attorney_id
+            )
+            if existing and existing.id != client_id:  # Исключить текущего
+                raise ValidationException(f"Phone already used")
+        # Аналогично для email и personal_info

@@ -27,14 +27,14 @@ class CreateClientUseCase:
 
         async with self.uow_factory as uow:
             try:
-                # 1. Валидация
+                # 1. Валидация (проверка уникальности, существования адвоката)
                 validator = ClientValidator(
                     client_repo=uow.client_repo,
                     attorney_repo=uow.attorney_repo,
                 )
-                await validator.on_create(request)
+                await validator.on_create(request, owner_attorney_id)
 
-                # 4. Создаём Entity через Factory
+                # 2. Создание Entity
                 client = Client.create(
                     name=request.name,
                     type=request.type,
@@ -54,7 +54,7 @@ class CreateClientUseCase:
                     f'Клиент создан: ID = {saved_client.id}, Email = {saved_client.email}, владелец = {owner_attorney_id}'
                 )
 
-                # 5. Возврат Response DTO
+                # 4. Возврат Response
                 return ClientResponse.model_validate(saved_client)
 
             except (ValidationException, EntityNotFoundException) as e:

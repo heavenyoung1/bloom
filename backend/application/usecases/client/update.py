@@ -1,6 +1,6 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.client import ClientUpdateRequest, ClientResponse
-from backend.core.exceptions import EntityNotFoundException
+from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
 from backend.core.logger import logger
 
 
@@ -9,7 +9,10 @@ class UpdateClientUseCase:
         self.uow_factory = uow_factory
 
     async def execute(
-        self, client_id: int, request: ClientUpdateRequest
+        self, 
+        client_id: int, 
+        request: ClientUpdateRequest,
+        attorney_id: int
     ) -> ClientResponse:
         async with self.uow_factory as uow:
             try:
@@ -18,10 +21,21 @@ class UpdateClientUseCase:
                 # validator = ClientValidator(client_repo=uow.client_repo)
                 # await validator.on_update(client_id, request)
 
-                # Получение существующего клиента
+                # 1. Получить клиента
                 client = await uow.client_repo.get(client_id)
                 if not client:
+                    logger.warning(f"Client not found: ID={client_id}")
                     raise EntityNotFoundException(f'Клиент с ID {client_id} не найден.')
+
+                # 2. Проверить права доступа
+                if client.owner_attorney_id != attorney_id:
+                    logger.warning(
+                        f"Access denied: Attorney {attorney_id} tried to update "
+                        f"client {client_id} owned by {client.owner_attorney_id}"
+                    )
+                    raise AccessDeniedException(
+                        "You don't have access to this client"
+                    )
 
                 # Обновление данных
                 # ВОТ ЭТО КОНЕЧНО ПОЛНОЕ ДЕРЬМО
