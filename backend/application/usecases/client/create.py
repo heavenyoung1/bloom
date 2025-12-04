@@ -1,11 +1,9 @@
 from backend.application.dto.client import ClientCreateRequest, ClientResponse
-from backend.domain.entities.case import Case
-from backend.infrastructure.models.case import CaseStatus
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.core.logger import logger
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.domain.entities.client import Client
 from backend.application.validators.client_validator import ClientValidator
+from backend.core.logger import logger
 
 
 class CreateClientUseCase:
