@@ -156,14 +156,16 @@ class ClientRepository(IClientRepository):
             # 1. Получение записи из базы данных
             stmt = select(ClientORM).where(
                 ClientORM.email == email,
-                ClientORM.owner_attorney_id == owner_id, 
+                ClientORM.owner_attorney_id == owner_id,
             )
             result = await self.session.execute(stmt)
             orm_client = result.scalars().first()
             return ClientMapper.to_domain(orm_client) if orm_client else None
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении КЛИЕНТА по email = {email}: {e}')
-            raise DatabaseErrorException(f'Ошибка БД при получении КЛИЕНТА по email = {email}: {e}')
+            raise DatabaseErrorException(
+                f'Ошибка БД при получении КЛИЕНТА по email = {email}: {e}'
+            )
 
     async def get_by_phone_for_owner(self, phone: str, owner_id: int) -> 'Client':
         try:
@@ -177,9 +179,13 @@ class ClientRepository(IClientRepository):
             return ClientMapper.to_domain(orm_client) if orm_client else None
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении КЛИЕНТА по телефону = {phone}: {e}')
-            raise DatabaseErrorException(f'Ошибка БД при получении КЛИЕНТА по телефону = {phone}: {e}')
-         
-    async def get_by_personal_info_for_owner(self, personal_info: str, owner_id: int) -> 'Client':
+            raise DatabaseErrorException(
+                f'Ошибка БД при получении КЛИЕНТА по телефону = {phone}: {e}'
+            )
+
+    async def get_by_personal_info_for_owner(
+        self, personal_info: str, owner_id: int
+    ) -> 'Client':
         try:
             # 1. Получение записи из базы данных
             stmt = select(ClientORM).where(
@@ -190,7 +196,9 @@ class ClientRepository(IClientRepository):
             orm_client = result.scalars().first()
             return ClientMapper.to_domain(orm_client) if orm_client else None
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении КЛИЕНТА по персональным данным = {personal_info}: {e}')
-            raise DatabaseErrorException(f'Ошибка БД при получении КЛИЕНТА по персональным данным = {personal_info}: {e}')
-         
-
+            logger.error(
+                f'Ошибка БД при получении КЛИЕНТА по персональным данным = {personal_info}: {e}'
+            )
+            raise DatabaseErrorException(
+                f'Ошибка БД при получении КЛИЕНТА по персональным данным = {personal_info}: {e}'
+            )
