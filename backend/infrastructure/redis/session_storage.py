@@ -5,79 +5,97 @@ from uuid import UUID
 
 from backend.domain.entities.session import RefreshSession
 from backend.infrastructure.redis.interfaces.redis_storage import IRefreshSessionStore
-from backend.infrastructure.redis.client import get_redis
+from backend.infrastructure.redis.client import redis_client
 from backend.core.settings import settings
+from backend.core.logger import logger
+from typing import Dict, Any
 
+class SessionStorage:
+    '''
+    Управление сессиями в Redis.
 
-class RedisRefreshSessionStore(IRefreshSessionStore):
-    def __init__(self, redis):
-        self.redis = redis
+    Ответственность:
+    ✅ Создать сессию при логине
+    ✅ Получить сессию при запросе
+    ✅ Удалить сессию при логауте
+    ✅ Продлить TTL при активности
+    '''
+
+    SESSION_PREFIX = 'session'
 
     @staticmethod
-    def _key(jti: str) -> str:
-        return f'auth:refresh:{jti}'
+    def _make_key(token: str) -> str:
+        '''Сделать ключ Redis из токена'''
+        return f'{SessionStorage.SESSION_PREFIX}:{token}'
 
     @staticmethod
-    def _user_sessions_key(user_id: UUID) -> str:
-        return f'auth:user:{user_id}:sessions'
+    async def create_session(
+        token: str,
+        attorney_id: int,
+        attorney_email: str,
+        attorney_name: str,
+    ) -> None:
+        '''
+        Создать сессию при логине.
 
-    async def save(self, session: RefreshSession) -> None:
-        ttl = int((session.expires_at - datetime.utcnow()).total_seconds())
-        data = json.dumps(
-            {
-                'jti': session.jti,
-                'user_id': str(session.user_id),
-                'user_agent': session.user_agent,
-                'ip': session.ip,
-                'expires_at': session.expires_at.isoformat(),
-                'created_at': session.created_at.isoformat(),
-            }
-        )
+        Args:
+            token: JWT access token
+            attorney_id: ID адвоката
+            attorney_email: Email адвоката
+            attorney_name: Имя адвоката
+        '''
 
-        pipe = self.redis.pipeline()
-        pipe.set(self._key(session.jti), data, ex=ttl)
-        pipe.sadd(self._user_sessions_key(session.user_id), session.jti)
-        pipe.execute()
+        key = SessionStorage._make_key(token)
+        session_data = {
+            'id': attorney_id,
+            'email': attorney_email,
+            'name': attorney_name,
+        }
 
-    async def get(self, jti: str) -> Optional[RefreshSession]:
-        raw = await self.redis.get(self._key(jti))
-        if not raw:
+        # Сохраняем в Redis на 15 минут
+        await redis_client.set(key, session_data, ttl=15 * 60)  # 15 минут
+
+        logger.info(f'Session created for attorney {attorney_id}')
+
+    @staticmethod
+    async def get_session(token: str) -> Optional[Dict[str, Any]]:
+        '''
+        Получить сессию по токену.
+
+        Returns:
+            Данные сессии или None если не найдена/истекла
+        '''
+
+        key = SessionStorage._make_key(token)
+        session = await redis_client.get(key)
+
+        if not session:
+            logger.warning('Session not found or expired')
             return None
-        data = json.loads(raw)
-        return RefreshSession(
-            jti=data['jti'],
-            user_id=UUID(data['user_id']),
-            user_agent=data.get('user_agent'),
-            ip=data.get('ip'),
-            expires_at=datetime.fromisoformat(data['expires_at']),
-            created_at=datetime.fromisoformat(data['created_at']),
-        )
 
-    async def delete(self, jti: str) -> None:
-        # Вытащим user_id чтобы удалить из множества сессий
-        raw = await self.redis.get(self._key(jti))
-        pipe = self.redis.pipeline()
-        if raw:
-            data = json.loads(raw)
-            pipe.srem(self._user_sessions_key(UUID(data['user_id'])), jti)
-        pipe.delete(self._key(jti))
-        await pipe.execute()
+        return session
 
-    async def delete_all_for_user(self, user_id: UUID) -> None:
-        user_key = self._user_sessions_key(user_id)
-        jtis = await self.redis.smembers(user_key)
-        pipe = self.redis.pipeline()
-        for jti in jtis:
-            pipe.delete(self._key(jti))
-        pipe.delete(user_key)
-        await pipe.execute()
+    @staticmethod
+    async def invalidate_session(token: str) -> None:
+        '''
+        Удалить сессию (logout).
+        '''
 
-    async def list_for_user(self, user_id: UUID) -> List[RefreshSession]:
-        user_key = self._user_sessions_key(user_id)
-        jtis = await self.redis.smembers(user_key)
-        sessions: List[RefreshSession] = []
-        for jti in jtis:
-            s = await self.get(jti)
-            if s:
-                sessions.append(s)
-        return sessions
+        key = SessionStorage._make_key(token)
+        await redis_client.delete(key)
+        logger.info('Session invalidated')
+
+    @staticmethod
+    async def refresh_session_ttl(token: str) -> None:
+        '''
+        Продлить жизнь сессии (при активности).
+        '''
+
+        session = await SessionStorage.get_session(token)
+        if session:
+            await SessionStorage.create_session(
+                token=token,
+                attorney_id=session['id'],
+                attorney_email=session['email'],
+                attorney_name=session['name'],
+            )

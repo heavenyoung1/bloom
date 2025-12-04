@@ -23,7 +23,17 @@ class SignUpUseCase:
         self.factory = AttorneyFactory()  # Фабрика для создания сущностей
 
     async def execute(self, request: RegisterRequest) -> AttorneyResponse:
-        '''Регистрация нового юриста'''
+        '''
+        Регистрация нового юриста.
+
+        Flow:
+        1. Валидировать данные
+        2. Хешировать пароль
+        3. Создать Entity через Factory
+        4. Сохранить в БД
+        5. Отправить код верификации
+        '''
+
         # 1. Получить UoW (транзакция + все репозитории)
         async with self.uow_factory.create() as uow:
 
