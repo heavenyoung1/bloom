@@ -6,6 +6,10 @@ from backend.application.dto.attorney import (
     AttorneyResponse,
 )
 
+from backend.application.dto.client import (
+    ClientCreateRequest,
+)
+
 
 @pytest.fixture
 async def valid_attorney_dto():
@@ -42,4 +46,18 @@ async def update_attorney_dto():
         patronymic='Сергеевич',
         email='ivan12231@example.com',
         phone='+79991234567',
+    )
+
+
+@pytest.fixture
+async def valid_client_dto():
+    return ClientCreateRequest(
+        name='Иванов Иван Иванович',
+        type=True,
+        email='client@example.com',
+        phone='+79991234567',
+        personal_info='1212 443443',
+        address='г. Москва, ул. Пушкина, д.1',
+        messenger='Telegram',
+        messenger_handle='@client123',
     )

@@ -88,7 +88,7 @@ async def get_current_attorney(
                 detail='Token invalid',
                 headers={'WWW-Authenticate': 'Bearer'},
             )
-
+        # ПРОВЕРИТЬ ЧТО ЛЕЖИТ ВОТ ТУТ
         return payload
 
     except ValueError as e:
