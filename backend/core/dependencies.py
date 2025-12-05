@@ -20,15 +20,19 @@ from backend.core.logger import logger
 
 # ========== ASYNC SESSION ==========
 
+
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with database.get_session() as session:
         yield session
 
+
 # ========== UOW FACTORY ==========
+
 
 async def get_uow_factory() -> UnitOfWorkFactory:
     '''Получить фабрику UoW'''
     return UnitOfWorkFactory(database)
+
 
 # ========== JWT AUTHENTICATION ==========
 
@@ -40,18 +44,18 @@ async def get_current_attorney(
 ) -> Dict[str, Any]:
     '''
     Получить текущего юриста из JWT токена.
-    
+
     Используется в Depends() для защиты эндпоинтов.
-    
+
     Args:
         credentials: Автоматически извлекаются из заголовка Authorization: Bearer <token>
-    
+
     Returns:
         Декодированный payload с attorney_id и другими данными
-    
+
     Raises:
         HTTPException 401: Если токен невалиден или истёк
-    
+
     Example:
         @router.get('/profile')
         async def get_profile(
@@ -60,13 +64,13 @@ async def get_current_attorney(
             attorney_id = current_attorney['sub']
             return await get_attorney_by_id(attorney_id)
     '''
-    
+
     token = credentials.credentials
-    
+
     try:
         # Декодируем JWT токен
         payload = SecurityService.decode_token(token)
-        
+
         # Проверяем, что это access токен (не refresh)
         if not SecurityService.verify_token_type(payload, 'access'):
             logger.warning('Попытка использовать refresh token вместо access token')
@@ -75,7 +79,7 @@ async def get_current_attorney(
                 detail='Invalid token type. Use access token',
                 headers={'WWW-Authenticate': 'Bearer'},
             )
-        
+
         attorney_id: str = payload.get('sub')
         if attorney_id is None:
             logger.warning('Token payload missing subject')
@@ -84,9 +88,9 @@ async def get_current_attorney(
                 detail='Token invalid',
                 headers={'WWW-Authenticate': 'Bearer'},
             )
-        
+
         return payload
-        
+
     except ValueError as e:
         logger.warning(f'JWT validation error: {str(e)}')
         raise HTTPException(

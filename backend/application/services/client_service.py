@@ -16,7 +16,11 @@ from backend.application.dto.client import (
     ClientResponse,
 )
 
-from backend.core.exceptions import NotFoundException, VerificationError, AccessDeniedException
+from backend.core.exceptions import (
+    NotFoundException,
+    VerificationError,
+    AccessDeniedException,
+)
 
 from backend.core.logger import logger
 
@@ -30,9 +34,7 @@ class ClientService:
     - Может добавить дополнительную логику (логирование, кэширование и т.д.)
     '''
 
-    def __init__(
-        self, uow_factory: UnitOfWorkFactory
-    ):
+    def __init__(self, uow_factory: UnitOfWorkFactory):
         # Инициализируем все UseCase'ы
         self.create_client_use_case = CreateClientUseCase(uow_factory)
         # self.get_client_use_case = GetClientUseCase(uow_factory)
@@ -40,22 +42,29 @@ class ClientService:
         # self.delete_client_use_case = DeleteClientUseCase(uow_factory)
         # self.list_clients_use_case = ListClientsUseCase(uow_factory)
 
-# ========== CHECK ACCESS ==========
+    # ========== CHECK ACCESS ==========
 
-    async def _check_owner_access(self, current_attorney_id: int, owner_attorney_id: int):
+    async def _check_owner_access(
+        self, current_attorney_id: int, owner_attorney_id: int
+    ):
         '''Проверка прав доступа владельца'''
         if current_attorney_id != owner_attorney_id:
-            raise AccessDeniedException("You are not authorized to access this client's data.")
+            raise AccessDeniedException(
+                "You are not authorized to access this client's data."
+            )
 
-# ========== CREATE CLIENT ==========
+    # ========== CREATE CLIENT ==========
 
-    async def create_client(self, request, owner_attorney_id: int, current_attorney_id: int):
+    async def create_client(
+        self, request, owner_attorney_id: int, current_attorney_id: int
+    ):
 
         # Проверяем права доступа владельца
         await self._check_owner_access(current_attorney_id, owner_attorney_id)
 
         # Вызываем UseCase
         return await self.create_client_use_case.execute(request, owner_attorney_id)
+
 
 # # ========== UPDATE CLIENT ==========
 
@@ -73,7 +82,7 @@ class ClientService:
 
 #         # Проверяем права доступа владельца
 #         self._check_owner_access(current_attorney_id, owner_attorney_id)
-        
+
 #         # Вызываем UseCase
 #         return await self.delete_client_use_case.execute(request, owner_attorney_id)
 
@@ -93,7 +102,7 @@ class ClientService:
 
 #         # Проверяем права доступа владельца
 #         self._check_owner_access(current_attorney_id, owner_attorney_id)
-        
+
 #         # Вызываем UseCase
 #         return await self.get_clients_for_attorney_use_case.execute(
 #             request, owner_attorney_id

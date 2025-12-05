@@ -24,25 +24,22 @@ async def create_client(
     try:
         # current_attorney_id - это ID текущего юриста, который авторизован
         current_attorney_id = int(current_attorney['sub'])
-        
+
         logger.info(f'Создание клиента юристом {current_attorney_id}')
-        
+
         client_service = ClientService(uow_factory)
         return await client_service.create_client(
-            request, 
+            request,
             owner_attorney_id=current_attorney_id,
-            current_attorney_id=current_attorney_id
-            )
-        
+            current_attorney_id=current_attorney_id,
+        )
+
     except ValueError as e:
         logger.error(f'Ошибка валидации при создании клиента: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         logger.error(f'Критическая ошибка при создании клиента: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Не удалось создать клиента'
+            detail='Не удалось создать клиента',
         )

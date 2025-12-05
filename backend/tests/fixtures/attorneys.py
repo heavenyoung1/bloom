@@ -23,7 +23,7 @@ def sample_attorney():
         hashed_password='some_hash',
         is_active=True,
         is_superuser=False,
-        is_verified=True,
+        is_verified=False,
     )
 
 
@@ -40,7 +40,7 @@ def sample_update_attorney():
         hashed_password='some_hash',
         is_active=True,
         is_superuser=False,
-        is_verified=True,
+        is_verified=False,
     )
 
 

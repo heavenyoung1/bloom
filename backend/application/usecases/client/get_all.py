@@ -10,9 +10,9 @@ class GetClientsForAttorneyUseCase:
         self.uow_factory = uow_factory
 
     async def execute(
-            self, 
-            attorney_id: int,
-            ) -> List[ClientResponse]:
+        self,
+        attorney_id: int,
+    ) -> List[ClientResponse]:
         async with self.uow_factory as uow:
             try:
                 # Получить всех клиентов этого адвоката

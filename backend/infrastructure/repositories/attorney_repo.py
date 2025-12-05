@@ -144,14 +144,6 @@ class AttorneyRepository(IAttorneyRepository):
             )
 
     async def update(self, updated_attorney: Attorney) -> 'Attorney':
-        '''
-        Обновить данные юриста по ID.
-
-        :param id: ID юриста, который необходимо обновить.
-        :param updated_attorney: Обновленные данные юриста.
-        :return: Словарь с результатом операции ('success': True) и обновлённым юристом.
-        :raises DatabaseErrorException: Если произошла ошибка при обновлении данных.
-        '''
         try:
             # 1. Выполнение запроса на извлечение данных из БД
             stmt = select(AttorneyORM).where(AttorneyORM.id == updated_attorney.id)

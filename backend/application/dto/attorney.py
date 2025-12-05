@@ -141,6 +141,7 @@ class VerifyEmailRequest(BaseModel):
         }
     )
 
+
 class ResendVerificationRequest(BaseModel):
     '''Повторная отправка кода'''
 

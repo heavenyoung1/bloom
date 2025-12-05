@@ -9,10 +9,7 @@ class UpdateClientUseCase:
         self.uow_factory = uow_factory
 
     async def execute(
-        self, 
-        client_id: int, 
-        request: ClientUpdateRequest,
-        attorney_id: int
+        self, client_id: int, request: ClientUpdateRequest, attorney_id: int
     ) -> ClientResponse:
         async with self.uow_factory as uow:
             try:
@@ -33,9 +30,7 @@ class UpdateClientUseCase:
                         f"Access denied: Attorney {attorney_id} tried to update "
                         f"client {client_id} owned by {client.owner_attorney_id}"
                     )
-                    raise AccessDeniedException(
-                        "You don't have access to this client"
-                    )
+                    raise AccessDeniedException("You don't have access to this client")
 
                 # Обновление данных
                 # ВОТ ЭТО КОНЕЧНО ПОЛНОЕ ДЕРЬМО
