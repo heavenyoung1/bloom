@@ -50,7 +50,9 @@ class CreateClientUseCase:
                 saved_client = await uow.client_repo.save(client)
 
                 logger.info(
-                    f'Клиент создан: ID = {saved_client.id}, Email = {saved_client.email}, владелец = {owner_attorney_id}'
+                    f'Клиент создан: ID = {saved_client.id}'
+                    'Email = {saved_client.email}'
+                    'Владелец = {owner_attorney_id}'
                 )
 
                 # 4. Возврат Response

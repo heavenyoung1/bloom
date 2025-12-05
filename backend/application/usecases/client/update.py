@@ -1,6 +1,7 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.client import ClientUpdateRequest, ClientResponse
 from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
+from backend.application.validators.client_validator import ClientValidator
 from backend.core.logger import logger
 
 
@@ -9,28 +10,24 @@ class UpdateClientUseCase:
         self.uow_factory = uow_factory
 
     async def execute(
-        self, client_id: int, request: ClientUpdateRequest, attorney_id: int
+        self,
+        client_id: int,
+        request: ClientUpdateRequest,
+        owner_attorney_id: int,  # Из JWT!: int
     ) -> ClientResponse:
         async with self.uow_factory as uow:
             try:
-                # Валидация
-                # ДОБАВИТЬ ВАЛИДАЦИЮ ДЛЯ ОБНОВЛЕНИЯ
-                # validator = ClientValidator(client_repo=uow.client_repo)
-                # await validator.on_update(client_id, request)
+                # 1. Валидация (проверка уникальности, существования юриста)
+                validator = ClientValidator(
+                    client_repo=uow.client_repo, attorney_repo=uow.attorney_repo
+                )
+                await validator.on_create(request, owner_attorney_id)
 
                 # 1. Получить клиента
                 client = await uow.client_repo.get(client_id)
                 if not client:
-                    logger.warning(f"Client not found: ID={client_id}")
-                    raise EntityNotFoundException(f'Клиент с ID {client_id} не найден.')
-
-                # 2. Проверить права доступа
-                if client.owner_attorney_id != attorney_id:
-                    logger.warning(
-                        f"Access denied: Attorney {attorney_id} tried to update "
-                        f"client {client_id} owned by {client.owner_attorney_id}"
-                    )
-                    raise AccessDeniedException("You don't have access to this client")
+                    logger.warning(f'Клиент не найден: ID = {client_id}')
+                    raise EntityNotFoundException(f'Клиент не найден: ID = {client_id}')
 
                 # Обновление данных
                 # ВОТ ЭТО КОНЕЧНО ПОЛНОЕ ДЕРЬМО
