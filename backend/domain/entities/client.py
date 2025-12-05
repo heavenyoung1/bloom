@@ -21,3 +21,30 @@ class Client:
     # Необязательные атрибуты
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+    @staticmethod
+    def create(
+        *,
+        name: str,
+        type: bool,
+        email: str | None,
+        phone: str,
+        personal_info: str,
+        address: str,
+        messenger: Messenger,
+        messenger_handle: str,
+        owner_attorney_id: int,
+    ) -> 'Client':
+        '''Factory method для создания нового клиента'''
+        return Client(
+            id=None,
+            name=name,
+            type=type,
+            email=email,
+            phone=phone,
+            personal_info=personal_info,
+            address=address,
+            messenger=messenger,
+            messenger_handle=messenger_handle,
+            owner_attorney_id=owner_attorney_id,
+        )

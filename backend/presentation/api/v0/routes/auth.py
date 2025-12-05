@@ -23,10 +23,14 @@ router = APIRouter(prefix='/api/v1/auth', tags=['auth'])
 
 
 @router.post(
-    '/register', response_model=AttorneyResponse, status_code=status.HTTP_201_CREATED
+    '/register',
+    response_model=AttorneyResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary='Register new attorney',
 )
 async def register(
-    request: RegisterRequest, uow_factory: UnitOfWorkFactory = Depends(get_uow_factory)
+    request: RegisterRequest,
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     '''
     Регистрация нового юриста
@@ -99,16 +103,25 @@ async def resend_verification(
 
 @router.post('/login', response_model=TokenResponse)
 async def login(
-    request: LoginRequest, uow_factory: UnitOfWorkFactory = Depends(get_uow_factory)
+    request: LoginRequest,
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
-    '''Вход в систему'''
+    '''
+    Вход в систему
+
+    Returns access_token и refresh_token.
+    Используйте access_token в заголовке Authorization: Bearer <token>
+    '''
     try:
         use_case = SignInUseCase(uow_factory)
         return await use_case.execute(request)
 
     except ValueError as e:
         logger.error(f'Ошибка при входе: {str(e)}')
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e),
+        )
     except Exception as e:
         logger.error(f'Критическая ошибка при входе: {str(e)}')
         raise HTTPException(
@@ -144,21 +157,38 @@ async def refresh(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
 
 
-@router.post('/logout')
-async def logout(body: dict, uow_factory: UnitOfWorkFactory = Depends(get_uow_factory)):
-    '''Выход из системы'''
+async def logout(
+    request: dict,
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    '''
+    Выход из системы.
+
+    Body:
+    {
+        'attorney_id': 123
+    }
+    '''
     try:
-        attorney_id = body.get('attorney_id')
+        attorney_id = request.get('attorney_id')
+
         if not attorney_id:
             raise ValueError('Missing attorney_id')
 
-        service = AuthService(uow_factory)
-        await service.logout(attorney_id)
+        auth_service = AuthService(uow_factory)
+        await auth_service.logout(int(attorney_id))
 
         return {'message': 'Logged out successfully'}
 
-    except Exception as e:
-        logger.error(f'Ошибка при logout: {str(e)}')
+    except ValueError as e:
+        logger.warning(f'Logout error: {str(e)}')
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Logout failed'
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+    except Exception as e:
+        logger.error(f'Error during logout: {str(e)}', exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Logout failed',
         )

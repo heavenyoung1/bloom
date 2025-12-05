@@ -41,4 +41,5 @@ class RedisClient:
         return bool(await self._client.exists(key))
 
 
+# Singleton
 redis_client = RedisClient()

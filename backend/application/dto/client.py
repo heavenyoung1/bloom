@@ -1,14 +1,20 @@
-from backend.infrastructure.models.client import Messenger
-
+from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from typing import Optional
+
+from backend.infrastructure.models.client import Messenger
 
 # Первый аргумент в Field (...) - эллипсис - что поле обязательно
 # Если данные не заполнены, будет ошибка валидации.
 
 
-class CreateClientDTO(BaseModel):
-    '''DTO для создания нового клиента'''
+class ClientCreateRequest(BaseModel):
+    '''
+    DTO для создания нового клиента
+
+    ВАЖНО: owner_attorney_id НЕ включен!
+    Передаётся из JWT токена в API слое.
+    '''
 
     name: str = Field(
         ..., max_length=100, description='Название для Юр.лица либо ФИО для Физ.лица'
@@ -30,9 +36,9 @@ class CreateClientDTO(BaseModel):
     address: str = Field(..., max_length=255, description='Почтовый адрес')
     messenger: Messenger
     messenger_handle: str = Field(..., min_length=4, max_length=50)
-    owner_attorney_id: int = Field(
-        ..., description='ID юриста, ответственного за клиента'
-    )
+    # owner_attorney_id: int = Field(
+    #     ..., description='ID юриста, ответственного за клиента'
+    # )
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -45,13 +51,13 @@ class CreateClientDTO(BaseModel):
                 'address': 'г. Москва, ул. Пушкина, д.1',
                 'messenger': 'Telegram',
                 'messenger_handle': '@client123',
-                'owner_attorney_id': 1,
+                #'owner_attorney_id': 1,
             }
         }
     )
 
 
-class UpdateClientDTO(BaseModel):
+class ClientUpdateRequest(BaseModel):
     '''DTO для частичного обновления клиента (PATCH)'''
 
     name: Optional[str] = Field(
@@ -81,9 +87,30 @@ class UpdateClientDTO(BaseModel):
     )
     messenger: Messenger
     messenger_handle: Optional[str] = Field(default=None, max_length=50)
-    owner_attorney_id: Optional[int] = Field(
-        default=None, ge=1, description='ID юриста, ответственного за клиента '
-    )
+    # owner_attorney_id: Optional[int] = Field(
+    #     default=None, ge=1, description='ID юриста, ответственного за клиента '
+    # )
+
+
+class ClientResponse(BaseModel):
+    '''DTO для ответа: полная информация о деле'''
+
+    id: int
+    name: str
+    type: bool
+    email: Optional[str] = None  # email: str
+    phone: str
+    personal_info: str  # ИНН/ПАСПОРТ
+    address: str
+    messenger: Messenger
+    messenger_handle: str
+    owner_attorney_id: int
+
+    # Необязательные атрибуты
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ClientListItemDTO(BaseModel):
@@ -93,5 +120,6 @@ class ClientListItemDTO(BaseModel):
     name: str
     phone: str
     messenger_handle: str
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

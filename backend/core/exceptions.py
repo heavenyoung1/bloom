@@ -11,6 +11,11 @@ class EntityAlreadyExistsError(BaseCustomException):
 
     pass
 
+class AccessDeniedException(BaseCustomException):
+    '''Ошибка прав доступа'''
+
+    pass
+
 
 class VerificationError(BaseCustomException):
     '''Ошибка, когда пользователь уже верифицирован.'''

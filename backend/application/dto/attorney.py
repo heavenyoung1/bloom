@@ -107,12 +107,59 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'email': 'ivan@example.com',
+                'password': 'SecurePass123!',
+            }
+        }
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'email': 'ivan@example.com',
+                'password': 'SecurePass123!',
+            }
+        }
+    )
+
 
 class VerifyEmailRequest(BaseModel):
     '''Запрос на верификацию email'''
 
     email: EmailStr
     code: str = Field(..., min_length=6, max_length=6, pattern=r'^\d{6}$')
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'email': 'ivan@example.com',
+                'code': '000000',
+            }
+        }
+    )
+
+class ResendVerificationRequest(BaseModel):
+    '''Повторная отправка кода'''
+
+    email: EmailStr
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'email': 'ivan@example.com',
+            }
+        }
+    )
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = 'bearer'
+    expires_in: int  # секунды
 
 
 class AttorneyVerificationUpdateRequest(BaseModel):
@@ -128,19 +175,6 @@ class AttorneyVerificationResponse(BaseModel):
     id: int
     email: EmailStr
     is_verified: bool
-
-
-class ResendVerificationRequest(BaseModel):
-    '''Повторная отправка кода'''
-
-    email: EmailStr
-
-
-class TokenResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = 'bearer'
-    expires_in: int  # секунды
 
 
 # ============= Дополнительные схемы =============
