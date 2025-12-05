@@ -25,13 +25,13 @@ class CreateClientUseCase:
         owner_attorney_id: int,  # Из JWT!
     ) -> 'ClientResponse':
 
-        async with self.uow_factory as uow:
+        async with self.uow_factory.create() as uow:
             try:
                 # 1. Валидация (проверка уникальности, существования адвоката)
                 validator = ClientValidator(
-                    client_repo=uow.client_repo,
-                    attorney_repo=uow.attorney_repo,
-                )
+                    client_repo=uow.client_repo, 
+                    attorney_repo=uow.attorney_repo
+                    )
                 await validator.on_create(request, owner_attorney_id)
 
                 # 2. Создание Entity

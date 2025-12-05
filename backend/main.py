@@ -6,6 +6,7 @@ from backend.core.logger import logger
 from backend.core.db.database import database
 from backend.infrastructure.redis.client import redis_client
 from backend.presentation.api.v0.routes.auth import router as auth_router
+from backend.presentation.api.v0.routes.clients import router as client_router
 
 
 @asynccontextmanager
@@ -68,6 +69,7 @@ app.add_middleware(
 
 # Подключить роуты
 app.include_router(auth_router)
+app.include_router(client_router)
 
 
 # Health check endpoints

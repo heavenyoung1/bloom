@@ -16,7 +16,6 @@ class AccessDeniedException(BaseCustomException):
 
     pass
 
-AccessDeniedException
 
 class VerificationError(BaseCustomException):
     '''Ошибка, когда пользователь уже верифицирован.'''
