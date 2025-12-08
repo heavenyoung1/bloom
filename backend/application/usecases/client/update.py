@@ -1,7 +1,7 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.client import ClientUpdateRequest, ClientResponse
 from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
-from backend.application.validators.client_validator import ClientValidator
+from backend.application.policy.client_policy import ClientPolicy
 from backend.core.logger import logger
 
 
@@ -18,7 +18,7 @@ class UpdateClientUseCase:
         async with self.uow_factory as uow:
             try:
                 # 1. Валидация (проверка уникальности, существования юриста)
-                validator = ClientValidator(
+                validator = ClientPolicy(
                     client_repo=uow.client_repo, attorney_repo=uow.attorney_repo
                 )
                 await validator.on_create(request, owner_attorney_id)

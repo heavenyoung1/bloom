@@ -2,7 +2,7 @@ from backend.infrastructure.repositories.attorney_repo import AttorneyRepository
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.security import SecurityService
 from backend.domain.factories.attorney_factory import AttorneyFactory
-from backend.application.validators.attorney_validator import AttorneyValidator
+from backend.application.policy.attorney_policy import AttorneyPolicy
 from backend.application.services.verification_service import VerificationService
 from backend.infrastructure.redis.client import redis_client
 from backend.infrastructure.redis.keys import RedisKeys
@@ -38,7 +38,7 @@ class SignUpUseCase:
         async with self.uow_factory.create() as uow:
 
             # 2. Валидировать данные
-            validator = AttorneyValidator(uow.attorney_repo)
+            validator = AttorneyPolicy(uow.attorney_repo)
             await validator.on_create(request)
 
             # 3. Захэшировать пароль

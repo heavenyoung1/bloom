@@ -6,7 +6,7 @@ from backend.core.exceptions import ValidationException
 from backend.core.logger import logger
 
 
-class AttorneyValidator:
+class AttorneyPolicy:
     def __init__(self, repo: IAttorneyRepository):
         self.repo = repo
 

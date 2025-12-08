@@ -11,7 +11,7 @@ from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
 
-class ClientValidator:
+class ClientPolicy:
     '''Валидатор для клиентов.'''
 
     def __init__(

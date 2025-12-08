@@ -1,5 +1,5 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.application.validators.client_validator import ClientValidator
+from backend.application.policy.client_policy import ClientPolicy
 from backend.core.logger import logger
 
 from backend.application.usecases.client import (

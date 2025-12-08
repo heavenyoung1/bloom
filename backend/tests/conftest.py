@@ -7,7 +7,7 @@ from backend.tests.fixtures.cases import *
 from backend.tests.fixtures.contacts import *
 from backend.tests.fixtures.clients import *
 from backend.tests.fixtures.documents import *
-from backend.tests.fixtures.validators import *
+from backend.tests.fixtures.policy import *
 from backend.tests.fixtures.dto import *
 from backend.tests.fixtures.factories import *
 from backend.tests.fixtures.services import *

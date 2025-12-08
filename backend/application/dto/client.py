@@ -23,7 +23,7 @@ class ClientCreateRequest(BaseModel):
         default=True, description='Тип клиента: True — физ.лицо, False — юр.лицо'
     )
     email: Optional[EmailStr] = Field(
-        default=None, to_lowercase=True, description='Email (необязательно)'
+        default=None, description='Email (необязательно)'
     )
     phone: str = Field(
         ..., pattern=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
@@ -70,7 +70,7 @@ class ClientUpdateRequest(BaseModel):
         description='Тип клиента: True — физ.лицо, False — юр.лицо (если требуется изменить)',
     )
     email: Optional[EmailStr] = Field(
-        default=None, to_lowercase=True, description='Email (необязательно)'
+        default=None, description='Email (необязательно)'
     )
     phone: Optional[str] = Field(
         default=None,
