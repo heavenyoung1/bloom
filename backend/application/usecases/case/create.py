@@ -1,6 +1,6 @@
 from backend.application.dto.case import CaseCreateRequest, CaseResponse
 from backend.domain.entities.case import Case
-from backend.infrastructure.models.case import CaseStatus
+from backend.domain.entities.auxiliary import CaseStatus
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.logger import logger
 from backend.core.exceptions import NotFoundException

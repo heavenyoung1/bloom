@@ -1,5 +1,5 @@
 from backend.domain.entities.case import Case
-from backend.infrastructure.models.case import CaseStatus
+from backend.domain.entities.auxiliary import CaseStatus
 
 
 class CaseFactory:

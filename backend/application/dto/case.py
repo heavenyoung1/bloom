@@ -1,4 +1,4 @@
-from backend.infrastructure.models.case import CaseStatus
+from backend.domain.entities.auxiliary import CaseStatus
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 from typing import Optional

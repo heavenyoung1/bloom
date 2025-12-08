@@ -1,7 +1,7 @@
 from datetime import datetime
 import pytest
 from backend.domain.entities.case import Case
-from backend.infrastructure.models import CaseStatus
+from backend.domain.entities.auxiliary import CaseStatus
 
 
 @pytest.fixture
