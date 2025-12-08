@@ -5,6 +5,7 @@ from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.dependencies import get_uow_factory
 from backend.core.dependencies import get_current_attorney
 from backend.core.logger import logger
+from backend.application.commands.client import CreateClientCommand
 
 router = APIRouter(prefix='/api/v0/clients', tags=['clients'])
 
@@ -25,14 +26,20 @@ async def create_client(
         # current_attorney_id - это ID текущего юриста, который авторизован
         current_attorney_id = int(current_attorney['sub'])
 
-        logger.info(f'Создание клиента юристом {current_attorney_id}')
+        cmd = CreateClientCommand(
+            name=request.name,
+            type=request.type,
+            email=request.email,
+            phone=request.phone,
+            personal_info=request.personal_info,
+            address=request.address,
+            messenger=request.messenger,
+            messenger_handle=request.messenger_handle,
+            owner_attorney_id=current_attorney_id,
+        )
 
         client_service = ClientService(uow_factory)
-        return await client_service.create_client(
-            request,
-            owner_attorney_id=current_attorney_id,
-            current_attorney_id=current_attorney_id,
-        )
+        return await client_service.create_client(cmd)
 
     except ValueError as e:
         logger.error(f'Ошибка валидации при создании клиента: {e}')

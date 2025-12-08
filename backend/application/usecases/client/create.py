@@ -2,6 +2,7 @@ from backend.application.dto.client import ClientCreateRequest, ClientResponse
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.domain.entities.client import Client
+from backend.application.commands.client import CreateClientCommand
 from backend.application.policy.client_policy import ClientPolicy
 from backend.core.logger import logger
 
@@ -21,8 +22,7 @@ class CreateClientUseCase:
 
     async def execute(
         self,
-        request: ClientCreateRequest,
-        owner_attorney_id: int,  # Из JWT!
+        cmd: CreateClientCommand,
     ) -> 'ClientResponse':
 
         async with self.uow_factory.create() as uow:
@@ -31,19 +31,19 @@ class CreateClientUseCase:
                 validator = ClientPolicy(
                     client_repo=uow.client_repo, attorney_repo=uow.attorney_repo
                 )
-                await validator.on_create(request, owner_attorney_id)
+                await validator.on_create(cmd)
 
                 # 2. Создание Entity
                 client = Client.create(
-                    name=request.name,
-                    type=request.type,
-                    email=request.email,
-                    phone=request.phone,
-                    personal_info=request.personal_info,
-                    address=request.address,
-                    messenger=request.messenger,
-                    messenger_handle=request.messenger_handle,
-                    owner_attorney_id=owner_attorney_id,
+                    name=cmd.name,
+                    type=cmd.type,
+                    email=cmd.email,
+                    phone=cmd.phone,
+                    personal_info=cmd.personal_info,
+                    address=cmd.address,
+                    messenger=cmd.messenger,
+                    messenger_handle=cmd.messenger_handle,
+                    owner_attorney_id=cmd.owner_attorney_id,
                 )
 
                 # 3. Сохранение в БД
@@ -52,7 +52,7 @@ class CreateClientUseCase:
                 logger.info(
                     f'Клиент создан: ID = {saved_client.id}'
                     f'Email = {saved_client.email}'
-                    f'Владелец = {owner_attorney_id}'
+                    f'Владелец = {cmd.messenger_handle}'
                 )
 
                 # 4. Возврат Response

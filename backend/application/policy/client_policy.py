@@ -2,6 +2,10 @@ from backend.application.interfaces.repositories.attorney_repo import (
     IAttorneyRepository,
 )
 from backend.application.interfaces.repositories.client_repo import IClientRepository
+from backend.application.commands.client import (
+    CreateClientCommand,
+    UpdateClientCommand,
+)
 
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.client import ClientCreateRequest, ClientUpdateRequest
@@ -13,10 +17,12 @@ class ClientPolicy:
     '''Валидатор для клиентов.'''
 
     def __init__(
-        self, client_repo: IClientRepository, attorney_repo: IAttorneyRepository
+        self,
+        client_repo: IClientRepository,
+        attorney_repo: IAttorneyRepository,
     ):
-        self.client_repo = client_repo  # Репозиторий для клиентов
         self.attorney_repo = attorney_repo  # Репозиторий для адвокатов
+        self.client_repo = client_repo  # Репозиторий для клиентов
 
     async def _check_attorney_exists(self, attorney_id: int) -> None:
         '''Проверить, существует ли адвокат и активен ли он.'''
@@ -64,39 +70,37 @@ class ClientPolicy:
                 f'{field_name.capitalize()} {field_value} уже используется другим клиентом этого юриста'
             )
 
-    async def on_create(
-        self, request: ClientCreateRequest, owner_attorney_id: int
-    ) -> None:
+    async def on_create(self, cmd: CreateClientCommand) -> None:
         '''Валидировать данные при создании клиента.'''
 
-        # 1. Проверка существования адвоката
-        await self._check_attorney_exists(owner_attorney_id)
+        # 1. Проверка адвоката
+        await self._check_attorney_exists(cmd.owner_attorney_id)
 
-        # 2. Проверки уникальности полей
-        if request.email:
-            await self._check_unique_field(request.email, 'email', owner_attorney_id)
-        if request.phone:
-            await self._check_unique_field(request.phone, 'phone', owner_attorney_id)
-        if request.personal_info:
+        # 2. Уникальность
+        if cmd.email:
+            await self._check_unique_field(cmd.email, 'email', cmd.owner_attorney_id)
+        if cmd.phone:
+            await self._check_unique_field(cmd.phone, 'phone', cmd.owner_attorney_id)
+        if cmd.personal_info:
             await self._check_unique_field(
-                request.personal_info, 'personal_info', owner_attorney_id
+                cmd.personal_info, 'personal_info', cmd.owner_attorney_id
             )
 
-    async def on_update(
-        self, request: ClientUpdateRequest, owner_attorney_id: int, client_id: int
-    ) -> None:
-        '''Валидировать при обновлении (проверить уникальность)'''
+    # async def on_update(
+    #     self, request: ClientUpdateRequest, owner_attorney_id: int, client_id: int
+    # ) -> None:
+    #     '''Валидировать при обновлении (проверить уникальность)'''
 
-        # Проверка только тех полей, которые изменяются
-        if request.email:
-            await self._check_unique_field(
-                request.email, 'email', owner_attorney_id, client_id
-            )
-        if request.phone:
-            await self._check_unique_field(
-                request.phone, 'phone', owner_attorney_id, client_id
-            )
-        if request.personal_info:
-            await self._check_unique_field(
-                request.personal_info, 'personal_info', owner_attorney_id, client_id
-            )
+    #     # Проверка только тех полей, которые изменяются
+    #     if request.email:
+    #         await self._check_unique_field(
+    #             request.email, 'email', owner_attorney_id, client_id
+    #         )
+    #     if request.phone:
+    #         await self._check_unique_field(
+    #             request.phone, 'phone', owner_attorney_id, client_id
+    #         )
+    #     if request.personal_info:
+    #         await self._check_unique_field(
+    #             request.personal_info, 'personal_info', owner_attorney_id, client_id
+    #         )

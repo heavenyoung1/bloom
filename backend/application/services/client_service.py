@@ -1,4 +1,5 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
+from backend.application.commands.client import CreateClientCommand
 from backend.application.policy.client_policy import ClientPolicy
 from backend.core.logger import logger
 
@@ -56,8 +57,8 @@ class ClientService:
 
     # ========== CREATE CLIENT ==========
 
-    async def create_client(self, request, owner_attorney_id: int):
-        return await self.create_client_use_case.execute(request, owner_attorney_id)
+    async def create_client(self, cmd: CreateClientCommand):
+        return await self.create_client_use_case.execute(cmd)
 
     # ========== UPDATE CLIENT ==========
 
