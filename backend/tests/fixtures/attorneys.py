@@ -115,6 +115,7 @@ def attorneys_list():
         ),
     ]
 
+
 @pytest.fixture
 async def attorney_id(test_uow_factory):
     '''Создание тестового юриста и возврат его ID'''
@@ -141,7 +142,8 @@ async def attorney_id(test_uow_factory):
 
         saved_attorney = await uow.attorney_repo.save(attorney)
         return saved_attorney.id
-    
+
+
 @pytest.fixture
 async def another_attorney_id(test_uow_factory):
     '''Создание второго тестового юриста (для проверки доступа)'''

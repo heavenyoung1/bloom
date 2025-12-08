@@ -23,8 +23,6 @@ from backend.core.exceptions import (
 )
 
 
-
-
 class ClientService:
     '''
     Сервис для работы с клиентами
@@ -45,53 +43,50 @@ class ClientService:
     # ========== CHECK ACCESS ==========
 
     async def _check_owner_access(
-        self, 
-        current_attorney_id: int, 
+        self,
+        current_attorney_id: int,
         owner_attorney_id: int,
     ):
         '''Проверка прав доступа владельца'''
         if owner_attorney_id != current_attorney_id:
             logger.warning(f'ACCESS DENIED: У ВАС НЕТ ДОСТУПА К ЭТОЙ СУЩНОСТИ!')
-            raise AccessDeniedException('ACCESS DENIED: У ВАС НЕТ ДОСТУПА К ЭТОЙ СУЩНОСТИ!')
+            raise AccessDeniedException(
+                'ACCESS DENIED: У ВАС НЕТ ДОСТУПА К ЭТОЙ СУЩНОСТИ!'
+            )
 
     # ========== CREATE CLIENT ==========
 
-    async def create_client(
-        self, request, owner_attorney_id: int
-    ):
+    async def create_client(self, request, owner_attorney_id: int):
         return await self.create_client_use_case.execute(request, owner_attorney_id)
 
-
-# ========== UPDATE CLIENT ==========
+    # ========== UPDATE CLIENT ==========
 
     async def update_client(
-            self, request, owner_attorney_id: int, current_attorney_id: int
-            ):
+        self, request, owner_attorney_id: int, current_attorney_id: int
+    ):
         self._check_owner_access(current_attorney_id, owner_attorney_id)
         return await self.update_client_use_case.execute(request, owner_attorney_id)
 
-# ========== DELETE CLIENT ==========
+    # ========== DELETE CLIENT ==========
 
     async def delete_client(
-            self, request, owner_attorney_id: int, current_attorney_id: int
-            ):
+        self, request, owner_attorney_id: int, current_attorney_id: int
+    ):
         self._check_owner_access(current_attorney_id, owner_attorney_id)
         return await self.delete_client_use_case.execute(request, owner_attorney_id)
 
-# ========== GET ONE CLIENT ==========
+    # ========== GET ONE CLIENT ==========
 
     async def get_client_by_id(
-            self, request, owner_attorney_id: int, current_attorney_id: int
-            ):
+        self, request, owner_attorney_id: int, current_attorney_id: int
+    ):
         self._check_owner_access(current_attorney_id, owner_attorney_id)
         return await self.get_client_use_case.execute(request, owner_attorney_id)
 
-# ========== GET ALL CLIENTS FOR ATTORNEY ==========
+    # ========== GET ALL CLIENTS FOR ATTORNEY ==========
 
     async def get_all_clients(
-            self, request, owner_attorney_id: int, current_attorney_id: int
-            ):
+        self, request, owner_attorney_id: int, current_attorney_id: int
+    ):
         self._check_owner_access(current_attorney_id, owner_attorney_id)
-        return await self.list_clients_use_case.execute(
-            request, owner_attorney_id
-        )
+        return await self.list_clients_use_case.execute(request, owner_attorney_id)

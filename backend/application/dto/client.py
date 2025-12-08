@@ -22,9 +22,7 @@ class ClientCreateRequest(BaseModel):
     type: bool = Field(
         default=True, description='Тип клиента: True — физ.лицо, False — юр.лицо'
     )
-    email: Optional[EmailStr] = Field(
-        default=None, description='Email (необязательно)'
-    )
+    email: Optional[EmailStr] = Field(default=None, description='Email (необязательно)')
     phone: str = Field(
         ..., pattern=r'^\+7\d{10}$', description='Телефон в формате +7XXXXXXXXXX'
     )
@@ -69,9 +67,7 @@ class ClientUpdateRequest(BaseModel):
         default=None,
         description='Тип клиента: True — физ.лицо, False — юр.лицо (если требуется изменить)',
     )
-    email: Optional[EmailStr] = Field(
-        default=None, description='Email (необязательно)'
-    )
+    email: Optional[EmailStr] = Field(default=None, description='Email (необязательно)')
     phone: Optional[str] = Field(
         default=None,
         pattern=r'^\+7\d{10}$',
