@@ -51,8 +51,8 @@ class CreateClientUseCase:
 
                 logger.info(
                     f'Клиент создан: ID = {saved_client.id}'
-                    'Email = {saved_client.email}'
-                    'Владелец = {owner_attorney_id}'
+                    f'Email = {saved_client.email}'
+                    f'Владелец = {owner_attorney_id}'
                 )
 
                 # 4. Возврат Response
