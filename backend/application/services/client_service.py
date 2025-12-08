@@ -1,6 +1,11 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.commands.client import CreateClientCommand
 from backend.application.policy.client_policy import ClientPolicy
+from backend.application.commands.client import (
+    GetClientByIdQuery,
+    UpdateClientCommand,
+    DeleteClientCommand,
+)
 from backend.core.logger import logger
 
 from backend.application.usecases.client import (
@@ -63,31 +68,41 @@ class ClientService:
     # ========== UPDATE CLIENT ==========
 
     async def update_client(
-        self, request, owner_attorney_id: int, current_attorney_id: int
+        self, cmd: UpdateClientCommand, owner_attorney_id: int, current_attorney_id: int
     ):
         self._check_owner_access(current_attorney_id, owner_attorney_id)
-        return await self.update_client_use_case.execute(request, owner_attorney_id)
+
+        return await self.update_client_use_case.execute(cmd)
 
     # ========== DELETE CLIENT ==========
 
     async def delete_client(
-        self, request, owner_attorney_id: int, current_attorney_id: int
+        self, cmd: DeleteClientCommand, owner_attorney_id: int, current_attorney_id: int
     ):
         self._check_owner_access(current_attorney_id, owner_attorney_id)
-        return await self.delete_client_use_case.execute(request, owner_attorney_id)
+
+        return await self.delete_client_use_case.execute(cmd)
 
     # ========== GET ONE CLIENT ==========
 
     async def get_client_by_id(
-        self, request, owner_attorney_id: int, current_attorney_id: int
+        self, client_id, owner_attorney_id: int, current_attorney_id: int
     ):
         self._check_owner_access(current_attorney_id, owner_attorney_id)
-        return await self.get_client_use_case.execute(request, owner_attorney_id)
+
+        # Создаём команду для получения клиента по ID
+        cmd = GetClientByIdQuery(client_id)
+
+        # Передаем команду в use case
+        return await self.GetClientByIdUseCase.execute(cmd)
 
     # ========== GET ALL CLIENTS FOR ATTORNEY ==========
 
     async def get_all_clients(
-        self, request, owner_attorney_id: int, current_attorney_id: int
+        self,
+        cmd: GetClientsForAttorneyUseCase,
+        owner_attorney_id: int,
+        current_attorney_id: int,
     ):
         self._check_owner_access(current_attorney_id, owner_attorney_id)
-        return await self.list_clients_use_case.execute(request, owner_attorney_id)
+        return await self.list_clients_use_case.execute(cmd)

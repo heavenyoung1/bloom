@@ -86,8 +86,7 @@ class ClientPolicy:
                 cmd.personal_info, 'personal_info', cmd.owner_attorney_id
             )
 
-    async def on_update(
-        self, cmd: UpdateClientCommand) -> None:
+    async def on_update(self, cmd: UpdateClientCommand) -> None:
         '''Валидировать при обновлении (проверить уникальность)'''
 
         if cmd.email:

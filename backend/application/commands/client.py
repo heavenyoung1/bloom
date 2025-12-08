@@ -39,7 +39,6 @@ class UpdateClientCommand:
 @dataclass
 class DeleteClientCommand:
     client_id: int
-    owner_attorney_id: int
 
 
 # ====== QUERIES (read операции) ======
@@ -48,12 +47,11 @@ class DeleteClientCommand:
 @dataclass
 class GetClientByIdQuery:
     client_id: int
-    owner_attorney_id: int
 
 
 @dataclass
 class GetClientsForAttorneyQuery:
     owner_attorney_id: int
-    # если потом добавишь пагинацию/фильтры:
+    # если потом добавить пагинацию/фильтры:
     # page: int = 1
     # page_size: int = 20

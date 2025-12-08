@@ -12,7 +12,7 @@ class UpdateClientUseCase:
 
     async def execute(
         self,
-        cmd: ClientUpdateRequest,
+        cmd: UpdateClientCommand,
     ) -> ClientResponse:
         async with self.uow_factory.create() as uow:
             try:
@@ -23,7 +23,7 @@ class UpdateClientUseCase:
                     raise EntityNotFoundException(
                         f'Клиент не найден: ID = {cmd.client_id}'
                     )
-                
+
                 # 2. Валидация бизнес-правил (уникальность и т.п.)
                 policy = ClientPolicy(
                     client_repo=uow.client_repo,
@@ -45,5 +45,3 @@ class UpdateClientUseCase:
                 logger.error(f'Ошибка при обновлении клиента: {e}')
                 # Можно не заворачивать, а просто пробросить
                 raise
-
-
