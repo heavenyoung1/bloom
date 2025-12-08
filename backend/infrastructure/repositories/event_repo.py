@@ -8,7 +8,7 @@ from backend.core.logger import logger
 from backend.domain.entities.event import Event
 from backend.infrastructure.mappers import EventMapper
 from backend.infrastructure.models import EventORM
-from backend.infrastructure.repositories.interfaces import IEventRepository
+from backend.application.interfaces.repositories.event_repo import IEventRepository
 
 
 class EventRepository(IEventRepository):

@@ -9,7 +9,7 @@ from backend.core.exceptions import DatabaseErrorException, EntityNotFoundExcept
 from backend.domain.entities.contact import Contact
 from backend.infrastructure.mappers import ContactMapper
 from backend.infrastructure.models import ContactORM
-from backend.infrastructure.repositories.interfaces import IContactRepository
+from backend.application.interfaces.repositories.contact_repo import IContactRepository
 
 if TYPE_CHECKING:
     from backend.domain.entities.contact import Contact

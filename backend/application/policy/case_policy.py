@@ -1,4 +1,4 @@
-from backend.infrastructure.repositories.interfaces.case_repo import ICaseRepository
+from backend.application.interfaces.repositories.case_repo import ICaseRepository
 from backend.application.dto.case import CreateCaseDTO
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger

@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Sequence
 
-from backend.infrastructure.repositories.interfaces.base_repo import IBaseRepository
+from backend.application.interfaces.repositories.base_repo import IBaseRepository
 from backend.domain.entities.contact import Contact
 
 

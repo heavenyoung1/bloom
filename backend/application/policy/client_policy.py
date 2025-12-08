@@ -1,9 +1,7 @@
-from backend.infrastructure.repositories.interfaces.client_repo import (
-    IClientRepository,
-)
-from backend.infrastructure.repositories.interfaces.attorney_repo import (
+from backend.application.interfaces.repositories.attorney_repo import (
     IAttorneyRepository,
 )
+from backend.application.interfaces.repositories.client_repo import IClientRepository
 
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.client import ClientCreateRequest, ClientUpdateRequest

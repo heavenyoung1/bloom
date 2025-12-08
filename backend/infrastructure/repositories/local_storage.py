@@ -1,4 +1,4 @@
-from backend.infrastructure.repositories.interfaces import IFileStorage
+from backend.application.interfaces.repositories.local_storage import IFileStorage
 import os
 
 

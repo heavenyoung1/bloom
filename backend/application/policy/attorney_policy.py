@@ -1,4 +1,4 @@
-from backend.infrastructure.repositories.interfaces.attorney_repo import (
+from backend.application.interfaces.repositories.attorney_repo import (
     IAttorneyRepository,
 )
 from backend.application.dto.attorney import RegisterRequest

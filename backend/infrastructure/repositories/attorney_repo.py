@@ -9,7 +9,9 @@ from backend.core.exceptions import DatabaseErrorException, EntityNotFoundExcept
 from backend.domain.entities.attorney import Attorney
 from backend.infrastructure.mappers import AttorneyMapper
 from backend.infrastructure.models import AttorneyORM
-from ..repositories.interfaces import IAttorneyRepository
+from backend.application.interfaces.repositories.attorney_repo import (
+    IAttorneyRepository,
+)
 
 if TYPE_CHECKING:
     from backend.domain.entities.attorney import Attorney

@@ -9,7 +9,7 @@ from backend.core.exceptions import DatabaseErrorException, EntityNotFoundExcept
 from backend.domain.entities.case import Case
 from backend.infrastructure.mappers import CaseMapper
 from backend.infrastructure.models import CaseORM
-from backend.infrastructure.repositories.interfaces import ICaseRepository
+from backend.application.interfaces.repositories.case_repo import ICaseRepository
 
 if TYPE_CHECKING:
     from backend.domain.entities.case import Case
