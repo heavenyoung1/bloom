@@ -8,15 +8,6 @@ from backend.core.logger import logger
 
 
 class CreateClientUseCase:
-    '''
-    Создание нового клиента
-
-    Ответственность:
-    - Координация валидации, создания и сохранения
-    - Обработка ошибок
-    - Логирование
-    '''
-
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

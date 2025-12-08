@@ -21,8 +21,8 @@ class ClientPolicy:
         client_repo: IClientRepository,
         attorney_repo: IAttorneyRepository,
     ):
-        self.attorney_repo = attorney_repo  # Репозиторий для адвокатов
-        self.client_repo = client_repo  # Репозиторий для клиентов
+        self.attorney_repo = attorney_repo
+        self.client_repo = client_repo
 
     async def _check_attorney_exists(self, attorney_id: int) -> None:
         '''Проверить, существует ли адвокат и активен ли он.'''
@@ -86,21 +86,30 @@ class ClientPolicy:
                 cmd.personal_info, 'personal_info', cmd.owner_attorney_id
             )
 
-    # async def on_update(
-    #     self, request: ClientUpdateRequest, owner_attorney_id: int, client_id: int
-    # ) -> None:
-    #     '''Валидировать при обновлении (проверить уникальность)'''
+    async def on_update(
+        self, cmd: UpdateClientCommand) -> None:
+        '''Валидировать при обновлении (проверить уникальность)'''
 
-    #     # Проверка только тех полей, которые изменяются
-    #     if request.email:
-    #         await self._check_unique_field(
-    #             request.email, 'email', owner_attorney_id, client_id
-    #         )
-    #     if request.phone:
-    #         await self._check_unique_field(
-    #             request.phone, 'phone', owner_attorney_id, client_id
-    #         )
-    #     if request.personal_info:
-    #         await self._check_unique_field(
-    #             request.personal_info, 'personal_info', owner_attorney_id, client_id
-    #         )
+        if cmd.email:
+            await self._check_unique_field(
+                cmd.email,
+                'email',
+                cmd.owner_attorney_id,
+                client_id=cmd.client_id,
+            )
+
+        if cmd.phone:
+            await self._check_unique_field(
+                cmd.phone,
+                'phone',
+                cmd.owner_attorney_id,
+                client_id=cmd.client_id,
+            )
+
+        if cmd.personal_info:
+            await self._check_unique_field(
+                cmd.personal_info,
+                'personal_info',
+                cmd.owner_attorney_id,
+                client_id=cmd.client_id,
+            )
