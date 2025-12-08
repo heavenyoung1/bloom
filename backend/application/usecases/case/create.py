@@ -13,8 +13,4 @@ class CreateCaseUseCase:
         self.uow_factory = uow_factory
 
     async def execute(self, dto: CaseCreateRequest, attorney_id: int) -> CaseResponse:
-        # 1. Проверяем, что клиент существует (опционально, но правильно)
-        async with self.uow_factory.create() as uow:
-            # 1. Проверяем, что клиент существует (опционально, но правильно)
-
-            pass
+        pass
