@@ -6,7 +6,6 @@ from backend.application.commands.case import CreateCaseCommand
 from backend.application.policy.case_policy import CasePolicy
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
-from backend.core.exceptions import NotFoundException
 
 
 class CreateCaseUseCase:
@@ -21,11 +20,11 @@ class CreateCaseUseCase:
     ) -> 'CaseResponse':
         async with self.uow_factory.create() as uow:
             try:
-                # 1. Валидация (проверка уникальности, существования адвоката)
+                # 1. Валидация (проверка уникальности, существования юриста)
                 validator = CasePolicy(
                     attorney_repo=uow.attorney_repo,
                     client_repo=uow.client_repo,
-                    attorney_repo=uow.attorney_repo,
+                    case_repo=uow.case_repo,
                 )
                 await validator.on_create(cmd)
 
@@ -33,7 +32,7 @@ class CreateCaseUseCase:
                 case = Case.create(
                     name=cmd.name,
                     client_id=cmd.client_id,
-                    attorney_id=cmd.owner_attorney_id,
+                    attorney_id=cmd.attorney_id,
                     status=cmd.status,  # Статус будет передан из команды
                     description=cmd.description,
                 )

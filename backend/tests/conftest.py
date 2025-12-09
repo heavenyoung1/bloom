@@ -13,6 +13,7 @@ from backend.tests.fixtures.factories import *
 from backend.tests.fixtures.services import *
 from backend.tests.fixtures.uow import *
 from backend.tests.fixtures.settings import *
+from backend.tests.fixtures.commands import *
 
 
 def pytest_configure(config):
