@@ -17,7 +17,7 @@ class UpdateClientUseCase:
         async with self.uow_factory.create() as uow:
             try:
                 # 1. Получить клиента
-                client = await uow.attorney_repo.get(cmd.client_id)
+                client = await uow.client_repo.get(cmd.client_id)
                 if not client:
                     logger.warning(f'Клиент не найден: ID = {cmd.client_id}')
                     raise EntityNotFoundException(

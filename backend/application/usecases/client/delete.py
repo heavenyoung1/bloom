@@ -10,7 +10,6 @@ class DeleteClientUseCase:
     async def execute(
         self,
         client_id: int,
-        owner_attorney_id: int,  # Для проверки прав доступа
     ) -> bool:
         async with self.uow_factory as uow:
             try:

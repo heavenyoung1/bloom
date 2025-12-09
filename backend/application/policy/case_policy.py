@@ -4,7 +4,11 @@ from backend.application.interfaces.repositories.attorney_repo import (
 from backend.application.interfaces.repositories.case_repo import ICaseRepository
 from backend.application.interfaces.repositories.client_repo import IClientRepository
 from backend.application.dto.case import CreateCaseDTO
-from backend.application.commands.case import CreateCaseCommand
+from backend.application.commands.case import (
+    CreateCaseCommand,
+    UpdateCaseCommand,
+    DeleteCaseCommand,
+)
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
@@ -52,6 +56,26 @@ class CasePolicy:
             raise ValidationException(
                 f'Клиент не принадлежит юристу с ID {cmd.attorney_id}'
             )
+
+        # 3. Проверка адвоката
+        await self._check_attorney_exists(cmd.owner_attorney_id)
+
+    async def on_update(self, cmd: UpdateCaseCommand) -> None:
+        # 1. Проверить, что дело существует
+        case = await self.case_repo.get(cmd.case_id)
+        if not case:
+            logger.warning(f'Дело не найдено: ID = {cmd.case_id}')
+            raise EntityNotFoundException(f'Дело не найдено: ID = {cmd.case_id}')
+
+        # 3. Проверка адвоката
+        await self._check_attorney_exists(cmd.owner_attorney_id)
+
+    async def on_delete(self, cmd: DeleteCaseCommand) -> None:
+        # 1. Проверить, что дело существует
+        case = await self.case_repo.get(cmd.case_id)
+        if not case:
+            logger.warning(f'Дело не найдено: ID = {cmd.case_id}')
+            raise EntityNotFoundException(f'Дело не найдено: ID = {cmd.case_id}')
 
         # 3. Проверка адвоката
         await self._check_attorney_exists(cmd.owner_attorney_id)

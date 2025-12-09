@@ -19,6 +19,7 @@ class CreateCaseCommand:
 
 @dataclass
 class UpdateCaseCommand:
+    case_id: int
     client_id: int
     attorney_id: int  # из JWT
 

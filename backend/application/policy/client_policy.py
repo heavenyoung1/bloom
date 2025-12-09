@@ -89,27 +89,4 @@ class ClientPolicy:
 
     async def on_update(self, cmd: UpdateClientCommand) -> None:
         '''Валидировать при обновлении (проверить уникальность)'''
-
-        if cmd.email:
-            await self._check_unique_field(
-                cmd.email,
-                'email',
-                cmd.owner_attorney_id,
-                client_id=cmd.client_id,
-            )
-
-        if cmd.phone:
-            await self._check_unique_field(
-                cmd.phone,
-                'phone',
-                cmd.owner_attorney_id,
-                client_id=cmd.client_id,
-            )
-
-        if cmd.personal_info:
-            await self._check_unique_field(
-                cmd.personal_info,
-                'personal_info',
-                cmd.owner_attorney_id,
-                client_id=cmd.client_id,
-            )
+        pass
