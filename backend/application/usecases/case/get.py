@@ -1,7 +1,7 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.client import ClientResponse
 from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
-from backend.application.commands.client import GetCaseByIdQuery
+from backend.application.commands.case import GetCaseByIdQuery
 from backend.core.logger import logger
 
 

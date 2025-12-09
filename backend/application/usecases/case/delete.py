@@ -19,7 +19,7 @@ class DeleteCaseUseCase:
                 validator = CasePolicy(
                     attorney_repo=uow.attorney_repo,
                     client_repo=uow.client_repo,
-                    attorney_repo=uow.attorney_repo,
+                    case_repo=uow.case_repo,
                 )
                 await validator.on_delete(cmd)
 

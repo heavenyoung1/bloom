@@ -21,21 +21,22 @@ class UpdateCaseUseCase:
     ) -> 'CaseResponse':
         async with self.uow_factory.create() as uow:
             try:
+                # 1. Получить дело
+                case = await uow.case_repo.get(cmd.case_id)
+                if not case:
+                    logger.warning(f'Дело не найден: ID = {cmd.client_id}')
+                    raise EntityNotFoundException(
+                        f'Дело не найден: ID = {cmd.client_id}'
+                    )
+
                 # 1. Валидация (проверка уникальности, существования адвоката)
                 validator = CasePolicy(
                     attorney_repo=uow.attorney_repo,
                     client_repo=uow.client_repo,
-                    attorney_repo=uow.attorney_repo,
+                    case_repo=uow.case_repo,
                 )
                 await validator.on_update(cmd)
 
-                # 2. Создание Entity
-                case = Case.update(
-                    name=cmd.name,
-                    client_id=cmd.client_id,
-                    status=cmd.status,  # Статус будет передан из команды
-                    description=cmd.description,
-                )
 
                 # 3. Сохранение в базе
                 updated_case = await uow.case_repo.update(case)
