@@ -23,6 +23,18 @@ async def sample_case(persisted_attorney_id, persisted_client_id):
         description='Описание дела о краже',
     )
 
+@pytest.fixture
+async def sample_case_for_verified_attorney(verifiied_persisted_attorney_id, verified_persisted_client_id):
+    '''Фикстура для дефолтного дела с реальными attorney_id и client_id.'''
+    return Case(
+        id=None,
+        name='Дело о краже',
+        client_id=verified_persisted_client_id,  # Реальный ID из БД
+        attorney_id=verifiied_persisted_attorney_id,  # Реальный ID из БД
+        status=CaseStatus.IN_PROGRESS,
+        description='Описание дела о краже',
+    )
+
 
 @pytest.fixture
 async def sample_update_case(persisted_attorney_id, persisted_client_id):

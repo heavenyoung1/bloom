@@ -9,6 +9,12 @@ async def persisted_attorney_id(attorney_repo, sample_attorney):
     result = await attorney_repo.save(sample_attorney)
     return result.id
 
+@pytest.fixture
+async def verifiied_persisted_attorney_id(attorney_repo, verified_attorney):
+    '''Сохраняет юриста и возвращает ID ВЕРИФИЦИРОВАННОГО юриста.'''
+    result = await attorney_repo.save(verified_attorney)
+    return result.id
+
 
 @pytest.fixture
 def sample_attorney():
@@ -43,6 +49,21 @@ def sample_update_attorney():
         is_verified=False,
     )
 
+@pytest.fixture
+def verified_attorney():
+    return Attorney(
+        id=None,  # Позволяем БД генерировать ID
+        license_id='777/4767',
+        first_name='Сергей',
+        last_name='Петров',
+        patronymic='Сергеевич',
+        email='sergey@example.com',
+        phone='+72991234567',
+        hashed_password='some_hash',
+        is_active=True,
+        is_superuser=False,
+        is_verified=True,
+    )
 
 @pytest.fixture
 def attorneys_list():

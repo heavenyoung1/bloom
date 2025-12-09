@@ -41,9 +41,9 @@ class CreateCaseUseCase:
                 saved_case = await uow.case_repo.save(case)
 
                 logger.info(
-                    f'Дело создано: ID = {saved_case.id}'
-                    f'Владелец = {saved_case.attorney_id}'
-                    f'Связанный клиент = {saved_case.client_id}'
+                    f'Дело создано: ID = {saved_case.id} '
+                    f'Владелец = {saved_case.attorney_id} '
+                    f'Связанный клиент = {saved_case.client_id} '
                 )
 
                 # 4. Возврат Response

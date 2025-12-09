@@ -112,8 +112,8 @@ class CaseResponse(BaseModel):
     attorney_id: int
     status: CaseStatus
     description: Optional[str]
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
 
     model_config = ConfigDict(from_attributes=True)
 
