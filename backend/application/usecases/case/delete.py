@@ -23,8 +23,8 @@ class DeleteCaseUseCase:
                 )
                 await validator.on_delete(cmd)
 
-                # 3. Удалить клиента
-                await uow.client_repo.delete(cmd.case_id)
+                # 3. Удалить дело
+                await uow.case_repo.delete(cmd.case_id)
 
                 logger.info(f'Дело с ID {cmd.case_id} удалено.')
                 return True

@@ -1,5 +1,5 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.application.dto.client import ClientResponse
+from backend.application.dto.case import CaseResponse
 from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
 from backend.application.commands.case import GetCaseByIdQuery
 from backend.core.logger import logger
@@ -13,20 +13,20 @@ class GetCaseByIdUseCase:
     async def execute(
         self,
         cmd: GetCaseByIdQuery,
-    ) -> ClientResponse:
+    ) -> 'CaseResponse':
         async with self.uow_factory as uow:
             try:
-                # 1. Получить клиента
-                client = await uow.client_repo.get(cmd.client_id)
+                # 1. Получить дело
+                case = await uow.case_repo.get(cmd.case_id)
 
-                if not client:
-                    logger.error(f'Клиент с ID {cmd.client_id} не найден.')
+                if not case:
+                    logger.error(f'Дело с ID {cmd.case_id} не найдено.')
                     raise EntityNotFoundException(
-                        f'Клиент с ID {cmd.client_id} не найден.'
+                        f'Дело не найдено.'
                     )
 
-                logger.info(f'Клиент получен: ID = {cmd.client_id}')
-                return ClientResponse.model_validate(client)
+                logger.info(f'Дело получено: ID = {cmd.case_id}')
+                return CaseResponse.model_validate(case)
             except Exception as e:
-                logger.error(f'Ошибка при получении клиента с ID {cmd.client_id}: {e}')
+                logger.error(f'Ошибка при получении дела: {e}')
                 raise e

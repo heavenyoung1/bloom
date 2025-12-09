@@ -11,8 +11,11 @@ async def persisted_client_id(client_repo, sample_client, persisted_attorney_id)
     result = await client_repo.save(sample_client)
     return result.id
 
+
 @pytest.fixture
-async def verified_persisted_client_id(client_repo, sample_client_for_verify, verifiied_persisted_attorney_id):
+async def verified_persisted_client_id(
+    client_repo, sample_client_for_verify, verifiied_persisted_attorney_id
+):
     '''Сохраняет клиента и возвращает его ID. Требует существующего адвоката-владельца.'''
     sample_client.owner_attorney_id = verifiied_persisted_attorney_id
     result = await client_repo.save(sample_client_for_verify)
@@ -35,6 +38,7 @@ def sample_client(persisted_attorney_id):
         messenger_handle='ivan123',
         owner_attorney_id=persisted_attorney_id,  # Пример ссылки на адвоката
     )
+
 
 # Фикстура для дефолтного клиента
 @pytest.fixture

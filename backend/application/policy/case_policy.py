@@ -74,5 +74,3 @@ class CasePolicy:
             logger.warning(f'Дело не найдено: ID = {cmd.case_id}')
             raise EntityNotFoundException(f'Дело не найдено')
 
-        # 3. Проверка юриста
-        await self._check_attorney_exists(cmd.attorney_id)

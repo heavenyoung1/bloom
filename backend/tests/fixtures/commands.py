@@ -1,9 +1,6 @@
 import pytest
 
-from backend.application.commands.case import (
-    CreateCaseCommand,
-    UpdateCaseCommand
-    )
+from backend.application.commands.case import CreateCaseCommand, UpdateCaseCommand
 
 
 @pytest.fixture
@@ -15,6 +12,7 @@ def create_case_command(sample_case_for_verified_attorney):
         status=sample_case_for_verified_attorney.status,
         description=sample_case_for_verified_attorney.description,
     )
+
 
 @pytest.fixture
 def update_case_command(sample_case_for_verified_attorney):

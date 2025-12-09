@@ -22,13 +22,12 @@ from backend.application.usecases.case import (
 from backend.core.logger import logger
 
 
-
-
 from backend.core.exceptions import (
     NotFoundException,
     VerificationError,
     AccessDeniedException,
 )
+
 
 class CaseService:
     def __init__(self, uow_factory: UnitOfWorkFactory):
