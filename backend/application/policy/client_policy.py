@@ -24,6 +24,7 @@ class ClientPolicy:
         self.attorney_repo = attorney_repo
         self.client_repo = client_repo
 
+    # ТУТ МОЖНО БУДЕТ ПОЗЖЕ ДОБАВИТЬ НОВУЮ ЛОГИКУ!!!
     async def _check_attorney_exists(self, attorney_id: int) -> None:
         '''Проверить, существует ли адвокат и активен ли он.'''
         attorney = await self.attorney_repo.get(attorney_id)
