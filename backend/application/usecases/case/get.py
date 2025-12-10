@@ -14,7 +14,7 @@ class GetCaseByIdUseCase:
         self,
         cmd: GetCaseByIdQuery,
     ) -> 'CaseResponse':
-        async with self.uow_factory as uow:
+        async with self.uow_factory.create() as uow:
             try:
                 # 1. Получить дело
                 case = await uow.case_repo.get(cmd.case_id)

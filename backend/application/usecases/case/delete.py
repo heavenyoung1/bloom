@@ -13,7 +13,7 @@ class DeleteCaseUseCase:
         self,
         cmd: DeleteCaseCommand,
     ) -> bool:
-        async with self.uow_factory as uow:
+        async with self.uow_factory.create() as uow:
             try:
                 # 1. Валидация (проверка уникальности, существования адвоката)
                 validator = CasePolicy(

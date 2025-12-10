@@ -14,7 +14,7 @@ class GetClientsForAttorneyUseCase:
         self,
         cmd: GetClientsForAttorneyQuery,
     ) -> List[ClientResponse]:
-        async with self.uow_factory as uow:
+        async with self.uow_factory.create() as uow:
             try:
                 # 1. Получить всех клиентов этого адвоката
                 clients = await uow.client_repo.get_all_for_attorney(

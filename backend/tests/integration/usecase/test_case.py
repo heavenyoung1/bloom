@@ -18,84 +18,79 @@ from backend.core.logger import logger
 
 @pytest.mark.asyncio
 async def test_create_case(test_uow_factory, create_case_command):
-    # Создаем UseCase с реальными репозиториями
-    async with test_uow_factory.create() as uow:
-        use_case = CreateCaseUseCase(test_uow_factory)
-        # Передаем экземпляр CreateCaseCommand
-        result = await use_case.execute(create_case_command)
+    use_case = CreateCaseUseCase(test_uow_factory)
+    result = await use_case.execute(create_case_command)
 
-        assert result.id is not None
-
+    assert result.id is not None
 
 @pytest.mark.asyncio
 async def test_update_case(test_uow_factory, create_case_command, update_case_command):
-    # Создаем UseCase с реальными репозиториями
-    async with test_uow_factory.create() as uow:
-        create_use_case = CreateCaseUseCase(test_uow_factory)
-        result = await create_use_case.execute(create_case_command)
-        assert result.id is not None
+    create_use_case = CreateCaseUseCase(test_uow_factory)
+    created_case = await create_use_case.execute(create_case_command)
+    assert created_case.id is not None
 
-        # Теперь добавляем ID для обновления
-        update_case_command.case_id = result.id  # Устанавливаем ID для обновления
-
-        update_use_case = UpdateCaseUseCase(test_uow_factory)
-        updated_result = await update_use_case.execute(update_case_command)
-        assert updated_result.id is not None
-        assert updated_result.id == result.id  # Проверяем, что ID совпадает
-
+    # Обновляем кейс
+    update_case_command.case_id = created_case.id
+    update_use_case = UpdateCaseUseCase(test_uow_factory)
+    updated_case = await update_use_case.execute(update_case_command)
+    
+    assert updated_case.id == created_case.id
 
 @pytest.mark.asyncio
-async def test_get_case(test_uow_factory, create_case_command):
-    # Создаем UseCase с реальными репозиториями
-    async with test_uow_factory.create() as uow:
-        create_use_case = CreateCaseUseCase(test_uow_factory)
-        result = await create_use_case.execute(create_case_command)
-        assert result.id is not None
-        saved_case_id = result.id
-        
-        cmd = GetCaseByIdQuery(
-            case_id=saved_case_id
-        )
-        get_use_case = GetCaseByIdUseCase(uow)
-        result = await get_use_case.execute(cmd)
-        logger.info(f'РЕЗУЛЬТАТ1 {result}')
+async def test_get_case_by_id(test_uow_factory, create_case_command):
+    '''Тест получения кейса по ID'''
+    # Создаем кейс
+    create_use_case = CreateCaseUseCase(test_uow_factory)
+    created_case = await create_use_case.execute(create_case_command)
+    assert created_case.id is not None
+    
+    # Получаем кейс
+    query = GetCaseByIdQuery(case_id=created_case.id)
+    get_use_case = GetCaseByIdUseCase(test_uow_factory)
+    retrieved_case = await get_use_case.execute(query)
+    
+    assert retrieved_case is not None
+    assert retrieved_case.id == created_case.id
+
 
 @pytest.mark.asyncio
 async def test_get_all_case(test_uow_factory, create_case_command, verified_cases_list):
-    async with test_uow_factory.create() as uow:
-        for i in verified_cases_list:
-            cmd = CreateCaseCommand(
-                name=i.name,
-                client_id=i.client_id,
-                attorney_id=i.attorney_id,
-                status=i.status,
-                description=i.description,
-            )
-            create_use_case = CreateCaseUseCase(test_uow_factory)
-            result = await create_use_case.execute(cmd)
-            logger.info(f'РЕЗУЛЬТАТ2 {result}')
-        assert result.id is not None
-        owner_attorney_id = result.attorney_id
-
-        cmd = GetCasesForAttorneyQuery(
-            attorney_id=owner_attorney_id,
+    attorney_id = verified_cases_list[0].attorney_id
+    
+    # Создаем кейсы
+    create_use_case = CreateCaseUseCase(test_uow_factory)
+    for case_data in verified_cases_list:
+        cmd = CreateCaseCommand(
+            name=case_data.name,
+            client_id=case_data.client_id,
+            attorney_id=case_data.attorney_id,
+            status=case_data.status,
+            description=case_data.description,
         )
-        get_all_cases_use_case = GetlAllCasesUseCase(test_uow_factory)
-        result = await get_all_cases_use_case.execute(cmd)
-        logger.info(f'РЕЗУЛЬТАТ2 {result}')
+        await create_use_case.execute(cmd)
+    
+    # Получаем все кейсы адвоката
+    query = GetCasesForAttorneyQuery(attorney_id=attorney_id)
+    get_all_cases_use_case = GetlAllCasesUseCase(test_uow_factory)
+    cases = await get_all_cases_use_case.execute(query)
+    
+    assert cases is not None
+    assert len(cases) >= len(verified_cases_list)
 
 @pytest.mark.asyncio
 async def test_delete_case(test_uow_factory, create_case_command):
-    # Создаем UseCase с реальными репозиториями
-    async with test_uow_factory.create() as uow:
-        create_use_case = CreateCaseUseCase(test_uow_factory)
-        result = await create_use_case.execute(create_case_command)
-        assert result.id is not None
-        saved_case_id = result.id
-        
-        cmd = DeleteCaseCommand(
-            case_id=saved_case_id
-        )
-        delete_use_case = DeleteCaseUseCase(uow)
-        result = await delete_use_case.execute(cmd)
-        logger.info(f'РЕЗУЛЬТАТ1 {result}')
+    '''Тест удаления кейса'''
+    # Создаем кейс
+    create_use_case = CreateCaseUseCase(test_uow_factory)
+    created_case = await create_use_case.execute(create_case_command)
+    assert created_case.id is not None
+    
+    # Удаляем кейс
+    cmd = DeleteCaseCommand(case_id=created_case.id)
+    delete_use_case = DeleteCaseUseCase(test_uow_factory)
+    result = await delete_use_case.execute(cmd)
+
+    # Проверяем, что дело удалено
+    assert result is True
+    # НУЖНА ДО ПРОВЕРКА С GETUSECASE
+    # СЕЙЧАС ТАМ ОШИБКА ПРИ ПОЛУЧЕНИИ NONE

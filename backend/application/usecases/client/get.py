@@ -14,7 +14,7 @@ class GetClientByIdUseCase:
         self,
         cmd: GetClientByIdQuery,
     ) -> ClientResponse:
-        async with self.uow_factory as uow:
+        async with self.uow_factory.create() as uow:
             try:
                 # 1. Получить клиента
                 client = await uow.client_repo.get(cmd.client_id)
