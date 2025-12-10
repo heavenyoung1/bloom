@@ -2,56 +2,49 @@ from backend.application.dto.client import ClientCreateRequest, ClientResponse
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.domain.entities.client import Client
-from backend.application.validators.client_validator import ClientValidator
+from backend.application.commands.client import CreateClientCommand
+from backend.application.policy.client_policy import ClientPolicy
 from backend.core.logger import logger
 
 
 class CreateClientUseCase:
-    '''
-    Создание нового клиента
-
-    Ответственность:
-    - Координация валидации, создания и сохранения
-    - Обработка ошибок
-    - Логирование
-    '''
-
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 
     async def execute(
         self,
-        request: ClientCreateRequest,
-        owner_attorney_id: int,  # Из JWT!
+        cmd: CreateClientCommand,
     ) -> 'ClientResponse':
 
         async with self.uow_factory.create() as uow:
             try:
                 # 1. Валидация (проверка уникальности, существования адвоката)
-                validator = ClientValidator(
+                validator = ClientPolicy(
                     client_repo=uow.client_repo, 
-                    attorney_repo=uow.attorney_repo
-                    )
-                await validator.on_create(request, owner_attorney_id)
+                    attorney_repo=uow.attorney_repo,
+                )
+                await validator.on_create(cmd)
 
                 # 2. Создание Entity
                 client = Client.create(
-                    name=request.name,
-                    type=request.type,
-                    email=request.email,
-                    phone=request.phone,
-                    personal_info=request.personal_info,
-                    address=request.address,
-                    messenger=request.messenger,
-                    messenger_handle=request.messenger_handle,
-                    owner_attorney_id=owner_attorney_id,
+                    name=cmd.name,
+                    type=cmd.type,
+                    email=cmd.email,
+                    phone=cmd.phone,
+                    personal_info=cmd.personal_info,
+                    address=cmd.address,
+                    messenger=cmd.messenger,
+                    messenger_handle=cmd.messenger_handle,
+                    owner_attorney_id=cmd.owner_attorney_id,
                 )
 
                 # 3. Сохранение в БД
                 saved_client = await uow.client_repo.save(client)
 
                 logger.info(
-                    f'Клиент создан: ID = {saved_client.id}, Email = {saved_client.email}, владелец = {owner_attorney_id}'
+                    f'Клиент создан: ID = {saved_client.id}'
+                    f'Email = {saved_client.email}'
+                    f'Владелец = {cmd.messenger_handle}'
                 )
 
                 # 4. Возврат Response

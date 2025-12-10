@@ -1,14 +1,10 @@
 from datetime import datetime
 
-from backend.infrastructure.repositories.interfaces.event_repo import (
-    IEventRepository,
-)
-from backend.infrastructure.repositories.interfaces.case_repo import (
-    ICaseRepository,
-)
-from backend.infrastructure.repositories.interfaces.attorney_repo import (
+from backend.application.interfaces.repositories.attorney_repo import (
     IAttorneyRepository,
 )
+from backend.application.interfaces.repositories.case_repo import ICaseRepository
+from backend.application.interfaces.repositories.event_repo import IEventRepository
 
 from backend.application.dto.event import CreateEventDTO
 from backend.core.exceptions import ValidationException, EntityNotFoundException
@@ -20,9 +16,9 @@ class EventValidator:
 
     def __init__(
         self,
-        event_repo: IEventRepository,
-        case_repo: ICaseRepository,
         attorney_repo: IAttorneyRepository,
+        case_repo: ICaseRepository,
+        event_repo: IEventRepository,
     ):
         self.event_repo = event_repo
         self.case_repo = case_repo

@@ -9,7 +9,7 @@ from backend.core.exceptions import DatabaseErrorException, EntityNotFoundExcept
 from backend.domain.entities.case import Case
 from backend.infrastructure.mappers import CaseMapper
 from backend.infrastructure.models import CaseORM
-from backend.infrastructure.repositories.interfaces import ICaseRepository
+from backend.application.interfaces.repositories.case_repo import ICaseRepository
 
 if TYPE_CHECKING:
     from backend.domain.entities.case import Case
@@ -68,7 +68,7 @@ class CaseRepository(ICaseRepository):
             return case
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении дела ID={id}: {e}')
+            logger.error(f'Ошибка БД при получении дела ID = {id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении ДЕЛА: {str(e)}')
 
     async def get_all_for_attorney(self, id: int) -> List['Case']:
@@ -111,11 +111,11 @@ class CaseRepository(ICaseRepository):
             await self.session.flush()  # или session.commit() если нужна транзакция
 
             # 5. Возврат доменного объекта
-            logger.info(f'Дело обновлено. ID= {updated_case.id}')
+            logger.info(f'Дело обновлено. ID = {updated_case.id}')
             return CaseMapper.to_domain(orm_case)
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при обновлении дела ID={updated_case.id}: {e}')
+            logger.error(f'Ошибка БД при обновлении дела ID = {updated_case.id}: {e}')
             raise DatabaseErrorException(f'Ошибка при обновлении данных ДЕЛА: {str(e)}')
 
     async def delete(self, id: int) -> bool:

@@ -12,7 +12,9 @@ from backend.core.exceptions import (
 from backend.domain.entities.document import Document
 from backend.infrastructure.mappers import DocumentMapper
 from backend.infrastructure.models import DocumentORM
-from backend.infrastructure.repositories.interfaces import IDocumentMetadataRepository
+from backend.application.interfaces.repositories.document_repo import (
+    IDocumentMetadataRepository,
+)
 
 if TYPE_CHECKING:
     from backend.domain.entities.document import Document

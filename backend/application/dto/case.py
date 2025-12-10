@@ -1,4 +1,4 @@
-from backend.infrastructure.models.case import CaseStatus
+from backend.domain.entities.auxiliary import CaseStatus
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 from typing import Optional
@@ -58,13 +58,12 @@ class CaseUpdateRequest(BaseModel):
     '''DTO для частичного обновления дела (PATCH)'''
 
     name: Optional[str] = Field(
-        default=None,
+        None,  # Указываем значение по умолчанию как None для необязательных полей
         max_length=100,
         description='Название дела',
     )
     status: Optional[str] = Field(
-        ...,
-        default=None,
+        None,  # Указываем значение по умолчанию как None для необязательных полей
         description=(
             'Статус дела. Возможные значения:\n'
             ' - Новое: дело создано, но не принято в работу\n'
@@ -77,8 +76,7 @@ class CaseUpdateRequest(BaseModel):
         ),
     )
     description: Optional[str] = Field(
-        ...,
-        default=None,
+        None,  # Указываем значение по умолчанию как None для необязательных полей
         max_length=255,  # увеличено для развёрнутого описания
         description=(
             'Подробное описание сути дела: ключевые вопросы, требования, '
@@ -114,8 +112,8 @@ class CaseResponse(BaseModel):
     attorney_id: int
     status: CaseStatus
     description: Optional[str]
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -129,5 +127,4 @@ class CaseListItemDTO(BaseModel):
     attorney_id: int
     status: CaseStatus
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

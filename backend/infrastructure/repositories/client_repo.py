@@ -10,7 +10,7 @@ from backend.core.exceptions import DatabaseErrorException, EntityNotFoundExcept
 from backend.domain.entities.client import Client
 from backend.infrastructure.mappers import ClientMapper
 from backend.infrastructure.models import ClientORM
-from backend.infrastructure.repositories.interfaces import IClientRepository
+from backend.application.interfaces.repositories.client_repo import IClientRepository
 
 if TYPE_CHECKING:
     from backend.domain.entities.client import Client

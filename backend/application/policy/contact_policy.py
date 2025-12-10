@@ -1,9 +1,5 @@
-from backend.infrastructure.repositories.interfaces.contact_repo import (
-    IContactRepository,
-)
-from backend.infrastructure.repositories.interfaces.case_repo import (
-    ICaseRepository,
-)
+from backend.application.interfaces.repositories.contact_repo import IContactRepository
+from backend.application.interfaces.repositories.case_repo import ICaseRepository
 
 from backend.application.dto.contact import CreateContactDTO
 from backend.core.exceptions import ValidationException, EntityNotFoundException

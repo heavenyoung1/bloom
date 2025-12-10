@@ -1,18 +1,13 @@
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from backend.domain.entities.auxiliary import Messenger
 from backend.infrastructure.models._base import Base
 from backend.infrastructure.models.mixins import TimeStampMixin
 from typing import TYPE_CHECKING
-from enum import Enum
+
 
 if TYPE_CHECKING:
     from backend.infrastructure.models import AttorneyORM, CaseORM
-
-
-class Messenger(str, Enum):
-    TG = 'Telegram'
-    WA = 'WhatsApp'
-    MA = 'MAX'
 
 
 class ClientORM(TimeStampMixin, Base):

@@ -10,6 +10,7 @@ from backend.core.settings import settings
 from backend.core.logger import logger
 from typing import Dict, Any
 
+
 class SessionStorage:
     '''
     Управление сессиями в Redis.

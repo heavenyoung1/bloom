@@ -11,6 +11,13 @@ async def persisted_attorney_id(attorney_repo, sample_attorney):
 
 
 @pytest.fixture
+async def verifiied_persisted_attorney_id(attorney_repo, verified_attorney):
+    '''Сохраняет юриста и возвращает ID ВЕРИФИЦИРОВАННОГО юриста.'''
+    result = await attorney_repo.save(verified_attorney)
+    return result.id
+
+
+@pytest.fixture
 def sample_attorney():
     return Attorney(
         id=None,  # Позволяем БД генерировать ID
@@ -23,7 +30,7 @@ def sample_attorney():
         hashed_password='some_hash',
         is_active=True,
         is_superuser=False,
-        is_verified=True,
+        is_verified=False,
     )
 
 
@@ -37,6 +44,23 @@ def sample_update_attorney():
         patronymic='Сергеевич',
         email='ivanov3232@example.com',
         phone='+79914873567',
+        hashed_password='some_hash',
+        is_active=True,
+        is_superuser=False,
+        is_verified=False,
+    )
+
+
+@pytest.fixture
+def verified_attorney():
+    return Attorney(
+        id=None,  # Позволяем БД генерировать ID
+        license_id='777/4767',
+        first_name='Сергей',
+        last_name='Петров',
+        patronymic='Сергеевич',
+        email='sergey@example.com',
+        phone='+72991234567',
         hashed_password='some_hash',
         is_active=True,
         is_superuser=False,
@@ -114,3 +138,58 @@ def attorneys_list():
             is_verified=True,
         ),
     ]
+
+
+@pytest.fixture
+async def attorney_id(test_uow_factory):
+    '''Создание тестового юриста и возврат его ID'''
+    async with test_uow_factory.create() as uow:
+        from backend.domain.factories.attorney_factory import AttorneyFactory
+        from backend.core.security import SecurityService
+
+        factory = AttorneyFactory()
+        hashed_password = SecurityService.hash_password('password123')
+
+        attorney = factory.create(
+            license_id='LIC123456',
+            first_name='John',
+            last_name='Doe',
+            patronymic='Test',
+            email='john.doe@example.com',
+            phone='+1234567890',
+            hashed_password=hashed_password,
+        )
+
+        # Делаем юриста верифицированным
+        attorney.is_verified = True
+        attorney.is_active = True
+
+        saved_attorney = await uow.attorney_repo.save(attorney)
+        return saved_attorney.id
+
+
+@pytest.fixture
+async def another_attorney_id(test_uow_factory):
+    '''Создание второго тестового юриста (для проверки доступа)'''
+    async with test_uow_factory.create() as uow:
+        from backend.domain.factories.attorney_factory import AttorneyFactory
+        from backend.core.security import SecurityService
+
+        factory = AttorneyFactory()
+        hashed_password = SecurityService.hash_password('password123')
+
+        attorney = factory.create(
+            license_id='LIC789012',
+            first_name='Jane',
+            last_name='Smith',
+            patronymic='Test',
+            email='jane.smith@example.com',
+            phone='+9876543210',
+            hashed_password=hashed_password,
+        )
+
+        attorney.is_verified = True
+        attorney.is_active = True
+
+        saved_attorney = await uow.attorney_repo.save(attorney)
+        return saved_attorney.id

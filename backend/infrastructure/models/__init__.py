@@ -1,7 +1,7 @@
 from backend.infrastructure.models._base import Base
 from backend.infrastructure.models.attorney import AttorneyORM
-from backend.infrastructure.models.case import CaseORM, CaseStatus
-from backend.infrastructure.models.client import ClientORM, Messenger
+from backend.infrastructure.models.case import CaseORM
+from backend.infrastructure.models.client import ClientORM
 from backend.infrastructure.models.contact import ContactORM
 from backend.infrastructure.models.document import DocumentORM
 from backend.infrastructure.models.event import EventORM
@@ -19,8 +19,6 @@ __all__ = [
     'CaseORM',
     'DocumentORM',
     'EventORM',
-    'CaseStatus',
-    'Messenger',
     'TimeStampMixin',
     #    'PaymentORM',
     #    'SubscriptionORM',

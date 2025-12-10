@@ -1,14 +1,11 @@
-from backend.infrastructure.repositories.interfaces.document_repo import (
-    IDocumentRepository,
-)
-from backend.infrastructure.repositories.interfaces.case_repo import (
-    ICaseRepository,
-)
-from backend.infrastructure.repositories.interfaces.attorney_repo import (
+from backend.application.interfaces.repositories.attorney_repo import (
     IAttorneyRepository,
 )
+from backend.application.interfaces.repositories.case_repo import ICaseRepository
+from backend.application.interfaces.repositories.document_repo import (
+    IDocumentMetadataRepository,
+)
 
-#!!!!!!!!!!!!!!!
 from backend.application.dto.document import CreateDocumentDTO
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
@@ -19,13 +16,13 @@ class DocumentValidator:
 
     def __init__(
         self,
-        document_repo: IDocumentRepository,
-        case_repo: ICaseRepository,
         attorney_repo: IAttorneyRepository,
+        case_repo: ICaseRepository,
+        document_repo: IDocumentMetadataRepository,
     ):
-        self.document_repo = document_repo
-        self.case_repo = case_repo
         self.attorney_repo = attorney_repo
+        self.case_repo = case_repo
+        self.document_repo = document_repo
 
     async def validate_on_create(self, dto: CreateDocumentDTO) -> None:
         '''Валидировать данные при создании документа'''

@@ -7,7 +7,7 @@ from backend.core.exceptions import (
 
 
 class TestCaseRepository:
-    # -------- SAVE --------
+    # ========== SAVE SUCCESS ==========
     @pytest.mark.asyncio
     async def test_save_success(self, case_repo, sample_case):
         '''Тест: Сохранение дела со связанными клиентом и адвокатом.'''
@@ -20,7 +20,7 @@ class TestCaseRepository:
         assert case.attorney_id == sample_case.attorney_id
         assert case.description == sample_case.description
 
-    # -------- SAVE DUPLICATE --------
+    # ========== SAVE DUPLICATE ==========
     @pytest.mark.asyncio
     async def test_save_duplicate(self, case_repo, sample_case):
         '''Тест: Сохранение дела со связанными клиентом и адвокатом.'''
@@ -37,6 +37,7 @@ class TestCaseRepository:
         assert 'Ошибка при сохранении ДЕЛА' in str(exc_info.value)
         assert 'duplicate key' in str(exc_info.value).lower()  # подсказка из PostgreSQL
 
+    # ========== GET SUCCESS ==========
     @pytest.mark.asyncio
     async def test_get_success(self, case_repo, sample_case):
         '''Тест: Сохранение дела со связанными клиентом и адвокатом.'''
@@ -49,6 +50,7 @@ class TestCaseRepository:
         assert get_case.attorney_id == sample_case.attorney_id
         assert get_case.name == sample_case.name
 
+    # ========== GET ALL CASES SUCCESS ==========
     @pytest.mark.asyncio
     async def test_get_all_success(self, case_repo, cases_list, persisted_attorney_id):
         for i in cases_list:
@@ -60,9 +62,10 @@ class TestCaseRepository:
             logger.info(f'ID юриста = {case.attorney_id}')
             assert case.attorney_id == persisted_attorney_id
 
+    # ========== UPDATE SUCCESS ==========
     @pytest.mark.asyncio
     async def test_update_success(self, case_repo, sample_case, sample_update_case):
-        '''Тест: Сохранение дела со связанными клиентом и адвокатом.'''
+        '''Тест: Обновление дела со связанными клиентом и адвокатом.'''
         # Вызываем метод обновления
         saved_case = await case_repo.save(sample_case)
         assert isinstance(saved_case, Case)
@@ -83,6 +86,7 @@ class TestCaseRepository:
         assert update_case.status == sample_update_case.status
         assert update_case.description == sample_update_case.description
 
+    # ========== DELETE SUCCESS ==========
     @pytest.mark.asyncio
     async def test_delete_success(self, case_repo, sample_case):
         '''Тест: Сохранение дела со связанными клиентом и адвокатом.'''

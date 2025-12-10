@@ -11,6 +11,7 @@ class EntityAlreadyExistsError(BaseCustomException):
 
     pass
 
+
 class AccessDeniedException(BaseCustomException):
     '''Ошибка прав доступа'''
 

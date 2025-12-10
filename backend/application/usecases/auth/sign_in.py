@@ -2,7 +2,7 @@ from backend.infrastructure.repositories.attorney_repo import AttorneyRepository
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.security import SecurityService
 from backend.application.services.auth_service import AuthService
-from backend.application.validators.attorney_validator import AttorneyValidator
+from backend.application.policy.attorney_policy import AttorneyPolicy
 from backend.infrastructure.redis.client import redis_client
 from backend.infrastructure.redis.keys import RedisKeys
 from backend.core.settings import settings

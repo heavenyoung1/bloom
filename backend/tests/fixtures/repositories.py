@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock
 
-from backend.infrastructure.repositories.interfaces import (
+from backend.application.interfaces.repositories import (
     IAttorneyRepository,
     ICaseRepository,
     IClientRepository,

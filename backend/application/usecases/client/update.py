@@ -1,6 +1,8 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.client import ClientUpdateRequest, ClientResponse
 from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
+from backend.application.policy.client_policy import ClientPolicy
+from backend.application.commands.client import UpdateClientCommand
 from backend.core.logger import logger
 
 
@@ -9,47 +11,31 @@ class UpdateClientUseCase:
         self.uow_factory = uow_factory
 
     async def execute(
-        self, 
-        client_id: int, 
-        request: ClientUpdateRequest,
-        attorney_id: int
+        self,
+        cmd: UpdateClientCommand,
     ) -> ClientResponse:
-        async with self.uow_factory as uow:
+        async with self.uow_factory.create() as uow:
             try:
-                # Валидация
-                # ДОБАВИТЬ ВАЛИДАЦИЮ ДЛЯ ОБНОВЛЕНИЯ
-                # validator = ClientValidator(client_repo=uow.client_repo)
-                # await validator.on_update(client_id, request)
-
                 # 1. Получить клиента
-                client = await uow.client_repo.get(client_id)
+                client = await uow.client_repo.get(cmd.client_id)
                 if not client:
-                    logger.warning(f"Client not found: ID={client_id}")
-                    raise EntityNotFoundException(f'Клиент с ID {client_id} не найден.')
-
-                # 2. Проверить права доступа
-                if client.owner_attorney_id != attorney_id:
-                    logger.warning(
-                        f"Access denied: Attorney {attorney_id} tried to update "
-                        f"client {client_id} owned by {client.owner_attorney_id}"
-                    )
-                    raise AccessDeniedException(
-                        "You don't have access to this client"
+                    logger.warning(f'Клиент не найден: ID = {cmd.client_id}')
+                    raise EntityNotFoundException(
+                        f'Клиент не найден: ID = {cmd.client_id}'
                     )
 
-                # Обновление данных
-                # ВОТ ЭТО КОНЕЧНО ПОЛНОЕ ДЕРЬМО
-                client.name = request.name
-                client.type = request.type
-                client.email = request.email
-                client.phone = request.phone
-                client.address = request.address
-                client.messenger = request.messenger
-                client.messenger_handle = request.messenger_handle
-                client.personal_info = request.personal_info
+                # 2. Валидация бизнес-правил (уникальность и т.п.)
+                policy = ClientPolicy(
+                    client_repo=uow.client_repo,
+                    attorney_repo=uow.attorney_repo,
+                )
+                await policy.on_update(cmd)
 
-                # Сохранение изменений
-                updated_client = await uow.client_repo.save(client)
+                # 2. Применяем изменения через метод update доменной сущности
+                client.update(cmd)
+
+                # 3. Сохраняем изменения
+                updated_client = await uow.client_repo.update(client)
 
                 logger.info(f'Клиент обновлён: ID = {updated_client.id}')
 
@@ -57,4 +43,5 @@ class UpdateClientUseCase:
 
             except Exception as e:
                 logger.error(f'Ошибка при обновлении клиента: {e}')
-                raise e
+                # Можно не заворачивать, а просто пробросить
+                raise

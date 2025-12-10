@@ -1,4 +1,4 @@
-from backend.infrastructure.repositories.interfaces.attorney_repo import (
+from backend.application.interfaces.repositories.attorney_repo import (
     IAttorneyRepository,
 )
 from backend.application.dto.attorney import RegisterRequest
@@ -6,7 +6,7 @@ from backend.core.exceptions import ValidationException
 from backend.core.logger import logger
 
 
-class AttorneyValidator:
+class AttorneyPolicy:
     def __init__(self, repo: IAttorneyRepository):
         self.repo = repo
 

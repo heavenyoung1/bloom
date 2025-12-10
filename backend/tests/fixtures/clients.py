@@ -12,6 +12,16 @@ async def persisted_client_id(client_repo, sample_client, persisted_attorney_id)
     return result.id
 
 
+@pytest.fixture
+async def verified_persisted_client_id(
+    client_repo, sample_client_for_verify, verifiied_persisted_attorney_id
+):
+    '''Сохраняет клиента и возвращает его ID. Требует существующего адвоката-владельца.'''
+    sample_client.owner_attorney_id = verifiied_persisted_attorney_id
+    result = await client_repo.save(sample_client_for_verify)
+    return result.id
+
+
 # Фикстура для дефолтного клиента
 @pytest.fixture
 def sample_client(persisted_attorney_id):
@@ -27,6 +37,24 @@ def sample_client(persisted_attorney_id):
         messenger=Messenger.TG,  # Мессенджер Telegram
         messenger_handle='ivan123',
         owner_attorney_id=persisted_attorney_id,  # Пример ссылки на адвоката
+    )
+
+
+# Фикстура для дефолтного клиента
+@pytest.fixture
+def sample_client_for_verify(verifiied_persisted_attorney_id):
+    '''Фикстура для дефолтного клиента.'''
+    return Client(
+        id=None,  # Позволяем БД генерировать ID
+        name='Иван Иванович Петров',
+        type=True,  # Физическое лицо
+        email='ivan@example.com',
+        phone='+79991234567',
+        personal_info='1234567890',  # ИНН или номер паспорта
+        address='Москва, ул. Тверская, 1',
+        messenger=Messenger.TG,  # Мессенджер Telegram
+        messenger_handle='ivan123',
+        owner_attorney_id=verifiied_persisted_attorney_id,  # Пример ссылки на адвоката
     )
 
 

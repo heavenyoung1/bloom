@@ -1,7 +1,7 @@
-from backend.infrastructure.repositories.interfaces.document_repo import (
+from backend.application.interfaces.repositories.document_repo import (
     IDocumentMetadataRepository,
 )
-from backend.infrastructure.repositories.interfaces.local_storage import IFileStorage
+from backend.application.interfaces.repositories.local_storage import IFileStorage
 
 
 class DocumentService:

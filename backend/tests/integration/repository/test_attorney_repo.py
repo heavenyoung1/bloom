@@ -1,25 +1,16 @@
 import pytest
-from backend.infrastructure.mappers import AttorneyMapper
 from backend.core import logger
 from backend.domain.entities.attorney import Attorney
-from backend.infrastructure.models.attorney import AttorneyORM
-from sqlalchemy.future import select
 
 from backend.core.exceptions import (
     DatabaseErrorException,
     EntityNotFoundException,
-    EntityAlreadyExistsError,
-)
-
-from sqlalchemy.exc import (
-    SQLAlchemyError,
-    IntegrityError,
 )
 
 
 class TestAttorneyRepository:
 
-    # -------- SAVE --------
+    # ========== SAVE SUCCESS ==========
     @pytest.mark.asyncio
     async def test_save_success(self, attorney_repo, sample_attorney):
         '''Тест успешного сохранения нового юриста'''
@@ -28,10 +19,10 @@ class TestAttorneyRepository:
         assert save_result.id == sample_attorney.id
         assert save_result.license_id == sample_attorney.license_id
 
-    # -------- SAVE AND GET --------
+    # ========== GET SUCCESS ==========
     @pytest.mark.asyncio
     async def test_save_and_get_success(self, attorney_repo, sample_attorney):
-        '''Тест: сохранение + получение по ID.'''
+        '''Тест успешного сохранения и получения нового юриста'''
         save_result = await attorney_repo.save(sample_attorney)
         assert save_result is not None
         logger.debug(f'Сохранен ЮРИСТ {save_result}')
@@ -40,7 +31,7 @@ class TestAttorneyRepository:
         attorney = await attorney_repo.get(id)
         assert attorney.license_id == sample_attorney.license_id
 
-    # -------- SAVE DUPLICATE --------
+    # ========== SAVE DUPLICATE ==========
     @pytest.mark.asyncio
     async def test_save_duplicate(self, attorney_repo, sample_attorney):
         '''Тест попытки сохранения дубликата адвоката (ожидается исключение).'''
@@ -57,11 +48,12 @@ class TestAttorneyRepository:
         assert 'Ошибка при сохранении ЮРИСТА' in str(exc_info.value)
         assert 'duplicate key' in str(exc_info.value).lower()  # подсказка из PostgreSQL
 
+    # ========== UPDATE SUCCESS ==========
     @pytest.mark.asyncio
     async def test_update_success(
         self, attorney_repo, sample_attorney, sample_update_attorney
     ):
-        '''Тест успешного обновления адвоката.'''
+        '''Тест успешного обновления юриста.'''
         # Вызываем метод обновления
         saved_attorney = await attorney_repo.save(sample_attorney)
         assert isinstance(saved_attorney, Attorney)
@@ -81,16 +73,17 @@ class TestAttorneyRepository:
         assert update_attorney.phone == sample_update_attorney.phone
         assert update_attorney.hashed_password == sample_update_attorney.hashed_password
 
+    # ========== FAILED UPDATE, NONEXIST ATTORNEY ==========
     @pytest.mark.asyncio
     async def test_update_nonexistent(self, attorney_repo, sample_update_attorney):
-        '''Тест обновления несуществующего адвоката (ожидается исключение).'''
+        '''Тест обновления несуществующего юриста (ожидается исключение).'''
         with pytest.raises(EntityNotFoundException):
             await attorney_repo.update(sample_update_attorney)
 
-    # -------- GET BY EMAIL --------
+    # ========== GET BY EMAIL ==========
     @pytest.mark.asyncio
     async def test_get_by_email(self, attorney_repo, sample_attorney):
-        '''Тест получения адвоката по email (успешный случай).'''
+        '''Тест получения юриста по email (успешный случай).'''
         save_result = await attorney_repo.save(sample_attorney)
         assert save_result is not None
         logger.debug(f'Сохранен ЮРИСТ {save_result}. Email - {save_result.email}')
@@ -99,16 +92,17 @@ class TestAttorneyRepository:
         attorney = await attorney_repo.get_by_email(email)
         assert email == attorney.email
 
+    # ========== GET BY EMAIL UNSUCCESS ==========
     # @pytest.mark.asyncio
     # async def test_get_by_email_not_found(self, attorney_repo):
     #     '''Тест получения адвоката по несуществующему email (ожидается исключение).'''
     #     with pytest.raises(EntityNotFoundException):
     #         await attorney_repo.get_by_email('nonexistent@example.com')
 
-    # -------- GET BY LICENSE ID --------
+    # ========== GET BY EMAIL LICENSE_ID ==========
     @pytest.mark.asyncio
     async def test_get_by_license_id(self, attorney_repo, sample_attorney):
-        '''Тест: сохранение нового юриста'''
+        '''Тест успешного получения юриста по номеру удостоверения'''
         save_result = await attorney_repo.save(sample_attorney)
         assert save_result is not None
         logger.debug(f'Сохранен ЮРИСТ {save_result}')
@@ -117,16 +111,17 @@ class TestAttorneyRepository:
         attorney = await attorney_repo.get_by_license_id(license_id)
         assert license_id == attorney.license_id
 
+    # ========== GET BY EMAIL LICENSE_ID UNSUCCESS ==========
     # @pytest.mark.asyncio
     # async def test_get_by_license_id_not_found(self, attorney_repo):
     #     '''Тест получения адвоката по несуществующему license_id (ожидается исключение).'''
     #     with pytest.raises(EntityNotFoundException):
     #         await attorney_repo.get_by_license_id('nonexistent_license')
 
-    # -------- GET BY PHONE --------
+    # ========== GET BY EMAIL PHONE ==========
     @pytest.mark.asyncio
     async def test_get_by_phone(self, attorney_repo, sample_attorney):
-        '''Тест: сохранение нового юриста'''
+        '''Тест успешного получения юриста по номеру телефона'''
         save_result = await attorney_repo.save(sample_attorney)
         assert save_result is not None
         logger.debug(f'Сохранен ЮРИСТ {save_result}')
@@ -135,8 +130,25 @@ class TestAttorneyRepository:
         attorney = await attorney_repo.get_by_phone(phone_number)
         assert phone_number == attorney.phone
 
+    # ========== GET BY EMAIL PHONE UNSUCCESS ==========
     # @pytest.mark.asyncio
     # async def test_get_by_phone_not_found(self, attorney_repo):
     #     '''Тест получения адвоката по несуществующему phone (ожидается исключение).'''
     #     with pytest.raises(EntityNotFoundException):
     #         await attorney_repo.get_by_phone('+79990000000')
+
+    # ========== UPDATE VERIFICATION STATUS ==========
+    @pytest.mark.asyncio
+    async def test_change_verify(self, attorney_repo, sample_attorney):
+        '''Тест успешного изменения статуса верификации False -> True'''
+        save_result = await attorney_repo.save(sample_attorney)
+        assert save_result is not None
+        logger.debug(f'Сохранен ЮРИСТ {save_result}')
+        id = save_result.id
+
+        attorney = await attorney_repo.get(id)
+        assert attorney.license_id == sample_attorney.license_id
+        assert attorney.is_verified == False
+
+        verified_user = await attorney_repo.change_verify(attorney.id, True)
+        assert verified_user.is_verified == True
