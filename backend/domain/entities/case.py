@@ -15,7 +15,6 @@ class Case:
     description: str
     status: CaseStatus  # По умолчанию будет CaseStatus.NEW
 
-    # Необязательные атрибуты
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

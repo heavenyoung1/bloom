@@ -1,7 +1,7 @@
 from backend.infrastructure.repositories.attorney_repo import AttorneyRepository
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
+from backend.domain.entities.attorney import Attorney
 from backend.core.security import SecurityService
-from backend.domain.factories.attorney_factory import AttorneyFactory
 from backend.application.policy.attorney_policy import AttorneyPolicy
 from backend.application.services.verification_service import VerificationService
 from backend.infrastructure.redis.client import redis_client
@@ -20,7 +20,6 @@ from backend.core.logger import logger
 class SignUpUseCase:
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
-        self.factory = AttorneyFactory()  # Фабрика для создания сущностей
 
     async def execute(self, request: RegisterRequest) -> AttorneyResponse:
         '''
@@ -45,7 +44,7 @@ class SignUpUseCase:
             hashed_password = SecurityService.hash_password(request.password)
 
             # Создание юриста через Фабрику
-            attorney = self.factory.create(
+            attorney = Attorney.create(
                 license_id=request.license_id,
                 first_name=request.first_name,
                 last_name=request.last_name,

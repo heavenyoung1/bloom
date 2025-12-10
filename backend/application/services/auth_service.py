@@ -32,7 +32,7 @@ class AuthService:
         return new_access_token
 
     async def save_refresh_token(self, attorney_id: int, refresh_token: str) -> None:
-        """Сохранить refresh token в Redis"""
+        '''Сохранить refresh token в Redis'''
 
         ttl = settings.refresh_token_expire_days * 24 * 3600
         await redis_client.set(
@@ -40,14 +40,14 @@ class AuthService:
             refresh_token,
             ttl=ttl,
         )
-        logger.debug(f"Refresh token saved for attorney {attorney_id}")
+        logger.debug(f'Refresh token saved for attorney {attorney_id}')
 
     async def logout(self, attorney_id: int) -> None:
-        """Выход из системы (удалить refresh token из Redis)"""
+        '''Выход из системы (удалить refresh token из Redis)'''
 
         await redis_client.delete(RedisKeys.refresh_token(attorney_id))
         # Очистить попытки входа если были
-        logger.info(f"Attorney {attorney_id} logged out")
+        logger.info(f'Attorney {attorney_id} logged out')
 
     async def logout(self, attorney_id: int) -> None:
         '''Выход из системы (удалить refresh token)'''
@@ -57,7 +57,7 @@ class AuthService:
     # ========== TOKEN BLACKLIST ==========
 
     async def revoke_token(self, token: str) -> None:
-        """Добавить токен в чёрный список"""
+        '''Добавить токен в чёрный список'''
 
         ttl = settings.lockout_duration_minutes * 60
         await redis_client.set(
@@ -65,10 +65,10 @@ class AuthService:
             True,
             ttl=ttl,
         )
-        logger.debug("Token added to blacklist")
+        logger.debug('Token added to blacklist')
 
     async def is_token_revoked(self, token: str) -> bool:
-        """Проверить в чёрном ли списке токен"""
+        '''Проверить в чёрном ли списке токен'''
 
         return await redis_client.exists(RedisKeys.token_blacklist(token))
 
@@ -79,28 +79,28 @@ class AuthService:
     # ========== RATE LIMITING ==========
 
     async def check_rate_limit(self, email: str) -> None:
-        """
+        '''
         Проверить есть ли блокировка по rate limit.
 
         Raises:
             ValueError: Если заблокирован
-        """
+        '''
 
         lockout_key = RedisKeys.login_lockout(email)
         if await redis_client.exists(lockout_key):
             raise ValueError(
-                f"Too many login attempts. Try again in {settings.lockout_duration_minutes} minutes"
+                f'Too many login attempts. Try again in {settings.lockout_duration_minutes} minutes'
             )
 
     async def record_failed_attempt(self, email: str) -> None:
-        """
+        '''
         Записать неудачную попытку входа и заблокировать если нужно.
 
         Logic:
         1. Инкрементировать счётчик попыток
         2. Если первая попытка - установить TTL
         3. Если превышен лимит - заблокировать
-        """
+        '''
 
         attempts_key = RedisKeys.login_attempts(email)
         attempts = await redis_client.increment(attempts_key, amount=1)
@@ -116,13 +116,13 @@ class AuthService:
                 True,
                 ttl=settings.lockout_duration_minutes * 60,
             )
-            logger.warning(f"Attorney locked out due to failed attempts: {email}")
+            logger.warning(f'Attorney locked out due to failed attempts: {email}')
             raise ValueError(
-                f"Account locked. Try again in {settings.lockout_duration_minutes} minutes"
+                f'Account locked. Try again in {settings.lockout_duration_minutes} minutes'
             )
 
     async def clear_failed_attempts(self, email: str) -> None:
-        """Очистить счётчик попыток при успешном логине"""
+        '''Очистить счётчик попыток при успешном логине'''
 
         await redis_client.delete(RedisKeys.login_attempts(email))
-        logger.debug(f"Cleared failed attempts for {email}")
+        logger.debug(f'Cleared failed attempts for {email}')
