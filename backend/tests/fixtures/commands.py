@@ -1,6 +1,7 @@
 import pytest
 
 from backend.application.commands.case import CreateCaseCommand, UpdateCaseCommand
+from backend.application.commands.client import CreateClientCommand, UpdateClientCommand
 
 
 @pytest.fixture
@@ -23,4 +24,33 @@ def update_case_command(sample_case_for_verified_attorney):
         attorney_id=sample_case_for_verified_attorney.attorney_id,  # Реальный ID из БД
         status=sample_case_for_verified_attorney.status,
         description='Произошло что-то непонятное',
+    )
+
+@pytest.fixture
+def create_client_command(verifiied_persisted_attorney_id):
+    return CreateClientCommand(
+        name='АО Булочки и Пирожки товарища Ульянова и Джугашвили',
+        type=True,
+        email='leninandstalin@limited.com',
+        phone='+79103353535',
+        personal_info='12345678910',
+        address='США, шт. Флорида, г. Майами ул. Ленина, д 55, кв. 32',
+        messenger='MAX',
+        messenger_handle='@sirLeninGuy',
+        owner_attorney_id=verifiied_persisted_attorney_id,
+    )
+
+@pytest.fixture
+def update_client_command(verifiied_persisted_attorney_id):
+    return UpdateClientCommand(
+        client_id=None,
+        name='АО Булочки и Пирожки товарища Ульянова',
+        type=True,
+        email='lenin@limited.com',
+        phone='+79103351422',
+        personal_info='12345678910',
+        address='США, шт. Флорида, г. Майами ул. Ленина, д 55, кв. 33',
+        messenger='MAX',
+        messenger_handle='@GayLeninGuy',
+        owner_attorney_id=verifiied_persisted_attorney_id,
     )

@@ -35,7 +35,7 @@ class UpdateClientUseCase:
                 client.update(cmd)
 
                 # 3. Сохраняем изменения
-                updated_client = await uow.client_repo.save(client)
+                updated_client = await uow.client_repo.update(client)
 
                 logger.info(f'Клиент обновлён: ID = {updated_client.id}')
 
