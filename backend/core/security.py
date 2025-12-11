@@ -9,15 +9,21 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
 class SecurityService:
+    '''Сервис для работы с паролями и JWT токенами'''
+
+    # ========== PASSWORD ==========
+
     @staticmethod
     def hash_password(password: str) -> str:
+        '''Захешировать пароль (bcrypt)'''
         return pwd_context.hash(password)
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
+        '''Проверить пароль'''
         return pwd_context.verify(plain_password, hashed_password)
 
-    # ========== JWT TOKEN CREATION ==========
+    # ========== JWT TOKEN ==========
 
     @staticmethod
     def create_access_token(
@@ -29,22 +35,15 @@ class SecurityService:
         Создать ACCESS TOKEN (короткоживущий, для API запросов).
 
         Используется при:
-        - Логине адвоката
+        - Логине адвоката (вместе с refresh token)
 
         Args:
-            subject: Основная информация (обычно attorney_id как строка)
-            expires_delta: Время жизни (default: 15 минут)
-            additional_claims: Доп. данные в токен (email, name и т.д.)
+            subject: attorney_id как строка
+            expires_delta: Время жизни (default: settings.access_token_expire_minutes)
+            additional_claims: Дополнительные claims (email, name и т.д.)
 
         Returns:
             JWT токен в виде строки
-
-        Example:
-            token = SecurityService.create_access_token(
-                subject='123',  # attorney_id
-                additional_claims={'email': 'attorney@example.com'}
-            )
-            # Результат: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         '''
 
         if expires_delta is None:
@@ -66,7 +65,7 @@ class SecurityService:
             payload, settings.secret_key, algorithm=settings.algorithm
         )
 
-        logger.debug(f'Created access token for subject: {subject}')
+        logger.debug(f'Access token создан для: {subject}')
         return encoded_token
 
     @staticmethod
@@ -76,19 +75,13 @@ class SecurityService:
 
         Используется при:
         - Логине адвоката (вместе с access token)
-        - Обновлении access token'а (когда истёк)
 
         Args:
             subject: attorney_id как строка
 
         Returns:
             JWT токен в виде строки
-
-        Example:
-            refresh = SecurityService.create_refresh_token('123')
-            # Этот токен живет 7 дней, не требует повторного логина
         '''
-
         expire = datetime.now(timezone.utc) + timedelta(
             days=settings.refresh_token_expire_days
         )
@@ -97,54 +90,74 @@ class SecurityService:
             'sub': subject,
             'exp': expire,
             'iat': datetime.now(timezone.utc),
-            'type': 'refresh',  # ← Отличие от access token!
+            'type': 'refresh',  # Отличие от access token!
         }
 
         encoded_token = jwt.encode(
             payload, settings.secret_key, algorithm=settings.algorithm
         )
 
-        logger.debug(f'Created refresh token for subject: {subject}')
+        logger.debug(f'Refresh token создан для: {subject}')
         return encoded_token
 
     @staticmethod
     def decode_token(token: str) -> Dict[str, Any]:
+        '''
+        Декодировать JWT токен.
+
+        Args:
+            token: JWT токен в виде строки
+
+        Returns:
+            Декодированный payload
+
+        Raises:
+            ValueError: Если токен истёк или невалиден
+        '''
         try:
             payload = jwt.decode(
                 token, settings.secret_key, algorithms=[settings.algorithm]
             )
-            logger.debug(
-                f'Token decoded successfully for subject: {payload.get('sub')}'
-            )
+            logger.debug(f'Token декодирован для: {payload.get('sub')}')
             return payload
 
         except jwt.ExpiredSignatureError:
-            logger.warning('Token has expired')
-            raise ValueError('Token has expired')
+            logger.warning('Token истёк')
+            raise ValueError('Token истёк')
 
         except jwt.InvalidTokenError as e:
-            logger.warning(f'Invalid token: {str(e)}')
-            raise ValueError(f'Invalid token: {e}')
+            logger.warning(f'Невалидный token: {str(e)}')
+            raise ValueError(f'Невалидный token: {e}')
 
     @staticmethod
     def verify_token_type(payload: Dict[str, Any], expected_type: str) -> bool:
         '''
         Проверить тип токена (access vs refresh).
 
-        Используется при:
-        - Верификации что это именно access token, не refresh
-
         Args:
             payload: Декодированный payload
             expected_type: 'access' или 'refresh'
 
         Returns:
-            True если тип совпадает
-
-        Example:
-            if SecurityService.verify_token_type(payload, 'access'):
-                print('Это access token')
-            else:
-                print('Это refresh token или неправильно')
+            True если тип совпадает, иначе False
         '''
         return payload.get('type') == expected_type
+
+    @staticmethod
+    def get_subject_from_token(payload: Dict[str, Any]) -> str:
+        '''
+        Получить attorney_id из декодированного токена.
+
+        Args:
+            payload: Декодированный payload
+
+        Returns:
+            attorney_id как строка
+
+        Raises:
+            ValueError: Если subject отсутствует в payload
+        '''
+        subject = payload.get('sub')
+        if not subject:
+            raise ValueError('Subject отсутствует в token payload')
+        return subject

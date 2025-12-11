@@ -3,7 +3,7 @@ from backend.application.dto.client import ClientCreateRequest, ClientResponse
 from backend.application.services.client_service import ClientService
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.dependencies import get_uow_factory
-from backend.core.dependencies import get_current_attorney
+from backend.core.dependencies import get_current_attorney_id
 from backend.core.logger import logger
 from backend.application.commands.client import CreateClientCommand
 
@@ -18,7 +18,9 @@ router = APIRouter(prefix='/api/v0/clients', tags=['clients'])
 )
 async def create_client(
     request: ClientCreateRequest,
-    current_attorney: dict = Depends(get_current_attorney),  # Получаем текущего юриста
+    current_attorney: dict = Depends(
+        get_current_attorney_id
+    ),  # Получаем текущего юриста
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ) -> 'ClientResponse':
     '''Создание нового клиента'''

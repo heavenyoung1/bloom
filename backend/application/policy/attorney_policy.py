@@ -17,7 +17,7 @@ class AttorneyPolicy:
     def __init__(self, repo: IAttorneyRepository):
         self.repo = repo
 
-    async def on_create(self, cmd: RegisterAttorneyCommand) -> None:
+    async def on_register(self, cmd: RegisterAttorneyCommand) -> None:
         '''
         Валидация при регистрации:
         - Email не должен быть занят

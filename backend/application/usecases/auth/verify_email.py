@@ -50,7 +50,8 @@ class VerifyEmailUseCase:
 
             # Пометить как верифицированного
             attorney.is_verified = True
-            await uow.attorney_repo.save(attorney)
+            # await uow.attorney_repo.update(attorney)
+            await uow.attorney_repo.change_verify(attorney.id, True)
 
         # 3. Очистить код в Redis
         await VerificationService.cleanup_code(cmd.email)
