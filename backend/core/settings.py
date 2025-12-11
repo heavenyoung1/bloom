@@ -7,55 +7,55 @@ from pydantic import Field
 class Settings(BaseSettings):
     '''Конфигурация приложения (читается из .env файла).'''
 
-    project_name: str = 'CRM'
-    debug: bool = True
+    PROJECT_NAME: str = 'CRM'
+    DEBUG: bool = True
 
     # === PostgreSQL параметры ===
-    host: str = 'localhost'
-    port: int = 5432
-    user: str
-    password: str
-    db_name: str
+    HOST: str = 'localhost'
+    PORT: int = 5432
+    USER: str
+    PASSWORD: str
+    DB_NAME: str
 
     # SQLAlchemy параметры
-    driver: str = 'postgresql+asyncpg'
-    echo: bool = False
-    pool_size: int = 5
-    max_overflow: int = 10
-    pool_pre_ping: bool = True
+    DRIVER: str = 'postgresql+asyncpg'
+    ECHO: bool = False
+    POOL_SIZE: int = 5
+    MAX_OVERFLOW: int = 10
+    POOL_PRE_PING: bool = True
 
     # === Драйвер для синхронного движка Alembic миграций. ===
-    _sync_driver: str = 'postgresql'
+    SYNC_DRIVER: str = 'postgresql'
     # === === === === === === === === === === === === === ====== === === ====
 
     # Redis
-    redis_url: str = Field(default='redis://192.168.175.129:6379')
-    redis_default_ttl: int = 3600  # 1 час
+    REDIS_URL: str = Field(default='redis://localhost:6379')
+    REDIS_DEFAULT_TTL: int = 3600  # 1 час
 
     # === JWT ===
-    algorithm: str = 'HS256'
-    secret_key: str = Field(default='your-secret-key-change-in-production')
-    access_token_expire_minutes: int = 15
-    refresh_token_expire_days: int = 7
+    JWT_ALGORITHM: str = 'HS256'
+    JWT_SECRET_KEY: str = Field(default='your-secret-key-change-in-production')
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Security
-    password_min_length: int = 8
-    max_login_attempts: int = 5
-    lockout_duration_minutes: int = 15
+    PASSWORD_MIN_LENGTH: int = 8
+    MAX_LOGIN_ATTEMPTS: int = 5
+    LOCKOUT_DURATION_MINUTES: int = 15
 
     # === Email (для сброса пароля) ===
-    smtp_host: str = 'smtp.gmail.com'
-    smtp_port: int = 587
-    smtp_user: str = ''
-    smtp_password: str = ''
-    smtp_from: str = 'noreply@attorney-crm.com'
+    SMTP_HOST: str = 'smtp.gmail.com'
+    SMTP_PORT: int = 587
+    SMTP_USER: str
+    SMTP_PASSWORD: str
+    SMTP_FROM: str = 'noreply@attorney-crm.com'
 
     model_config = SettingsConfigDict(
         env_file='.env',
         env_file_encoding='utf-8',
         env_prefix='',  # <- Без префикса
         extra='ignore',
-        case_sensitive=True,
+        case_sensitive=False,  # В .env можно использовать как верхний, так и нижний регистр
     )
 
     # ============= 🧪 ВОТ ТУТ ПАРОЛЬ ПЕРЕДАЕТСЯ КАК *** 🧪 ================
@@ -74,11 +74,11 @@ class Settings(BaseSettings):
     # ============= 🧪 ================================= 🧪 ================
 
     def url(self) -> str:
-        return f'{self.driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
+        return f'{self.DRIVER}://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DB_NAME}'
 
     def alembic_url(self) -> str:
         '''Строка для подключения к БД ТОЛЬКО для выполнения Alembic миграций.'''
-        url = f'{self._sync_driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}'
+        url = f'{self.SYNC_DRIVER}://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DB_NAME}'
         return url
 
 

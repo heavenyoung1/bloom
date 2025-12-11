@@ -8,8 +8,8 @@ from backend.core.settings import settings
 def get_jwt_strategy() -> JWTStrategy:
     '''JWT-стратегия для FastAPI Users.'''
     return JWTStrategy(
-        secret=settings.secret_key,
-        lifetime_seconds=settings.access_token_expire_minutes * 60,
+        secret=settings.JWT_SECRET_KEY,
+        lifetime_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         token_audience=['fastapi-users:auth'],
-        algorithm=settings.algorithm,
+        algorithm=settings.JWT_ALGORITHM,
     )

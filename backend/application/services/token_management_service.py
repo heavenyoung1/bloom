@@ -24,7 +24,7 @@ class TokenManagementService:
 
         Используется в: SignInUseCase
         '''
-        ttl = settings.refresh_token_expire_days * 24 * 3600
+        ttl = settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600
         await redis_client.set(
             RedisKeys.refresh_token(attorney_id),
             refresh_token,
@@ -60,7 +60,7 @@ class TokenManagementService:
 
         Используется в: SignOutUseCase (для дополнительной безопасности)
         '''
-        ttl = settings.access_token_expire_minutes * 60
+        ttl = settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
         await redis_client.set(
             RedisKeys.token_blacklist(token),
             '1',  # Redis не может хранить boolean! сохраняем как Строку
@@ -91,7 +91,7 @@ class TokenManagementService:
         if await redis_client.exists(lockout_key):
             raise ValidationException(
                 f'Слишком много попыток входа. '
-                f'Попробуйте позже ({settings.lockout_duration_minutes} минут)'
+                f'Попробуйте позже ({settings.LOCKOUT_DURATION_MINUTES} минут)'
             )
 
     async def record_failed_attempt(self, email: str) -> None:
@@ -117,18 +117,18 @@ class TokenManagementService:
             await redis_client.expire(attempts_key, 900)
 
         # Если превышено максимум - заблокировать
-        if attempts >= settings.max_login_attempts:
+        if attempts >= settings.MAX_LOGIN_ATTEMPTS:
             await redis_client.set(
                 RedisKeys.login_lockout(email),
                 '1',  # Redis не может хранить boolean! сохраняем как Строку
-                ttl=settings.lockout_duration_minutes * 60,
+                ttl=settings.LOCKOUT_DURATION_MINUTES * 60,
             )
             logger.warning(
                 f'Адвокат заблокирован по rate limit: {email} ' f'({attempts} попыток)'
             )
             raise ValidationException(
                 f'Учетная запись заблокирована на '
-                f'{settings.lockout_duration_minutes} минут'
+                f'{settings.LOCKOUT_DURATION_MINUTES} минут'
             )
 
     async def clear_failed_attempts(self, email: str) -> None:

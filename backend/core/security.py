@@ -47,7 +47,7 @@ class SecurityService:
         '''
 
         if expires_delta is None:
-            expires_delta = timedelta(minutes=settings.access_token_expire_minutes)
+            expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
         expire = datetime.now(timezone.utc) + expires_delta
 
@@ -62,7 +62,7 @@ class SecurityService:
             payload.update(additional_claims)
 
         encoded_token = jwt.encode(
-            payload, settings.secret_key, algorithm=settings.algorithm
+            payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
         )
 
         logger.debug(f'Access token создан для: {subject}')
@@ -83,7 +83,7 @@ class SecurityService:
             JWT токен в виде строки
         '''
         expire = datetime.now(timezone.utc) + timedelta(
-            days=settings.refresh_token_expire_days
+            days=settings.REFRESH_TOKEN_EXPIRE_DAYS
         )
 
         payload = {
@@ -94,7 +94,7 @@ class SecurityService:
         }
 
         encoded_token = jwt.encode(
-            payload, settings.secret_key, algorithm=settings.algorithm
+            payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
         )
 
         logger.debug(f'Refresh token создан для: {subject}')
@@ -116,7 +116,7 @@ class SecurityService:
         '''
         try:
             payload = jwt.decode(
-                token, settings.secret_key, algorithms=[settings.algorithm]
+                token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
             )
             logger.debug(f'Token декодирован для: {payload.get('sub')}')
             return payload
