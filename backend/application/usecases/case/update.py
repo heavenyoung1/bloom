@@ -37,6 +37,9 @@ class UpdateCaseUseCase:
                 )
                 await validator.on_update(cmd)
 
+                # 2. Применяем изменения через метод update доменной сущности
+                case.update(cmd)
+
                 # 3. Сохранение в базе
                 updated_case = await uow.case_repo.update(case)
 
