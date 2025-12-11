@@ -6,6 +6,8 @@ from backend.application.policy.attorney_policy import AttorneyPolicy
 from backend.infrastructure.redis.client import redis_client
 from backend.infrastructure.redis.keys import RedisKeys
 from backend.core.settings import settings
+from backend.application.commands.attorney import LoginAttorneyCommand
+from backend.core.exceptions import ValidationException
 from backend.core.logger import logger
 
 from backend.application.dto.attorney import (
@@ -22,7 +24,7 @@ class SignInUseCase:
         self.uow_factory = uow_factory
         self.auth_service = AuthService(uow_factory)
 
-    async def execute(self, request: LoginRequest) -> TokenResponse:
+    async def execute(self, cmd: LoginAttorneyCommand) -> 'TokenResponse':
         '''
         Вход в систему.
 
@@ -30,49 +32,47 @@ class SignInUseCase:
         1. Проверить rate limit
         2. Получить юриста по email
         3. Проверить пароль
-        4. Проверить что верифицирован
+        4. Проверить активность и верификацию
         5. Создать токены
         6. Сохранить refresh token в Redis
         7. Очистить счётчик попыток
         '''
-
         # 1. Проверить rate limiting
-        await self._check_rate_limit(request.email)
+        await self._check_rate_limit(cmd.email)
 
         async with self.uow_factory.create() as uow:
-
             # 2. Получить юриста по email
-            attorney = await uow.attorney_repo.get_by_email(request.email)
+            attorney = await uow.attorney_repo.get_by_email(cmd.email)
             if not attorney:
-                await self._record_failed_attempt(request.email)  # Это что за хрень?
-                raise ValueError('Invalid credentials')
+                await self._record_failed_attempt(cmd.email)
+                raise ValueError('Некорректный email или пароль')
 
             # 3. Проверить пароль
             if not SecurityService.verify_password(
-                request.password, attorney.hashed_password
-            ):
-                await self._record_failed_attempt(request.email)
-                raise ValueError('Invalid credentials')
+                cmd.password, 
+                attorney.hashed_password,
+                ):
+                await self._record_failed_attempt(cmd.email)
+                raise ValidationException('Некорректный email или пароль')
 
-            # 4. Проверить статус
+            # 4. Проверить статусы
             if not attorney.is_active:
-                raise ValueError('Attorney account is not active')
+                raise ValidationException('Учетная запись юриста не активна')
 
-            # 5. Проверить верификацию
             if not attorney.is_verified:
-                raise ValueError("Email not verified. Please check your email")
+                raise ValidationException('Email не подтвержден. Проверьте почту')
 
-        # 6. Создать токены
+        # 5. Создать токены
         access_token = SecurityService.create_access_token(str(attorney.id))
         refresh_token = SecurityService.create_refresh_token(str(attorney.id))
 
-        # 7. Сохранить refresh token в Redis
+        # 6. Сохранить refresh token в Redis
         await self.auth_service.save_refresh_token(attorney.id, refresh_token)
 
-        # 8. Очистить счётчик попыток
-        await self.auth_service.clear_failed_attempts(request.email)
+        # 7. Очистить счётчик попыток
+        await self.auth_service.clear_failed_attempts(cmd.email)
 
-        logger.info(f"Attorney logged in: {request.email}")
+        logger.info(f'Юрист успешно вошел: {cmd.email} (ID: {attorney.id})')
 
         return TokenResponse(
             access_token=access_token,
@@ -84,7 +84,10 @@ class SignInUseCase:
         '''Проверить блокировку по rate limit'''
         lockout_key = RedisKeys.login_lockout(email)
         if await redis_client.exists(lockout_key):
-            raise ValueError('Слишком много попыток входа. Попробуйте позже')
+            raise ValidationException(
+                'Слишком много неудачных попыток входа. '
+                'Попробуйте позже.'
+            )
 
     async def _record_failed_attempt(self, email: str) -> None:
         '''Записать неудачную попытку входа'''
@@ -93,7 +96,7 @@ class SignInUseCase:
 
         # Если первая попытка - установить TTL
         if attempts == 1:
-            await redis_client.set(attempts_key, 1, ttl=900)  # 15 минут
+            await redis_client.expire(attempts_key, 900)  # 15 минут
 
         # Если превышено максимум - заблокировать
         if attempts >= settings.MAX_LOGIN_ATTEMPTS:
@@ -102,4 +105,7 @@ class SignInUseCase:
                 True,
                 ttl=settings.LOCKOUT_DURATION_MINUTES * 60,
             )
-            logger.warning(f'Юрист заблокирован по rate limit: {email}')
+            logger.warning(
+                f'Адвокат заблокирован по rate limit: {email} '
+                f'({attempts} попыток)'
+            )
