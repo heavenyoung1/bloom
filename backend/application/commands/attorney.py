@@ -48,6 +48,14 @@ class RefreshTokenCommand:
     refresh_token: str
 
 
+@dataclass
+class LogoutCommand:
+    '''Выход из системы'''
+
+    attorney_id: int
+    access_token: str
+
+
 # ====== PROFILE COMMANDS (write операции) ======
 
 
