@@ -20,7 +20,7 @@ class CreateClientUseCase:
             try:
                 # 1. Валидация (проверка уникальности, существования адвоката)
                 validator = ClientPolicy(
-                    client_repo=uow.client_repo, 
+                    client_repo=uow.client_repo,
                     attorney_repo=uow.attorney_repo,
                 )
                 await validator.on_create(cmd)

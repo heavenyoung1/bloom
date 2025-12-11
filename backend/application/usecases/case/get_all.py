@@ -25,11 +25,11 @@ class GetlAllCasesUseCase:
                 # Проверка, что дела существуют
                 if not cases:
                     logger.warning(f'Нет дел для юриста с ID {cmd.attorney_id}')
-                    raise EntityNotFoundException(f'Нет дел для юриста с ID {cmd.attorney_id}')
+                    raise EntityNotFoundException(
+                        f'Нет дел для юриста с ID {cmd.attorney_id}'
+                    )
 
-                logger.info(
-                    f'Получено {len(cases)} дел для юриста {cmd.attorney_id}'
-                )
+                logger.info(f'Получено {len(cases)} дел для юриста {cmd.attorney_id}')
                 # 2. Возвращаем список дел в нужном формате (через модель CaseResponse)
                 case_responses = [
                     CaseResponse(
@@ -40,11 +40,14 @@ class GetlAllCasesUseCase:
                         status=case.status,
                         description=case.description,
                         created_at=case.created_at,
-                        updated_at=case.updated_at
-                    ) for case in cases
+                        updated_at=case.updated_at,
+                    )
+                    for case in cases
                 ]
 
-                logger.info(f'Получено {len(cases)} дел для юриста с ID {cmd.attorney_id}')
+                logger.info(
+                    f'Получено {len(cases)} дел для юриста с ID {cmd.attorney_id}'
+                )
                 return case_responses
 
             except Exception as e:

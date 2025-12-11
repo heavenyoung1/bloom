@@ -18,7 +18,9 @@ class DeleteClientUseCase:
                 client = await uow.client_repo.get(cmd.client_id)
 
                 if not client:
-                    raise EntityNotFoundException(f'Клиент с ID {cmd.client_id} не найден.')
+                    raise EntityNotFoundException(
+                        f'Клиент с ID {cmd.client_id} не найден.'
+                    )
 
                 # 3. Удалить клиента
                 await uow.client_repo.delete(cmd.client_id)

@@ -52,7 +52,6 @@ async def sample_update_case(persisted_attorney_id, persisted_client_id):
     )
 
 
-
 @pytest.fixture
 async def cases_list(persisted_attorney_id, persisted_client_id):
     '''
@@ -102,6 +101,7 @@ async def cases_list(persisted_attorney_id, persisted_client_id):
         ),
     ]
 
+
 @pytest.fixture
 async def verified_cases_list(
     verifiied_persisted_attorney_id, verified_persisted_client_id
@@ -134,5 +134,5 @@ async def verified_cases_list(
             attorney_id=verifiied_persisted_attorney_id,  # Реальный ID из БД
             status=CaseStatus.IN_PROGRESS,
             description='Описание дела о краже 3',
-        )
+        ),
     ]

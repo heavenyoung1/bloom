@@ -21,9 +21,7 @@ class GetCaseByIdUseCase:
 
                 if not case:
                     logger.error(f'Дело с ID {cmd.case_id} не найдено.')
-                    raise EntityNotFoundException(
-                        f'Дело не найдено.'
-                    )
+                    raise EntityNotFoundException(f'Дело не найдено.')
 
                 logger.info(f'Дело получено: ID = {cmd.case_id}')
                 return CaseResponse.model_validate(case)

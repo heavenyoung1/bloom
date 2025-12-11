@@ -8,6 +8,7 @@ from typing import Optional
 @dataclass
 class RegisterAttorneyCommand:
     '''Регистрация нового адвоката'''
+
     license_id: str
     first_name: str
     last_name: str
@@ -20,6 +21,7 @@ class RegisterAttorneyCommand:
 @dataclass
 class LoginAttorneyCommand:
     '''Вход в систему'''
+
     email: str
     password: str
 
@@ -27,6 +29,7 @@ class LoginAttorneyCommand:
 @dataclass
 class VerifyEmailCommand:
     '''Верификация email'''
+
     email: str
     code: str
 
@@ -34,12 +37,14 @@ class VerifyEmailCommand:
 @dataclass
 class ResendVerificationCommand:
     '''Повторно отправить код верификации'''
+
     email: str
 
 
 @dataclass
 class RefreshTokenCommand:
     '''Обновить access token'''
+
     refresh_token: str
 
 
@@ -49,8 +54,9 @@ class RefreshTokenCommand:
 @dataclass
 class UpdateAttorneyCommand:
     '''Обновление профиля адвоката'''
+
     attorney_id: int
-    
+
     # PATCH — все поля опциональные
     first_name: Optional[str] = None
     last_name: Optional[str] = None
@@ -62,6 +68,7 @@ class UpdateAttorneyCommand:
 @dataclass
 class ChangePasswordCommand:
     '''Изменение пароля'''
+
     attorney_id: int
     old_password: str
     new_password: str
@@ -70,6 +77,7 @@ class ChangePasswordCommand:
 @dataclass
 class DeleteAttorneyAccountCommand:
     '''Удаление учетной записи'''
+
     attorney_id: int
     password: str  # подтверждение пароля
 

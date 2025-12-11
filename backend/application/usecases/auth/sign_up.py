@@ -6,6 +6,8 @@ from backend.application.policy.attorney_policy import AttorneyPolicy
 from backend.application.services.verification_service import VerificationService
 from backend.infrastructure.redis.client import redis_client
 from backend.infrastructure.redis.keys import RedisKeys
+from backend.core.exceptions import ValidationException, EntityNotFoundException
+from backend.application.commands.attorney import RegisterAttorneyCommand
 
 from backend.application.dto.attorney import (
     AttorneyResponse,
@@ -21,7 +23,7 @@ class SignUpUseCase:
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 
-    async def execute(self, request: RegisterRequest) -> AttorneyResponse:
+    async def execute(self, cmd: RegisterAttorneyCommand) -> 'AttorneyResponse':
         '''
         Регистрация нового юриста.
 
@@ -33,33 +35,40 @@ class SignUpUseCase:
         5. Отправить код верификации
         '''
         async with self.uow_factory.create() as uow:
+            try:
+                # 1. Валидировать
+                policy = AttorneyPolicy(uow.attorney_repo)
+                await policy.on_register(cmd)
 
-            # 2. Валидировать данные
-            validator = AttorneyPolicy(uow.attorney_repo)
-            await validator.on_create(request)
+                # 2. Захешировать пароль
+                hashed_password = SecurityService.hash_password(cmd.password)
 
-            # 3. Захэшировать пароль
-            hashed_password = SecurityService.hash_password(request.password)
+                # 3. Создать Entity
+                attorney = Attorney.create(
+                    license_id=cmd.license_id,
+                    first_name=cmd.first_name,
+                    last_name=cmd.last_name,
+                    patronymic=cmd.patronymic,
+                    email=cmd.email,
+                    phone=cmd.phone,
+                    hashed_password=hashed_password,
+                )
 
-            # Создание юриста через Фабрику
-            attorney = Attorney.create(
-                license_id=request.license_id,
-                first_name=request.first_name,
-                last_name=request.last_name,
-                patronymic=request.patronymic,
-                email=request.email,
-                phone=request.phone,
-                hashed_password=hashed_password,
-            )
+                # 4. Сохранить в БД
+                attorney = await uow.attorney_repo.save(attorney)
 
-            # 5. Сохранить в БД
-            attorney = await uow.attorney_repo.save(attorney)
+            except (ValidationException, EntityNotFoundException) as e:
+                logger.error(f'Ошибка валидации при регистрации: {e}')
+                raise
 
-        # 6. Сгенерировать код верификации (в реальности - случайный)
+        # 5. Отправить код верификации (вне транзакции)
         await VerificationService.send_verification_code(
-            email=request.email, first_name=request.first_name
+            email=cmd.email, first_name=cmd.first_name
         )
 
-        logger.info(f'Юрист зарегистрирован: {attorney.email}. Ожидание верификации...')
+        logger.info(
+            f'Юрист зарегистрирован: {attorney.email} '
+            f'(ID: {attorney.id}). Ожидание верификации...'
+        )
 
         return AttorneyResponse.model_validate(attorney)

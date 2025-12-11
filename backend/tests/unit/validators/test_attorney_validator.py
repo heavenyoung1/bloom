@@ -41,7 +41,8 @@ class TestAttorneyValidator:
 
         # Проверяем, что выбрасывается исключение для email
         with pytest.raises(
-            ValidationException, match=f'Email {valid_attorney_dto.email} уже зарегистрирован'
+            ValidationException,
+            match=f'Email {valid_attorney_dto.email} уже зарегистрирован',
         ):
             await attorney_validator.on_create(valid_attorney_dto)
 
