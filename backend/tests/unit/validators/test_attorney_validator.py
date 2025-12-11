@@ -4,7 +4,7 @@ import pytest
 import re
 
 
-class TestAttorneyValidator:
+class TestAttorneyPolicy:
     @pytest.mark.asyncio
     async def test_validate_on_create(
         self, attorney_repo_mock, valid_attorney_dto, attorney_validator
@@ -16,7 +16,7 @@ class TestAttorneyValidator:
         attorney_repo_mock.get_by_license_id.return_value = None
         attorney_repo_mock.get_by_phone.return_value = None
 
-        await attorney_validator.on_create(valid_attorney_dto)
+        await attorney_validator.on_register(valid_attorney_dto)
 
         attorney_repo_mock.get_by_email.assert_called_once_with(
             valid_attorney_dto.email
@@ -44,7 +44,7 @@ class TestAttorneyValidator:
             ValidationException,
             match=f'Email {valid_attorney_dto.email} уже зарегистрирован',
         ):
-            await attorney_validator.on_create(valid_attorney_dto)
+            await attorney_validator.on_register(valid_attorney_dto)
 
         attorney_repo_mock.get_by_email.assert_called_once_with(
             valid_attorney_dto.email
@@ -66,7 +66,7 @@ class TestAttorneyValidator:
             ValidationException,
             match=f'Номер Удостоверения адвоката {valid_attorney_dto.license_id} уже зарегистрирован',
         ):
-            await attorney_validator.on_create(valid_attorney_dto)
+            await attorney_validator.on_register(valid_attorney_dto)
 
         attorney_repo_mock.get_by_license_id.assert_called_once_with(
             valid_attorney_dto.license_id
@@ -88,7 +88,7 @@ class TestAttorneyValidator:
             ValidationException,
             match=re.escape(f'Номер телефона {valid_attorney_dto.phone} уже занят'),
         ):
-            await attorney_validator.on_create(valid_attorney_dto)
+            await attorney_validator.on_register(valid_attorney_dto)
 
         attorney_repo_mock.get_by_phone.assert_called_once_with(
             valid_attorney_dto.phone
