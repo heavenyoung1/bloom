@@ -10,13 +10,37 @@ class Attorney:
     first_name: str
     last_name: str
     patronymic: str
-    email: str  # Как валидировать email
+    email: str
     phone: str
     hashed_password: str
-    is_active: bool  # Можно ли юзеру логиниться
-    is_superuser: bool  # Админ?
-    is_verified: bool  # Подтвердил ли email
+    is_active: bool
+    is_superuser: bool
+    is_verified: bool
 
-    # Необязательные атрибуты
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+    @staticmethod
+    def create(
+        *,
+        license_id: str,
+        first_name: str,
+        last_name: str,
+        patronymic: str | None,
+        email: str,
+        phone: str | None,
+        hashed_password: str,
+    ) -> 'Attorney':
+        return Attorney(
+            id=None,
+            license_id=license_id,
+            first_name=first_name,
+            last_name=last_name,
+            patronymic=patronymic,
+            email=email,
+            phone=phone,
+            hashed_password=hashed_password,
+            is_active=True,
+            is_superuser=False,
+            is_verified=False,
+        )

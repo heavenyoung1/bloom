@@ -26,6 +26,7 @@ def update_case_command(sample_case_for_verified_attorney):
         description='Произошло что-то непонятное',
     )
 
+
 @pytest.fixture
 def create_client_command(verifiied_persisted_attorney_id):
     return CreateClientCommand(
@@ -39,6 +40,7 @@ def create_client_command(verifiied_persisted_attorney_id):
         messenger_handle='@sirLeninGuy',
         owner_attorney_id=verifiied_persisted_attorney_id,
     )
+
 
 @pytest.fixture
 def update_client_command(verifiied_persisted_attorney_id):

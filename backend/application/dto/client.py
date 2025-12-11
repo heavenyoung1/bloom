@@ -49,7 +49,6 @@ class ClientCreateRequest(BaseModel):
                 'address': 'г. Москва, ул. Пушкина, д.1',
                 'messenger': 'Telegram',
                 'messenger_handle': '@client123',
-                #'owner_attorney_id': 1,
             }
         }
     )
@@ -83,9 +82,21 @@ class ClientUpdateRequest(BaseModel):
     )
     messenger: Messenger
     messenger_handle: Optional[str] = Field(default=None, max_length=50)
-    # owner_attorney_id: Optional[int] = Field(
-    #     default=None, ge=1, description='ID юриста, ответственного за клиента '
-    # )
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'name': 'Иванов Иван Иванович',
+                'type': True,
+                'email': 'client777@example.com',
+                'phone': '+79691234232',
+                'personal_info': '7744 443443',
+                'address': 'г. Москва, ул. Пушкина, д.1',
+                'messenger': 'Telegram',
+                'messenger_handle': '@client111',
+            }
+        }
+    )
 
 
 class ClientResponse(BaseModel):

@@ -11,7 +11,7 @@ console_handler.setFormatter(
 )
 
 # Файловый обработчик
-file_handler = logging.FileHandler('app.log')
+file_handler = logging.FileHandler('app.log', encoding='utf-8')
 # ПОТОМ ВЫВЕСТИ В INFO
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(

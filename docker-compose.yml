@@ -3,15 +3,15 @@ services:
     image: postgres:16
     container_name: bloom_postgres_dev
     environment:
-      POSTGRES_USER: ${user}           # Переменная из .env
-      POSTGRES_PASSWORD: ${password}   # Переменная из .env
-      POSTGRES_DB: ${db_name}          # Переменная из .env
+      POSTGRES_USER: ${USER}           # Переменная из .env
+      POSTGRES_PASSWORD: ${PASSWORD}   # Переменная из .env
+      POSTGRES_DB: ${DB_NAME}          # Переменная из .env
     ports:
       - "5436:5432"
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${user} -d ${db_name}"]
+      test: ["CMD-SHELL", "pg_isready -U ${USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 3s
       retries: 10

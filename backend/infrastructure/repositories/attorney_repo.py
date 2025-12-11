@@ -209,14 +209,7 @@ class AttorneyRepository(IAttorneyRepository):
             raise DatabaseErrorException(f'Ошибка при удалении ЮРИСТА: {str(e)}')
 
     async def change_verify(self, attorney_id: int, is_verified: bool) -> 'Attorney':
-        '''
-        Обновить данные юриста по ID.
-
-        :param id: ID юриста, который необходимо обновить.
-        :param updated_attorney: Обновленные данные юриста.
-        :return: Словарь с результатом операции ('success': True) и обновлённым юристом.
-        :raises DatabaseErrorException: Если произошла ошибка при обновлении данных.
-        '''
+        '''Изменить статус верификации Юриста по ID.'''
         try:
             # 1. Выполнение запроса на извлечение данных из БД
             stmt = select(AttorneyORM).where(AttorneyORM.id == attorney_id)
@@ -230,6 +223,35 @@ class AttorneyRepository(IAttorneyRepository):
 
             # 3. Прямое обновление полей ORM-объекта
             orm_attorney.is_verified = is_verified
+
+            # 4. Сохранение в БД
+            await self.session.flush()  # или session.commit() если нужна транзакция
+
+            # 5. Возврат доменного объекта
+            logger.info(f'Юрист обновлен. ID = {orm_attorney.id}')
+            return AttorneyMapper.to_domain(orm_attorney)
+
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка БД при обновлении ЮРИСТА ID={orm_attorney.id}: {e}')
+            raise DatabaseErrorException(
+                f'Ошибка при обновлении данных ЮРИСТА: {str(e)}'
+            )
+
+    async def change_is_avtive(self, attorney_id: int, is_active: bool) -> 'Attorney':
+        '''Изменить статус верификации Юриста по ID.'''
+        try:
+            # 1. Выполнение запроса на извлечение данных из БД
+            stmt = select(AttorneyORM).where(AttorneyORM.id == attorney_id)
+            result = await self.session.execute(stmt)
+            orm_attorney = result.scalar_one_or_none()
+
+            # 2. Проверка наличия записи в БД
+            if not orm_attorney:
+                logger.error(f'Юрист с ID {attorney_id} не найден.')
+                raise EntityNotFoundException(f'Юрист с ID {attorney_id} не найден.')
+
+            # 3. Прямое обновление полей ORM-объекта
+            orm_attorney.is_verified = is_active
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция

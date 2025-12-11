@@ -115,17 +115,17 @@ class EmailService:
                 # Создаём письмо
                 msg = MIMEMultipart('alternative')
                 msg['Subject'] = subject
-                msg['From'] = settings.smtp_from
+                msg['From'] = settings.SMTP_FROM
                 msg['To'] = to_email
 
                 # Добавляем HTML
                 msg.attach(MIMEText(html_content, 'html'))
 
                 # Подключаемся к SMTP серверу
-                with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
+                with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
                     server.starttls()  # Включаем шифрование TLS
                     server.login(
-                        settings.smtp_user, settings.smtp_password
+                        settings.SMTP_USER, settings.SMTP_PASSWORD
                     )  # Аутентификация
                     server.send_message(msg)  # Отправка
 

@@ -62,6 +62,11 @@ class CaseUpdateRequest(BaseModel):
         max_length=100,
         description='Название дела',
     )
+    client_id: int = Field(
+        None,
+        gt=0,
+        description='ID клиента, прикрепленного к делу',
+    )
     status: Optional[str] = Field(
         None,  # Указываем значение по умолчанию как None для необязательных полей
         description=(
@@ -82,6 +87,16 @@ class CaseUpdateRequest(BaseModel):
             'Подробное описание сути дела: ключевые вопросы, требования, '
             'участники, правовые основания'
         ),
+    )
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'name': 'Споры по недвижимости',
+                'status': 'Новое',
+                'client_id': 777,
+                'description': 'Разрешение спора о праве собственности на квартиру',
+            }
+        }
     )
 
 

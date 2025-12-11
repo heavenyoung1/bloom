@@ -18,10 +18,10 @@ class DataBaseConnection:
     def __init__(self):  # , settings: Settings):
         self.engine = create_async_engine(
             settings.url(),
-            echo=settings.echo,  # Логгирование SQL-запросов для отладки
-            pool_pre_ping=settings.pool_pre_ping,  # Лечит «мертвые» коннекты (проверять соединение перед использованием (защита от dead connections))
-            pool_size=settings.pool_size,  # Тюнинг пула по ситуации (сколько соединений держать в пуле)
-            max_overflow=settings.max_overflow,  # Сколько дополнительных можно создать при пиках
+            echo=settings.ECHO,  # Логгирование SQL-запросов для отладки
+            pool_pre_ping=settings.POOL_PRE_PING,  # Лечит «мертвые» коннекты (проверять соединение перед использованием (защита от dead connections))
+            pool_size=settings.POOL_SIZE,  # Тюнинг пула по ситуации (сколько соединений держать в пуле)
+            max_overflow=settings.MAX_OVERFLOW,  # Сколько дополнительных можно создать при пиках
         )
 
         self.AsyncSessionLocal = async_sessionmaker(

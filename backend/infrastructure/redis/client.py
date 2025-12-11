@@ -10,14 +10,14 @@ class RedisClient:
         self._client: Optional[redis.Redis] = None
 
     async def connect(self) -> None:
-        self._client = await redis.from_url(settings.redis_url, decode_responses=True)
+        self._client = await redis.from_url(settings.REDIS_URL, decode_responses=True)
 
     async def disconnect(self) -> None:
         if self._client:
             await self._client.close()
 
     async def set(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
-        ttl = ttl or settings.redis_default_ttl
+        ttl = ttl or settings.REDIS_DEFAULT_TTL
         if isinstance(value, dict):
             value = json.dumps(value)
         return await self._client.setex(key, ttl, value)

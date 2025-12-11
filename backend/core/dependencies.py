@@ -30,7 +30,14 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def get_uow_factory() -> UnitOfWorkFactory:
-    '''Получить фабрику UoW'''
+    '''
+    Получить фабрику UnitOfWork для использования в UseCase'ах.
+
+    Используется в каждом Router'е для передачи в UseCase.
+
+    Returns:
+        UnitOfWorkFactory для работы с БД
+    '''
     return UnitOfWorkFactory(database)
 
 
@@ -39,11 +46,11 @@ async def get_uow_factory() -> UnitOfWorkFactory:
 security = HTTPBearer()
 
 
-async def get_current_attorney(
+async def get_current_attorney_id(
     credentials: HTTPBasicCredentials = Depends(security),
-) -> Dict[str, Any]:
+) -> int:
     '''
-    Получить текущего юриста из JWT токена.
+    Получить ID текущего адвоката из JWT токена.
 
     Используется в Depends() для защиты эндпоинтов.
 
@@ -51,57 +58,67 @@ async def get_current_attorney(
         credentials: Автоматически извлекаются из заголовка Authorization: Bearer <token>
 
     Returns:
-        Декодированный payload с attorney_id и другими данными
+        attorney_id как int
 
     Raises:
-        HTTPException 401: Если токен невалиден или истёк
+        HTTPException 401: Если токен невалиден, истёк или неправильного типа
 
     Example:
         @router.get('/profile')
         async def get_profile(
-            current_attorney: dict = Depends(get_current_attorney)
+            current_attorney_id: int = Depends(get_current_attorney_id)
         ):
-            attorney_id = current_attorney['sub']
-            return await get_attorney_by_id(attorney_id)
+            return await get_attorney(current_attorney_id)
     '''
-
     token = credentials.credentials
 
     try:
-        # Декодируем JWT токен
+        # 1. Декодируем JWT токен
         payload = SecurityService.decode_token(token)
 
-        # Проверяем, что это access токен (не refresh)
+        # 2. Проверяем, что это access токен (не refresh)
         if not SecurityService.verify_token_type(payload, 'access'):
-            logger.warning('Попытка использовать refresh token вместо access token')
+            logger.warning(
+                f'Попытка использовать неправильный тип токена: '
+                f'{payload.get('type')}'
+            )
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail='Invalid token type. Use access token',
+                detail='Неправильный тип токена. Используйте access token',
                 headers={'WWW-Authenticate': 'Bearer'},
             )
 
-        attorney_id: str = payload.get('sub')
-        if attorney_id is None:
-            logger.warning('Token payload missing subject')
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail='Token invalid',
-                headers={'WWW-Authenticate': 'Bearer'},
-            )
-        # ПРОВЕРИТЬ ЧТО ЛЕЖИТ ВОТ ТУТ
-        return payload
+        # 3. Получаем attorney_id из токена
+        attorney_id_str = SecurityService.get_subject_from_token(payload)
+        attorney_id = int(attorney_id_str)
+
+        logger.debug(f'Attorney {attorney_id} автентифицирован')
+        return attorney_id
 
     except ValueError as e:
         logger.warning(f'JWT validation error: {str(e)}')
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(e),
+            detail='Невалидный или истёкший токен',
             headers={'WWW-Authenticate': 'Bearer'},
         )
+
     except Exception as e:
         logger.error(f'Unexpected error during token verification: {str(e)}')
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Could not validate credentials',
+            detail='Не удалось верифицировать учетные данные',
             headers={'WWW-Authenticate': 'Bearer'},
         )
+
+
+async def get_current_access_token(
+    credentials: HTTPBasicCredentials = Depends(security),
+) -> str:
+    '''
+    Получить текущий access token (для logout и т.д.).
+
+    Returns:
+        access token как строка
+    '''
+    return credentials.credentials
