@@ -63,7 +63,7 @@ class TokenManagementService:
         ttl = settings.access_token_expire_minutes * 60
         await redis_client.set(
             RedisKeys.token_blacklist(token),
-            True,
+            '1',  # Redis не может хранить boolean! сохраняем как Строку
             ttl=ttl,
         )
         logger.debug(f'Access token добавлен в чёрный список')
@@ -120,7 +120,7 @@ class TokenManagementService:
         if attempts >= settings.max_login_attempts:
             await redis_client.set(
                 RedisKeys.login_lockout(email),
-                True,
+                '1',  # Redis не может хранить boolean! сохраняем как Строку
                 ttl=settings.lockout_duration_minutes * 60,
             )
             logger.warning(

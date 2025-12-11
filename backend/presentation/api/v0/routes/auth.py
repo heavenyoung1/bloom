@@ -21,7 +21,8 @@ from backend.application.commands.attorney import (
     VerifyEmailCommand,
     ResendVerificationCommand,
 )
-from backend.application.services.auth_service import AuthService
+
+# from backend.application.services.auth_service import AuthService
 from backend.core.dependencies import get_current_attorney_id
 from backend.core.dependencies import get_uow_factory
 from backend.application.dto.attorney import (

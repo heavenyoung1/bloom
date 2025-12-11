@@ -1,7 +1,6 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.attorney import VerifyEmailRequest
 from backend.application.services.verification_service import VerificationService
-from backend.application.services.attorney_service import AttorneyService
 from backend.application.dto.attorney import AttorneyVerificationResponse
 from backend.core.exceptions import NotFoundException, VerificationError
 from backend.core.logger import logger
@@ -16,7 +15,6 @@ from backend.core.exceptions import ValidationException, EntityNotFoundException
 class VerifyEmailUseCase:
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
-        self.attorney_service = AttorneyService(uow_factory)
 
     async def execute(
         self,
