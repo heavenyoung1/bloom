@@ -49,9 +49,9 @@ class SignInUseCase:
 
             # 3. Проверить пароль
             if not SecurityService.verify_password(
-                cmd.password, 
+                cmd.password,
                 attorney.hashed_password,
-                ):
+            ):
                 await self._record_failed_attempt(cmd.email)
                 raise ValidationException('Некорректный email или пароль')
 
@@ -85,8 +85,7 @@ class SignInUseCase:
         lockout_key = RedisKeys.login_lockout(email)
         if await redis_client.exists(lockout_key):
             raise ValidationException(
-                'Слишком много неудачных попыток входа. '
-                'Попробуйте позже.'
+                'Слишком много неудачных попыток входа. ' 'Попробуйте позже.'
             )
 
     async def _record_failed_attempt(self, email: str) -> None:
@@ -106,6 +105,5 @@ class SignInUseCase:
                 ttl=settings.LOCKOUT_DURATION_MINUTES * 60,
             )
             logger.warning(
-                f'Адвокат заблокирован по rate limit: {email} '
-                f'({attempts} попыток)'
+                f'Адвокат заблокирован по rate limit: {email} ' f'({attempts} попыток)'
             )

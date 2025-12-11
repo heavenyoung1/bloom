@@ -28,10 +28,12 @@ class ResendVerificationUseCase:
             # 1. Получить юриста
             attorney = await uow.attorney_repo.get_by_email(cmd.email)
             if not attorney:
-                    # ⚠️ Security: не раскрываем, существует ли email
-                    logger.warning(f'Попытка переотправить код на несуществующий email: {cmd.email}')
-                    raise ValidationException(
-                        'Если такой email зарегистрирован, код был отправлен'
+                # ⚠️ Security: не раскрываем, существует ли email
+                logger.warning(
+                    f'Попытка переотправить код на несуществующий email: {cmd.email}'
+                )
+                raise ValidationException(
+                    'Если такой email зарегистрирован, код был отправлен'
                 )
 
             # 2. Проверить, не подтвержден ли уже
@@ -40,13 +42,12 @@ class ResendVerificationUseCase:
 
         # 3. Отправить новый код (вне транзакции)
         await VerificationService.send_verification_code(
-            email=cmd.email,
-            first_name=attorney.first_name
+            email=cmd.email, first_name=attorney.first_name
         )
 
         logger.info(f'Код повторно отправлен на: {cmd.email}')
 
         return {
             'message': 'Код верификации отправлен на вашу почту',
-            'email': cmd.email
+            'email': cmd.email,
         }

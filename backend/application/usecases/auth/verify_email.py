@@ -12,13 +12,14 @@ from backend.application.commands.attorney import (
 from backend.application.dto.attorney import AttorneyResponse
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 
+
 class VerifyEmailUseCase:
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
         self.attorney_service = AttorneyService(uow_factory)
 
     async def execute(
-        self, 
+        self,
         cmd: VerifyEmailCommand,
     ) -> AttorneyVerificationResponse:
         '''
@@ -41,9 +42,7 @@ class VerifyEmailUseCase:
             # 2. Получить юриста и обновить статус
             attorney = await uow.attorney_repo.get_by_email(cmd.email)
             if not attorney:
-                raise EntityNotFoundException(
-                    f'Адвокат с email {cmd.email} не найден'
-                )
+                raise EntityNotFoundException(f'Адвокат с email {cmd.email} не найден')
 
             # Уже верифицирован?
             if attorney.is_verified:
