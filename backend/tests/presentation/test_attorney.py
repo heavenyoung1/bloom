@@ -129,3 +129,39 @@ class TestLoginAttorney:
         new_code = await redis_client._client.get(key)
         assert new_code is not None
         assert new_code != old_code
+
+    async def test_logout(
+        self,
+        http_client: AsyncClient,
+        valid_attorney_dto,
+    ):
+        # ===== REGISTER → VERIFY → LOGIN =====
+        payload = valid_attorney_dto.model_dump()
+        await http_client.post('/api/v1/auth/register', json=payload)
+
+        from backend.infrastructure.redis.client import redis_client
+        from backend.infrastructure.redis.keys import RedisKeys
+
+        email = payload["email"]
+        code = await redis_client._client.get(RedisKeys.email_verification_code(email))
+
+        await http_client.post(
+            '/api/v1/auth/verify-email',
+            json={'email': email, 'code': code},
+        )
+
+        login_response = await http_client.post(
+            '/api/v1/auth/login',
+            json={'email': email, 'password': payload['password']},
+        )
+
+        tokens = login_response.json()
+        access_token = tokens['access_token']
+
+        # ===== LOGOUT =====
+        logout_response = await http_client.post(
+            '/api/v1/auth/logout',
+            headers={'Authorization': f'Bearer {access_token}'},
+        )
+
+        assert logout_response.status_code == 200
