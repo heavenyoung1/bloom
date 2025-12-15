@@ -165,3 +165,33 @@ class TestLoginAttorney:
         )
 
         assert logout_response.status_code == 200
+
+class TestResendVerification:
+    async def test_resend_verification_success(
+        self,
+        http_client: AsyncClient,
+        valid_attorney_dto,
+    ):
+        # ======== РЕГИСТРАЦИЯ (email ещё НЕ верифицирован) ========
+        from backend.infrastructure.redis.keys import RedisKeys
+        from backend.infrastructure.redis.client import redis_client
+        register_payload = valid_attorney_dto.model_dump()
+        r = await http_client.post("/api/v1/auth/register", json=register_payload)
+        assert r.status_code == 201, r.text
+
+        email = register_payload["email"]
+        key = RedisKeys.email_verification_code(email)
+
+        old_code = await redis_client._client.get(key)
+        assert old_code is not None, f"Старый код не найден в Redis для {email}"
+
+        # ======== RESEND ========
+        resend_response = await http_client.post(
+            "/api/v1/auth/resend-verification",
+            json={"email": email},
+        )
+        assert resend_response.status_code == 200, resend_response.text
+
+        new_code = await redis_client._client.get(key)
+        assert new_code is not None, f"Новый код не найден в Redis для {email}"
+        assert new_code != old_code, "Код не изменился после resend-verification"
