@@ -15,6 +15,7 @@ from backend.tests.fixtures.uow import *
 from backend.tests.fixtures.settings import *
 from backend.tests.fixtures.commands import *
 from backend.tests.fixtures.http_client import *
+from backend.tests.fixtures.redis import *
 
 
 def pytest_configure(config):

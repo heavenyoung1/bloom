@@ -4,6 +4,7 @@ from backend.application.dto.attorney import (
     RegisterRequest,
     UpdateRequest,
     AttorneyResponse,
+    LoginRequest
 )
 
 from backend.application.dto.client import (
@@ -23,6 +24,19 @@ async def valid_attorney_dto():
         password='SecurePass123!',
     )
 
+@pytest.fixture
+async def valid_login_attorney_dto():
+    return LoginRequest(
+        email='ivan@example.com',
+        password='SecurePass123!',
+    )
+
+@pytest.fixture
+async def invalid_login_attorney_dto():
+    return LoginRequest(
+        email='ivan666@example.com',
+        password='SecurePass1235!',
+    )
 
 @pytest.fixture
 async def valid_attorney_dto_second():
