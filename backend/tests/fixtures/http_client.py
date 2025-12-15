@@ -4,6 +4,7 @@ from httpx import AsyncClient, ASGITransport
 from backend.main import app
 from backend.core.dependencies import get_uow_factory, get_current_attorney_id
 
+
 @pytest.fixture
 async def http_client():
     '''
@@ -41,14 +42,16 @@ async def http_client():
     ) as async_client:
         yield async_client
 
+
 @pytest.fixture(autouse=True)
 def override_uow_factory(test_uow_factory):
     async def _override_get_uow_factory():
         return test_uow_factory
-    
+
     app.dependency_overrides[get_uow_factory] = _override_get_uow_factory
     yield
     app.dependency_overrides.pop(get_uow_factory, None)
+
 
 # @pytest.fixture(autouse=True)
 # def override_auth():

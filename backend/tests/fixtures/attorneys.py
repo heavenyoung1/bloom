@@ -145,6 +145,7 @@ async def attorney_id(test_uow_factory):
     '''Создание тестового юриста и возврат его ID'''
     async with test_uow_factory.create() as uow:
         from backend.core.security import SecurityService
+
         hashed_password = SecurityService.hash_password('password123')
 
         attorney = Attorney.create(

@@ -3,6 +3,7 @@ import pytest
 
 class FakeRedisBackend:
     '''Минимальный async-заменитель для redis.asyncio.Redis (только то, что нужно твоему RedisClient).'''
+
     def __init__(self):
         self.store = {}
 

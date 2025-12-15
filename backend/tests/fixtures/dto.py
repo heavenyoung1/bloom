@@ -25,12 +25,14 @@ async def valid_attorney_dto():
         password='SecurePass123!',
     )
 
+
 @pytest.fixture
 async def valid_login_attorney_dto():
     return LoginRequest(
         email='ivan@example.com',
         password='SecurePass123!',
     )
+
 
 @pytest.fixture
 async def valid_verification_attorney_dto(code: str):
@@ -39,12 +41,14 @@ async def valid_verification_attorney_dto(code: str):
         code=code,
     )
 
+
 @pytest.fixture
 async def invalid_login_attorney_dto():
     return LoginRequest(
         email='ivan666@example.com',
         password='SecurePass1235!',
     )
+
 
 @pytest.fixture
 async def valid_attorney_dto_second():

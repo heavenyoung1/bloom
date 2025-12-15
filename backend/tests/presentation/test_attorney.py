@@ -6,6 +6,7 @@ from backend.application.dto.attorney import (
 )
 from backend.core.logger import logger
 
+
 class TestRegisterAttorney:
     '''Тесты регистрации адвоката'''
 
@@ -22,12 +23,14 @@ class TestRegisterAttorney:
         )
         # Ожидаем успех или ошибку валидации/дублирования
         assert register_response.status_code in [201, 400]
-        
+
         data = register_response.json()
         assert data['id'] is not None
         assert data['email'] == register_payload['email']
 
+
 # ========== LOGIN TESTS ==========
+
 
 class TestLoginAttorney:
     '''Тесты входа адвоката'''
@@ -46,7 +49,7 @@ class TestLoginAttorney:
             json=register_payload,
         )
         assert register_response.status_code in [201, 400]
-        
+
         data = register_response.json()
         assert data['id'] is not None
         assert data['email'] == register_payload['email']
@@ -56,26 +59,28 @@ class TestLoginAttorney:
         from backend.infrastructure.redis.keys import RedisKeys
 
         email = register_payload['email']
-        
+
         # Используем правильный ключ из RedisKeys
         verification_key = RedisKeys.email_verification_code(email)
         verification_code = await redis_client._client.get(verification_key)
-        
+
         logger.debug(f'[VERIFICATION] Key: {verification_key}')
         logger.debug(f'[VERIFICATION CODE] {verification_code}')
         logger.debug(f'[REDIS STORE] {redis_client._client.store}')
-        
+
         assert verification_code is not None, f'Код верификации не найден для {email}'
-        
+
         verify_response = await http_client.post(
             '/api/v1/auth/verify-email',
             json={
                 'email': email,
                 'code': verification_code,
-            }
+            },
         )
         logger.debug(f'[VERIFY RESPONSE] Status: {verify_response.status_code}')
-        assert verify_response.status_code == 200, f'Ошибка верификации: {verify_response.json()}'
+        assert (
+            verify_response.status_code == 200
+        ), f'Ошибка верификации: {verify_response.json()}'
 
         # ======== АВТОРИЗАЦИЯ ========
         login_payload = valid_login_attorney_dto.model_dump()
@@ -85,10 +90,42 @@ class TestLoginAttorney:
         )
 
         logger.debug(f'[LOGIN RESPONSE] Status: {login_response.status_code}')
-        assert login_response.status_code == 200, f'Ошибка входа: {login_response.json()}'
+        assert (
+            login_response.status_code == 200
+        ), f'Ошибка входа: {login_response.json()}'
 
         login_data = login_response.json()
         assert 'access_token' in login_data
         assert 'refresh_token' in login_data
         assert 'token_type' in login_data
         assert login_data['token_type'] == 'bearer'
+
+    async def test_resend_verification(
+        self,
+        http_client: AsyncClient,
+        valid_attorney_dto,
+    ):
+        # ===== REGISTER =====
+        payload = valid_attorney_dto.model_dump()
+        await http_client.post('/api/v1/auth/register', json=payload)
+
+        from backend.infrastructure.redis.client import redis_client
+        from backend.infrastructure.redis.keys import RedisKeys
+
+        email = payload['email']
+        key = RedisKeys.email_verification_code(email)
+
+        old_code = await redis_client._client.get(key)
+        assert old_code is not None
+
+        # ===== RESEND =====
+        resend_response = await http_client.post(
+            '/api/v1/auth/resend-verification',
+            json={'email': email},
+        )
+
+        assert resend_response.status_code == 200
+
+        new_code = await redis_client._client.get(key)
+        assert new_code is not None
+        assert new_code != old_code
