@@ -9,18 +9,18 @@ from backend.core.exceptions import ValidationException, EntityNotFoundException
 
 
 class SignInUseCase:
-    """
+    '''
     UseCase для входа в систему.
 
     Использует TokenManagementService для работы с токенами и rate limiting.
-    """
+    '''
 
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
         self.token_service = TokenManagementService()
 
     async def execute(self, cmd: LoginAttorneyCommand) -> TokenResponse:
-        """
+        '''
         Вход в систему.
 
         Flow:
@@ -35,7 +35,7 @@ class SignInUseCase:
         Raises:
             ValidationException: Если неправильные учетные данные или заблокирован
             EntityNotFoundException: Если юрист не найден
-        """
+        '''
         # 1. Проверить rate limiting
         await self.token_service.check_rate_limit(cmd.email)
 

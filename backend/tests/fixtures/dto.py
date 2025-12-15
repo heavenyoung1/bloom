@@ -3,8 +3,9 @@ import pytest
 from backend.application.dto.attorney import (
     RegisterRequest,
     UpdateRequest,
+    VerifyEmailRequest,
     AttorneyResponse,
-    LoginRequest
+    LoginRequest,
 )
 
 from backend.application.dto.client import (
@@ -29,6 +30,13 @@ async def valid_login_attorney_dto():
     return LoginRequest(
         email='ivan@example.com',
         password='SecurePass123!',
+    )
+
+@pytest.fixture
+async def valid_verification_attorney_dto(code: str):
+    return VerifyEmailRequest(
+        email='ivan@example.com',
+        code=code,
     )
 
 @pytest.fixture

@@ -26,6 +26,11 @@ class FakeRedisBackend:
     async def exists(self, key):
         return 1 if key in self.store else 0
 
+    async def expire(self, key, ttl):
+        # Для тестов просто проверяем, что ключ существует
+        # В реальном Redis устанавливает TTL на существующий ключ
+        return 1 if key in self.store else 0
+
     async def close(self):
         return None
 
