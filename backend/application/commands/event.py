@@ -20,11 +20,14 @@ class CreateEventCommand:
 
 @dataclass
 class GetEventQuery:
+    '''Получить одно событие по ID'''
+
     event_id: int
 
 
 @dataclass
 class UpdateEventCommand:
+    event_id: int
     case_id: int
     name: Optional[str] = None
     description: Optional[str] = None

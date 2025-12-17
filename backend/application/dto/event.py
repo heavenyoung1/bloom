@@ -17,8 +17,8 @@ class EventCreateRequest(BaseModel):
     event_type: EventType
     event_date: datetime
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             'example': {
                 'name': 'Заседание суда',
                 'description': 'Рассмотрение дела по существу',
@@ -28,6 +28,7 @@ class EventCreateRequest(BaseModel):
                 'attorney_id': 1,
             }
         }
+    )
 
 
 class EventUpdateRequest(BaseModel):
@@ -35,6 +36,7 @@ class EventUpdateRequest(BaseModel):
 
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=2000)
+    case_id: Optional[int] = None
     event_type: Optional[EventType] = None
     event_date: Optional[datetime] = None
 

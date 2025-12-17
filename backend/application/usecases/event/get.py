@@ -3,7 +3,7 @@ from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.domain.entities.event import Event
 from backend.application.commands.event import (
-    GetEventsForCaseQuery,
+    GetEventQuery,
     GetEventsForAttorneyQuery,
     GetEventsForCaseQuery,
 )
@@ -13,12 +13,14 @@ from backend.core.logger import logger
 
 
 class GetEventUseCase:
+    '''Получить одно событие по ID'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 
     async def execute(
         self,
-        cmd: GetEventsForCaseQuery,
+        cmd: GetEventQuery,
     ) -> 'EventResponse':
         async with self.uow_factory.create() as uow:
             try:
@@ -31,12 +33,15 @@ class GetEventUseCase:
 
                 logger.info(f'Событие получен: ID = {cmd.event_id}')
                 return EventResponse.model_validate(event)
+
             except Exception as e:
                 logger.error(f'Ошибка при получении события с ID {cmd.event_id}: {e}')
                 raise e
 
 
 class GetEventByAttorneyUseCase:
+    '''Получить все события юриста'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 
@@ -46,24 +51,29 @@ class GetEventByAttorneyUseCase:
     ) -> 'EventResponse':
         async with self.uow_factory.create() as uow:
             try:
-                # 1. Получить дело по ATTORNEY_ID
-                event = await uow.event_repo.get_all_for_attorney(cmd.attorney_id)
+                events = await uow.event_repo.get_all_for_attorney(cmd.attorney_id)
 
-                if not event:
-                    logger.error(f'События для юриста {cmd.attorney_id} не найдены.')
-                    raise EntityNotFoundException(f'События не найдены.')
+                if not events:
+                    logger.warning(f'События для юриста {cmd.attorney_id} не найдены.')
+                    return []
 
-                logger.info(f'Событие получено: ID = {cmd.attorney_id}')
-                return EventResponse.model_validate(event)
+                logger.info(
+                    f'Получено {len(events)} событий для юриста {cmd.attorney_id}'
+                )
+
+                # ПРЕОБРАЗУЕМ КАЖДЫЙ ЭЛЕМЕНТ СПИСКА ОТДЕЛЬНО!
+                return [EventResponse.model_validate(event) for event in events]
 
             except Exception as e:
                 logger.error(
-                    f'Ошибка при получении события с ID {cmd.attorney_id}: {e}'
+                    f'Ошибка при получении событий юриста {cmd.attorney_id}: {e}'
                 )
                 raise e
 
 
 class GetEventByCaseUseCase:
+    '''Получить все события для конкретного дела'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 
@@ -74,14 +84,16 @@ class GetEventByCaseUseCase:
         async with self.uow_factory.create() as uow:
             try:
                 # 1. Получить дело по CASE_ID
-                event = await uow.event_repo.get_for_case(cmd.case_id)
+                events = await uow.event_repo.get_for_case(cmd.case_id)
 
-                if not event:
+                if not events:
                     logger.error(f'События для дела {cmd.attorney_id} не найдены.')
-                    raise EntityNotFoundException(f'События не найдены.')
+                    return []
 
-                logger.info(f'Событие получено: ID = {cmd.case_id}')
-                return EventResponse.model_validate(event)
+                logger.info(f'Получено {len(events)} событий для дела {cmd.case_id}')
+
+                # ПРЕОБРАЗУЕМ КАЖДЫЙ ЭЛЕМЕНТ СПИСКА ОТДЕЛЬНО!
+                return [EventResponse.model_validate(event) for event in events]
 
             except Exception as e:
                 logger.error(f'Ошибка при получении события с ID {cmd.case_id}: {e}')

@@ -32,7 +32,6 @@ class UpdateEventUseCase:
 
                 # 3. Сохраняем изменения
                 updated_event = await uow.event_repo.update(event)
-
                 logger.info(f'Событие обновлено: ID = {updated_event.id}')
 
                 return EventResponse.model_validate(updated_event)

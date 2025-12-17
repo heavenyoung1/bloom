@@ -128,7 +128,7 @@ async def get_event(
 # ====== READ BY ATTORNEY ======
 @router.get(
     '/attorney/{attorney_id}',
-    response_model=EventResponse,
+    response_model=List[EventResponse],
     status_code=status.HTTP_200_OK,
     summary='Получение данных события',
     responses={
@@ -163,7 +163,7 @@ async def get_events_by_attorney(
 # ====== READ BY CASE ======
 @router.get(
     '/cases/{case_id}',
-    response_model=EventResponse,
+    response_model=List['EventResponse'],
     status_code=status.HTTP_200_OK,
     summary='Получение данных события',
     responses={
@@ -222,6 +222,7 @@ async def update_event(
     '''
     try:
         cmd = UpdateEventCommand(
+            event_id=event_id,  # ХМ????
             name=request.name,
             description=request.description,
             case_id=request.case_id,
