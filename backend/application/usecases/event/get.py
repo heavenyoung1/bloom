@@ -3,12 +3,37 @@ from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.domain.entities.event import Event
 from backend.application.commands.event import (
+    GetEventsForCaseQuery,
     GetEventsForAttorneyQuery,
     GetEventsForCaseQuery,
 )
 
 # ВАЛИДАТОР!
 from backend.core.logger import logger
+
+
+class GetEventUseCase:
+    def __init__(self, uow_factory: UnitOfWorkFactory):
+        self.uow_factory = uow_factory
+
+    async def execute(
+        self,
+        cmd: GetEventsForCaseQuery,
+    ) -> 'EventResponse':
+        async with self.uow_factory.create() as uow:
+            try:
+                # 1. Получить дело по ATTORNEY_ID
+                event = await uow.event_repo.get(cmd.event_id)
+
+                if not event:
+                    logger.error(f'Событие по этому ID {cmd.event_id} не найдено.')
+                    raise EntityNotFoundException(f'Событие не найдено.')
+
+                logger.info(f'Событие получен: ID = {cmd.event_id}')
+                return EventResponse.model_validate(event)
+            except Exception as e:
+                logger.error(f'Ошибка при получении события с ID {cmd.event_id}: {e}')
+                raise e
 
 
 class GetEventByAttorneyUseCase:
@@ -27,6 +52,10 @@ class GetEventByAttorneyUseCase:
                 if not event:
                     logger.error(f'События для юриста {cmd.attorney_id} не найдены.')
                     raise EntityNotFoundException(f'События не найдены.')
+
+                logger.info(f'Событие получено: ID = {cmd.attorney_id}')
+                return EventResponse.model_validate(event)
+
             except Exception as e:
                 logger.error(
                     f'Ошибка при получении события с ID {cmd.attorney_id}: {e}'
@@ -50,6 +79,10 @@ class GetEventByCaseUseCase:
                 if not event:
                     logger.error(f'События для дела {cmd.attorney_id} не найдены.')
                     raise EntityNotFoundException(f'События не найдены.')
+
+                logger.info(f'Событие получено: ID = {cmd.case_id}')
+                return EventResponse.model_validate(event)
+
             except Exception as e:
                 logger.error(f'Ошибка при получении события с ID {cmd.case_id}: {e}')
                 raise e

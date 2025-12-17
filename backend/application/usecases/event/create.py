@@ -36,6 +36,8 @@ class CreateEventUseCase:
                     f'Владелец = {saved_event.attorney_id}'
                     f'Назначенное дело = {saved_event.case_id}'
                 )
+                # 4. Возврат Response
+                return EventResponse.model_validate(saved_event)
 
             except (ValidationException, EntityNotFoundException) as e:
                 logger.error(f'Ошибка при создании события: {e}')

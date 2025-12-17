@@ -19,13 +19,17 @@ class CreateEventCommand:
 
 
 @dataclass
-class UpdateEventCommand:
+class GetEventQuery:
     event_id: int
+
+
+@dataclass
+class UpdateEventCommand:
+    case_id: int
     name: Optional[str] = None
     description: Optional[str] = None
-    case_id: int
-    attorney_id: Optional[int] = None
-    description: Optional[str] = None
+
+    # attorney_id: Optional[int] = None
     event_type: Optional[EventType] = None
     event_date: Optional[datetime] = None
 
