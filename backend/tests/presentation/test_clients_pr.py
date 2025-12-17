@@ -2,9 +2,11 @@ import pytest
 from httpx import AsyncClient
 from backend.core.logger import logger
 
+
 class TestCreateClient:
     '''Тесты создания клиента'''
 
+    @pytest.mark.asyncio
     async def test_create_client_success(
         self,
         http_client: AsyncClient,
@@ -21,9 +23,7 @@ class TestCreateClient:
         from backend.infrastructure.redis.keys import RedisKeys
 
         email = register_payload['email']
-        code = await redis_client._client.get(
-            RedisKeys.email_verification_code(email)
-        )
+        code = await redis_client._client.get(RedisKeys.email_verification_code(email))
 
         await http_client.post(
             '/api/v1/auth/verify-email',
@@ -47,13 +47,14 @@ class TestCreateClient:
 
         logger.info(f'[CREATE CLIENT] Status: {create_response.status_code}')
         assert create_response.status_code == 201
-        
+
         data = create_response.json()
         assert data['id'] is not None
         assert data['email'] == client_payload['email']
         assert data['name'] == client_payload['name']
         assert data['type'] == client_payload['type']
 
+    @pytest.mark.asyncio
     async def test_create_client_without_auth(
         self,
         http_client: AsyncClient,
@@ -68,6 +69,7 @@ class TestCreateClient:
 
         assert create_response.status_code == 401
 
+    @pytest.mark.asyncio
     async def test_create_client_invalid_email(
         self,
         http_client: AsyncClient,
@@ -83,9 +85,7 @@ class TestCreateClient:
         from backend.infrastructure.redis.keys import RedisKeys
 
         email = register_payload['email']
-        code = await redis_client._client.get(
-            RedisKeys.email_verification_code(email)
-        )
+        code = await redis_client._client.get(RedisKeys.email_verification_code(email))
 
         await http_client.post(
             '/api/v1/auth/verify-email',
@@ -111,6 +111,7 @@ class TestCreateClient:
 
         assert create_response.status_code == 422
 
+    @pytest.mark.asyncio
     async def test_create_client_duplicate_email(
         self,
         http_client: AsyncClient,
@@ -126,9 +127,7 @@ class TestCreateClient:
         from backend.infrastructure.redis.keys import RedisKeys
 
         email = register_payload['email']
-        code = await redis_client._client.get(
-            RedisKeys.email_verification_code(email)
-        )
+        code = await redis_client._client.get(RedisKeys.email_verification_code(email))
 
         await http_client.post(
             '/api/v1/auth/verify-email',

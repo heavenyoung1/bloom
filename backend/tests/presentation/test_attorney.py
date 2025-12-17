@@ -166,6 +166,7 @@ class TestLoginAttorney:
 
         assert logout_response.status_code == 200
 
+
 class TestResendVerification:
     async def test_resend_verification_success(
         self,
@@ -175,6 +176,7 @@ class TestResendVerification:
         # ======== РЕГИСТРАЦИЯ (email ещё НЕ верифицирован) ========
         from backend.infrastructure.redis.keys import RedisKeys
         from backend.infrastructure.redis.client import redis_client
+
         register_payload = valid_attorney_dto.model_dump()
         r = await http_client.post("/api/v1/auth/register", json=register_payload)
         assert r.status_code == 201, r.text

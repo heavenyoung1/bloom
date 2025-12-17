@@ -12,6 +12,10 @@ from backend.application.dto.client import (
     ClientCreateRequest,
 )
 
+from backend.application.dto.case import (
+    CaseCreateRequest,
+)
+
 
 @pytest.fixture
 async def valid_attorney_dto():
@@ -86,4 +90,15 @@ async def valid_client_dto():
         address='г. Москва, ул. Пушкина, д.1',
         messenger='Telegram',
         messenger_handle='@client123',
+    )
+
+
+@pytest.fixture
+def valid_case_dto():
+    return CaseCreateRequest(
+        name='Спор об имуществе, для теста',
+        attorney_id=1,  # будет переопределен в тестах
+        client_id=1,  # будет переопределен в тестах
+        status='Новое',
+        description='Тестовое описание тестового дела',
     )
