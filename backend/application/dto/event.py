@@ -1,4 +1,4 @@
-from backend.infrastructure.models.event import EventType
+from backend.domain.entities.auxiliary import EventType
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from typing import Optional
@@ -7,7 +7,7 @@ from typing import Optional
 # Если данные не заполнены, будет ошибка валидации.
 
 
-class CreateEventDTO(BaseModel):
+class EventCreateRequest(BaseModel):
     '''DTO для создания события'''
 
     name: str = Field(..., min_length=1, max_length=255)
@@ -30,7 +30,7 @@ class CreateEventDTO(BaseModel):
         }
 
 
-class UpdateEventDTO(BaseModel):
+class EventUpdateRequest(BaseModel):
     '''DTO для обновления события'''
 
     name: Optional[str] = Field(None, min_length=1, max_length=255)
@@ -39,7 +39,7 @@ class UpdateEventDTO(BaseModel):
     event_date: Optional[datetime] = None
 
 
-class EventResponseDTO(BaseModel):
+class EventResponse(BaseModel):
     '''DTO для ответа: полная информация о событии'''
 
     id: int
@@ -55,7 +55,7 @@ class EventResponseDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class EventListItemDTO(BaseModel):
+class EventListGetRequest(BaseModel):
     '''DTO для списка событий'''
 
     id: int

@@ -1,4 +1,4 @@
-from backend.application.dto.client import ClientCreateRequest, ClientResponse
+from backend.application.dto.client import ClientResponse
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.domain.entities.client import Client

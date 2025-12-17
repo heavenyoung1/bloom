@@ -89,6 +89,24 @@ class ClientRepository(IClientRepository):
             logger.error(f'Ошибка БД при получении КЛИЕНТА ID={id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении КЛИЕНТА: {str(e)}')
 
+    async def get_for_case(self, case_id: int) -> List['Client']:
+        try:
+            # 1. Получение записей из базы данных
+            stmt = (
+                select(ClientORM)
+                .where(ClientORM.owner_attorney_id == id)  # Фильтрация по адвокату
+                .order_by(ClientORM.created_at.desc())  # Например, сортировка по дате
+            )
+            result = await self.session.execute(stmt)
+            orm_cases = result.scalars().all()
+
+            # 2. Списковый генератор для всех записей из базы данных
+            return [ClientMapper.to_domain(orm_case) for orm_case in orm_cases]
+
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка БД при получении КЛИЕНТА ID={id}: {e}')
+            raise DatabaseErrorException(f'Ошибка при получении КЛИЕНТА: {str(e)}')
+
     async def update(self, updated_client: Client) -> 'Client':
         try:
             # 1. Выполнение запроса на извлечение данных из БД
