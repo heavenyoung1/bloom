@@ -25,6 +25,7 @@ dependencies = [
     "passlib>=1.7.4",
     "httpx>=0.28.1",
     "anyio>=4.12.0",
+    "ruff>=0.14.9",
 ]
 
 [tool.black]
@@ -39,3 +40,8 @@ max-line-length = 88  # Длина строки для Pylint
 [tool.mypy]
 files = "src"  # Папка с вашим кодом
 disallow_untyped_calls = true  # Запрещает вызовы без типов
+
+[tool.ruff]
+# Включение и отключение определённых проверок
+select = ["E", "F", "W"]  # Ошибки, предупреждения и другие проверки
+ignore = []          # Игнорировать конкретные предупреждения
