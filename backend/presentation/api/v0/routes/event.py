@@ -180,7 +180,7 @@ async def get_events_by_case(
         cmd = GetEventsForCaseQuery(case_id=case_id)
 
         use_case = GetEventByCaseUseCase(uow_factory)
-        result = use_case.execute(cmd)
+        result = await use_case.execute(cmd)
 
         return result if result else []
 
@@ -246,7 +246,7 @@ async def update_event(
 
 # ====== DELETE ======
 @router.delete(
-    '{event_id}',
+    '/{event_id}',
     status_code=status.HTTP_204_NO_CONTENT,
     summary='Удаление события',
     responses={
