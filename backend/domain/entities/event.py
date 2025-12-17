@@ -45,3 +45,6 @@ class Event:
             self.event_type = cmd.event_type
         if cmd.event_date is not None:
             self.event_date = cmd.event_date
+        if cmd.case_id is not None:
+            self.case_id = cmd.case_id
+        

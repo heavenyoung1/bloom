@@ -130,7 +130,7 @@ async def get_event(
     '/attorney/{attorney_id}',
     response_model=List[EventResponse],
     status_code=status.HTTP_200_OK,
-    summary='Получение данных события',
+    summary='Получение данных события по ID юриста',
     responses={
         200: {'description': 'Данные события'},
         401: {'description': 'Требуется авторизация'},
@@ -163,9 +163,9 @@ async def get_events_by_attorney(
 # ====== READ BY CASE ======
 @router.get(
     '/cases/{case_id}',
-    response_model=List['EventResponse'],
+    response_model=List[EventResponse],
     status_code=status.HTTP_200_OK,
-    summary='Получение данных события',
+    summary='Получение данных события по делу',
     responses={
         200: {'description': 'Данные события'},
         401: {'description': 'Требуется авторизация'},

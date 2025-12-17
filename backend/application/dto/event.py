@@ -40,6 +40,17 @@ class EventUpdateRequest(BaseModel):
     event_type: Optional[EventType] = None
     event_date: Optional[datetime] = None
 
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'name': 'Заседание суда повторное',
+                'description': 'Рассмотрение дела по существу, или не по существу',
+                'event_type': 'Судебное заседание',
+                'event_date': '2024-12-15T10:00:00Z',
+                'case_id': 1,
+            }
+        }
+    )
 
 class EventResponse(BaseModel):
     '''DTO для ответа: полная информация о событии'''

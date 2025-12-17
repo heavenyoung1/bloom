@@ -28,7 +28,7 @@ class DeleteEventUseCase:
                     raise EntityNotFoundException(f'События не найдены.')
 
                 # 3. Удалить событие
-                updated_event = await uow.event_repo.delete(event.id)
+                await uow.event_repo.delete(event.id)
 
                 logger.info(f'Событие с ID {cmd.id} удалено.')
                 return True

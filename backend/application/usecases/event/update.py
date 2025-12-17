@@ -24,7 +24,7 @@ class UpdateEventUseCase:
                 event = await uow.event_repo.get(cmd.event_id)
 
                 if not event:
-                    logger.error(f'События для юриста {cmd.attorney_id} не найдены.')
+                    logger.error(f'События для юриста {cmd.event_id} не найдены.')
                     raise EntityNotFoundException(f'События не найдены.')
 
                 # 2. Применяем изменения через метод update доменной сущности
@@ -38,6 +38,6 @@ class UpdateEventUseCase:
 
             except Exception as e:
                 logger.error(
-                    f'Ошибка при получении события с ID {cmd.attorney_id}: {e}'
+                    f'Ошибка при получении события с ID {cmd.event_id}: {e}'
                 )
                 raise e
