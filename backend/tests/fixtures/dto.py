@@ -29,6 +29,7 @@ async def valid_attorney_dto():
         last_name='Петров',
         patronymic='Сергеевич',
         email='ivan@example.com',
+        telegram_username='advokat1234',
         phone='+79991234567',
         password='SecurePass123!',
     )
@@ -66,6 +67,7 @@ async def valid_attorney_dto_second():
         last_name='Иванов',
         patronymic='Дмитриевич',
         email='alexander@example.com',
+        telegram_username='advokat123678',
         phone='+79998887766',
         password='hash232343244',
     )
@@ -79,6 +81,7 @@ async def update_attorney_dto():
         last_name='Петров',
         patronymic='Сергеевич',
         email='ivan12231@example.com',
+        telegram_username='advokat1231425',
         phone='+79991234567',
     )
 
@@ -89,6 +92,7 @@ async def valid_client_dto():
         name='Иванов Иван Иванович',
         type=True,
         email='client@example.com',
+        telegram_username='advweft1234',
         phone='+79991234567',
         personal_info='1212 443443',
         address='г. Москва, ул. Пушкина, д.1',

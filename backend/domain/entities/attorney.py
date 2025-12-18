@@ -11,12 +11,13 @@ class Attorney:
     last_name: str
     patronymic: str
     email: str
-    phone: str
-    hashed_password: str
+    hashed_password: str  # Обязательное поле идёт первым
     is_active: bool
     is_superuser: bool
     is_verified: bool
 
+    phone: Optional[str] = None  # Опциональное поле с дефолтным значением
+    telegram_username: Optional[str] = None  # Опциональное поле с дефолтным значением
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -26,10 +27,11 @@ class Attorney:
         license_id: str,
         first_name: str,
         last_name: str,
-        patronymic: str | None,
+        patronymic: Optional[str] = None,
         email: str,
-        phone: str | None,
         hashed_password: str,
+        phone: Optional[str] = None,
+        telegram_username: Optional[str] = None,
     ) -> 'Attorney':
         return Attorney(
             id=None,
@@ -38,9 +40,10 @@ class Attorney:
             last_name=last_name,
             patronymic=patronymic,
             email=email,
-            phone=phone,
-            hashed_password=hashed_password,
+            hashed_password=hashed_password,  # Обязательное поле идёт первым
             is_active=True,
             is_superuser=False,
             is_verified=False,
+            phone=phone,  # Опциональные поля идут после обязательных
+            telegram_username=telegram_username,
         )

@@ -167,6 +167,7 @@ class AttorneyRepository(IAttorneyRepository):
             orm_attorney.last_name = updated_attorney.last_name
             orm_attorney.patronymic = updated_attorney.patronymic
             orm_attorney.email = updated_attorney.email
+            orm_attorney.telegram_username = updated_attorney.telegram_username
             orm_attorney.phone = updated_attorney.phone
             orm_attorney.hashed_password = updated_attorney.hashed_password
 
