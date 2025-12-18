@@ -35,7 +35,6 @@ class Event:
             attorney_id=attorney_id,
         )
 
-    @staticmethod
     def update(self, cmd: UpdateEventCommand) -> None:
         if cmd.name is not None:
             self.name = cmd.name
@@ -45,5 +44,3 @@ class Event:
             self.event_type = cmd.event_type
         if cmd.event_date is not None:
             self.event_date = cmd.event_date
-        if cmd.case_id is not None:
-            self.case_id = cmd.case_id

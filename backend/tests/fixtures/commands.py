@@ -2,7 +2,10 @@ import pytest
 
 from backend.application.commands.case import CreateCaseCommand, UpdateCaseCommand
 from backend.application.commands.client import CreateClientCommand, UpdateClientCommand
-
+from backend.application.commands.event import (
+    CreateEventCommand,
+    UpdateEventCommand,
+)
 
 @pytest.fixture
 def create_case_command(sample_case_for_verified_attorney):
@@ -55,4 +58,26 @@ def update_client_command(verifiied_persisted_attorney_id):
         messenger='MAX',
         messenger_handle='@GayLeninGuy',
         owner_attorney_id=verifiied_persisted_attorney_id,
+    )
+
+@pytest.fixture
+def create_event_command(persisted_case, persisted_attorney_id, sample_date):
+    return CreateEventCommand(
+        name='Судебное заседание',
+        description='Продолжение суда, перенесенного в прошлый раз.',
+        event_type='Судебное заседание',
+        event_date=sample_date,
+        case_id=persisted_case,
+        attorney_id=persisted_attorney_id,
+    )
+
+@pytest.fixture
+def update_event_command(sample_date):
+    # event_id проставим уже в тесте после создания
+    return UpdateEventCommand(
+        event_id=None,
+        name='Встреча с клиентом',
+        description='',
+        event_type='Встреча',
+        event_date=sample_date,
     )

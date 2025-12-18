@@ -30,11 +30,11 @@ class DeleteEventUseCase:
                 # 3. Удалить событие
                 await uow.event_repo.delete(event.id)
 
-                logger.info(f'Событие с ID {cmd.id} удалено.')
+                logger.info(f'Событие с ID {cmd.event_id} удалено.')
                 return True
 
             except Exception as e:
                 logger.error(
-                    f'Ошибка при получении события с ID {cmd.attorney_id}: {e}'
+                    f'Ошибка при получении события с ID {cmd.event_id}: {e}'
                 )
                 raise e
