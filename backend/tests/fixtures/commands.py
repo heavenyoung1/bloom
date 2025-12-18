@@ -7,6 +7,7 @@ from backend.application.commands.event import (
     UpdateEventCommand,
 )
 
+
 @pytest.fixture
 def create_case_command(sample_case_for_verified_attorney):
     return CreateCaseCommand(
@@ -60,6 +61,7 @@ def update_client_command(verifiied_persisted_attorney_id):
         owner_attorney_id=verifiied_persisted_attorney_id,
     )
 
+
 @pytest.fixture
 def create_event_command(persisted_case, persisted_attorney_id, sample_date):
     return CreateEventCommand(
@@ -70,6 +72,7 @@ def create_event_command(persisted_case, persisted_attorney_id, sample_date):
         case_id=persisted_case,
         attorney_id=persisted_attorney_id,
     )
+
 
 @pytest.fixture
 def update_event_command(sample_date):

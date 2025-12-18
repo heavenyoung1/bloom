@@ -33,7 +33,9 @@ async def test_create_event(test_uow_factory, create_event_command):
 
 
 @pytest.mark.asyncio
-async def test_update_event(test_uow_factory, create_event_command, update_event_command):
+async def test_update_event(
+    test_uow_factory, create_event_command, update_event_command
+):
     # create
     create_use_case = CreateEventUseCase(test_uow_factory)
     created = await create_use_case.execute(create_event_command)
@@ -70,7 +72,9 @@ async def test_get_events_for_attorney(test_uow_factory, create_event_command):
     use_case = CreateEventUseCase(test_uow_factory)
     result = await use_case.execute(create_event_command)
     assert result.id is not None
-    create_event_command.event_date = datetime(2027, 11, 11, 11, 00, tzinfo=timezone.utc)
+    create_event_command.event_date = datetime(
+        2027, 11, 11, 11, 00, tzinfo=timezone.utc
+    )
     create_event_command.name = 'Приговор'
     result = await use_case.execute(create_event_command)
     assert result.id is not None
@@ -84,14 +88,14 @@ async def test_get_events_for_attorney(test_uow_factory, create_event_command):
     assert len(events) >= 2
 
 
-
-
 @pytest.mark.asyncio
 async def test_get_events_for_case(test_uow_factory, create_event_command):
     use_case = CreateEventUseCase(test_uow_factory)
     result = await use_case.execute(create_event_command)
     assert result.id is not None
-    create_event_command.event_date = datetime(2027, 11, 11, 11, 00, tzinfo=timezone.utc)
+    create_event_command.event_date = datetime(
+        2027, 11, 11, 11, 00, tzinfo=timezone.utc
+    )
     create_event_command.name = 'Приговор'
     result = await use_case.execute(create_event_command)
     assert result.id is not None

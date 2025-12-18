@@ -16,6 +16,10 @@ from backend.application.dto.case import (
     CaseCreateRequest,
 )
 
+from backend.application.dto.event import (
+    EventCreateRequest,
+)
+
 
 @pytest.fixture
 async def valid_attorney_dto():
@@ -101,4 +105,16 @@ def valid_case_dto():
         client_id=1,  # будет переопределен в тестах
         status='Новое',
         description='Тестовое описание тестового дела',
+    )
+
+
+@pytest.fixture
+def valid_event_dto(sample_date):
+    return EventCreateRequest(
+        attorney_id=1,
+        case_id=1,
+        description='Рассмотрение дела по существу',
+        event_date=sample_date,
+        event_type='Судебное заседание',
+        name='Заседание суда',
     )

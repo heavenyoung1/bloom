@@ -17,7 +17,7 @@ class TestCreateClient:
         # ======== ПОДГОТОВКА ========
         # Регистрируем и логиним адвоката
         register_payload = valid_attorney_dto.model_dump()
-        await http_client.post('/api/v1/auth/register', json=register_payload)
+        await http_client.post('/api/v0/auth/register', json=register_payload)
 
         from backend.infrastructure.redis.client import redis_client
         from backend.infrastructure.redis.keys import RedisKeys
@@ -26,12 +26,12 @@ class TestCreateClient:
         code = await redis_client._client.get(RedisKeys.email_verification_code(email))
 
         await http_client.post(
-            '/api/v1/auth/verify-email',
+            '/api/v0/auth/verify-email',
             json={'email': email, 'code': code},
         )
 
         login_response = await http_client.post(
-            '/api/v1/auth/login',
+            '/api/v0/auth/login',
             json={'email': email, 'password': register_payload['password']},
         )
 
@@ -40,7 +40,7 @@ class TestCreateClient:
         # ======== СОЗДАНИЕ КЛИЕНТА ========
         client_payload = valid_client_dto.model_dump()
         create_response = await http_client.post(
-            '/api/v1/clients',
+            '/api/v0/clients',
             json=client_payload,
             headers={'Authorization': f'Bearer {access_token}'},
         )
@@ -63,7 +63,7 @@ class TestCreateClient:
         '''Создание клиента без авторизации должно вернуть 401'''
         client_payload = valid_client_dto.model_dump()
         create_response = await http_client.post(
-            '/api/v1/clients',
+            '/api/v0/clients',
             json=client_payload,
         )
 
@@ -79,7 +79,7 @@ class TestCreateClient:
         '''Создание клиента с невалидным email'''
         # ======== SETUP ATTORNEY ========
         register_payload = valid_attorney_dto.model_dump()
-        await http_client.post('/api/v1/auth/register', json=register_payload)
+        await http_client.post('/api/v0/auth/register', json=register_payload)
 
         from backend.infrastructure.redis.client import redis_client
         from backend.infrastructure.redis.keys import RedisKeys
@@ -88,12 +88,12 @@ class TestCreateClient:
         code = await redis_client._client.get(RedisKeys.email_verification_code(email))
 
         await http_client.post(
-            '/api/v1/auth/verify-email',
+            '/api/v0/auth/verify-email',
             json={'email': email, 'code': code},
         )
 
         login_response = await http_client.post(
-            '/api/v1/auth/login',
+            '/api/v0/auth/login',
             json={'email': email, 'password': register_payload['password']},
         )
 
@@ -104,7 +104,7 @@ class TestCreateClient:
         client_payload['email'] = 'invalid-email'
 
         create_response = await http_client.post(
-            '/api/v1/clients',
+            '/api/v0/clients',
             json=client_payload,
             headers={'Authorization': f'Bearer {access_token}'},
         )
@@ -121,7 +121,7 @@ class TestCreateClient:
         '''Создание клиента с duplicate email'''
         # ======== SETUP ATTORNEY ========
         register_payload = valid_attorney_dto.model_dump()
-        await http_client.post('/api/v1/auth/register', json=register_payload)
+        await http_client.post('/api/v0/auth/register', json=register_payload)
 
         from backend.infrastructure.redis.client import redis_client
         from backend.infrastructure.redis.keys import RedisKeys
@@ -130,12 +130,12 @@ class TestCreateClient:
         code = await redis_client._client.get(RedisKeys.email_verification_code(email))
 
         await http_client.post(
-            '/api/v1/auth/verify-email',
+            '/api/v0/auth/verify-email',
             json={'email': email, 'code': code},
         )
 
         login_response = await http_client.post(
-            '/api/v1/auth/login',
+            '/api/v0/auth/login',
             json={'email': email, 'password': register_payload['password']},
         )
 
@@ -144,7 +144,7 @@ class TestCreateClient:
         # ======== CREATE FIRST CLIENT ========
         client_payload = valid_client_dto.model_dump()
         create_response = await http_client.post(
-            '/api/v1/clients',
+            '/api/v0/clients',
             json=client_payload,
             headers={'Authorization': f'Bearer {access_token}'},
         )
@@ -153,7 +153,7 @@ class TestCreateClient:
 
         # ======== CREATE DUPLICATE ========
         create_duplicate = await http_client.post(
-            '/api/v1/clients',
+            '/api/v0/clients',
             json=client_payload,
             headers={'Authorization': f'Bearer {access_token}'},
         )

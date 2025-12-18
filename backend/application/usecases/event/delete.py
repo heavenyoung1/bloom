@@ -34,7 +34,5 @@ class DeleteEventUseCase:
                 return True
 
             except Exception as e:
-                logger.error(
-                    f'Ошибка при получении события с ID {cmd.event_id}: {e}'
-                )
+                logger.error(f'Ошибка при получении события с ID {cmd.event_id}: {e}')
                 raise e

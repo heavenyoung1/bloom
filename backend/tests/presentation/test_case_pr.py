@@ -19,7 +19,7 @@ class TestCreateCase:
         # Регистрируем и логиним адвоката
         register_payload = valid_attorney_dto.model_dump()
         register_response = await http_client.post(
-            '/api/v1/auth/register', json=register_payload
+            '/api/v0/auth/register', json=register_payload
         )
         attorney_id = register_response.json()['id']
         from backend.infrastructure.redis.client import redis_client
@@ -29,12 +29,12 @@ class TestCreateCase:
         code = await redis_client._client.get(RedisKeys.email_verification_code(email))
 
         await http_client.post(
-            '/api/v1/auth/verify-email',
+            '/api/v0/auth/verify-email',
             json={'email': email, 'code': code},
         )
 
         login_response = await http_client.post(
-            '/api/v1/auth/login',
+            '/api/v0/auth/login',
             json={'email': email, 'password': register_payload['password']},
         )
 
@@ -43,7 +43,7 @@ class TestCreateCase:
         # ======== СОЗДАНИЕ КЛИЕНТА ========
         client_payload = valid_client_dto.model_dump()
         create_response = await http_client.post(
-            '/api/v1/clients',
+            '/api/v0/clients',
             json=client_payload,
             headers={'Authorization': f'Bearer {access_token}'},
         )
@@ -57,12 +57,13 @@ class TestCreateCase:
         assert data['email'] == client_payload['email']
         assert data['name'] == client_payload['name']
         assert data['type'] == client_payload['type']
+
         # ======== СОЗДАНИЕ ДЕЛА ========
         valid_case_dto.attorney_id = attorney_id
         valid_case_dto.client_id = client_id
         case_payload = valid_case_dto.model_dump()
         create_case_response = await http_client.post(
-            '/api/v1/cases',
+            '/api/v0/cases',
             json=case_payload,
             headers={'Authorization': f'Bearer {access_token}'},
         )
@@ -91,7 +92,7 @@ class TestFullCase:
         # Регистрируем и логиним адвоката
         register_payload = valid_attorney_dto.model_dump()
         register_response = await http_client.post(
-            '/api/v1/auth/register', json=register_payload
+            '/api/v0/auth/register', json=register_payload
         )
         attorney_id = register_response.json()['id']
         from backend.infrastructure.redis.client import redis_client
@@ -101,12 +102,12 @@ class TestFullCase:
         code = await redis_client._client.get(RedisKeys.email_verification_code(email))
 
         await http_client.post(
-            '/api/v1/auth/verify-email',
+            '/api/v0/auth/verify-email',
             json={'email': email, 'code': code},
         )
 
         login_response = await http_client.post(
-            '/api/v1/auth/login',
+            '/api/v0/auth/login',
             json={'email': email, 'password': register_payload['password']},
         )
 
@@ -115,7 +116,7 @@ class TestFullCase:
         # ======== СОЗДАНИЕ КЛИЕНТА ========
         client_payload = valid_client_dto.model_dump()
         create_response = await http_client.post(
-            '/api/v1/clients',
+            '/api/v0/clients',
             json=client_payload,
             headers={'Authorization': f'Bearer {access_token}'},
         )
@@ -135,7 +136,7 @@ class TestFullCase:
         valid_case_dto.client_id = client_id
         case_payload = valid_case_dto.model_dump()
         create_case_response = await http_client.post(
-            '/api/v1/cases',
+            '/api/v0/cases',
             json=case_payload,
             headers={'Authorization': f'Bearer {access_token}'},
         )
@@ -152,7 +153,7 @@ class TestFullCase:
 
         # ======== ПОЛУЧЕНИЕ ДЕЛА ========
         get_response = await http_client.get(
-            f'/api/v1/cases/{case_id}',
+            f'/api/v0/cases/{case_id}',
             headers={'Authorization': f'Bearer {access_token}'},
         )
 
@@ -169,7 +170,7 @@ class TestFullCase:
         update_payload['description'] = 'Обновленное описание уголовного дела для теста'
 
         update_case_response = await http_client.put(
-            f'/api/v1/cases/{case_id}',
+            f'/api/v0/cases/{case_id}',
             json=update_payload,
             headers={'Authorization': f'Bearer {access_token}'},
         )
@@ -183,7 +184,7 @@ class TestFullCase:
 
         # ======== УДАЛЕНИЕ ДЕЛА ========
         delete_case_response = await http_client.delete(
-            f'/api/v1/cases/{case_id}',
+            f'/api/v0/cases/{case_id}',
             headers={'Authorization': f'Bearer {access_token}'},
         )
 
@@ -191,7 +192,7 @@ class TestFullCase:
 
         # ======== VERIFY DELETION ========
         get_response = await http_client.get(
-            f'/api/v1/cases/{case_id}',
+            f'/api/v0/cases/{case_id}',
             headers={'Authorization': f'Bearer {access_token}'},
         )
         assert get_response.status_code == 404

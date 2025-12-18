@@ -41,7 +41,7 @@ router = APIRouter(prefix='/api/v0', tags=['events'])
 
 # ====== CREATE ======
 @router.post(
-    '/',
+    '/events',
     response_model=EventResponse,
     status_code=status.HTTP_201_CREATED,
     summary='Создание нового события',

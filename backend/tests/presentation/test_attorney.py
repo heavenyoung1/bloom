@@ -18,7 +18,7 @@ class TestRegisterAttorney:
         '''Успешная регистрация адвоката'''
         register_payload = valid_attorney_dto.model_dump()
         register_response = await http_client.post(
-            '/api/v1/auth/register',
+            '/api/v0/auth/register',
             json=register_payload,
         )
         # Ожидаем успех или ошибку валидации/дублирования
@@ -45,7 +45,7 @@ class TestLoginAttorney:
         # ======== РЕГИСТРАЦИЯ ========
         register_payload = valid_attorney_dto.model_dump()
         register_response = await http_client.post(
-            '/api/v1/auth/register',
+            '/api/v0/auth/register',
             json=register_payload,
         )
         assert register_response.status_code in [201, 400]
@@ -71,7 +71,7 @@ class TestLoginAttorney:
         assert verification_code is not None, f'Код верификации не найден для {email}'
 
         verify_response = await http_client.post(
-            '/api/v1/auth/verify-email',
+            '/api/v0/auth/verify-email',
             json={
                 'email': email,
                 'code': verification_code,
@@ -85,7 +85,7 @@ class TestLoginAttorney:
         # ======== АВТОРИЗАЦИЯ ========
         login_payload = valid_login_attorney_dto.model_dump()
         login_response = await http_client.post(
-            '/api/v1/auth/login',
+            '/api/v0/auth/login',
             json=login_payload,
         )
 
@@ -107,7 +107,7 @@ class TestLoginAttorney:
     ):
         # ===== REGISTER =====
         payload = valid_attorney_dto.model_dump()
-        await http_client.post('/api/v1/auth/register', json=payload)
+        await http_client.post('/api/v0/auth/register', json=payload)
 
         from backend.infrastructure.redis.client import redis_client
         from backend.infrastructure.redis.keys import RedisKeys
@@ -120,7 +120,7 @@ class TestLoginAttorney:
 
         # ===== RESEND =====
         resend_response = await http_client.post(
-            '/api/v1/auth/resend-verification',
+            '/api/v0/auth/resend-verification',
             json={'email': email},
         )
 
@@ -137,7 +137,7 @@ class TestLoginAttorney:
     ):
         # ===== REGISTER → VERIFY → LOGIN =====
         payload = valid_attorney_dto.model_dump()
-        await http_client.post('/api/v1/auth/register', json=payload)
+        await http_client.post('/api/v0/auth/register', json=payload)
 
         from backend.infrastructure.redis.client import redis_client
         from backend.infrastructure.redis.keys import RedisKeys
@@ -146,12 +146,12 @@ class TestLoginAttorney:
         code = await redis_client._client.get(RedisKeys.email_verification_code(email))
 
         await http_client.post(
-            '/api/v1/auth/verify-email',
+            '/api/v0/auth/verify-email',
             json={'email': email, 'code': code},
         )
 
         login_response = await http_client.post(
-            '/api/v1/auth/login',
+            '/api/v0/auth/login',
             json={'email': email, 'password': payload['password']},
         )
 
@@ -160,7 +160,7 @@ class TestLoginAttorney:
 
         # ===== LOGOUT =====
         logout_response = await http_client.post(
-            '/api/v1/auth/logout',
+            '/api/v0/auth/logout',
             headers={'Authorization': f'Bearer {access_token}'},
         )
 
@@ -178,7 +178,7 @@ class TestResendVerification:
         from backend.infrastructure.redis.client import redis_client
 
         register_payload = valid_attorney_dto.model_dump()
-        r = await http_client.post("/api/v1/auth/register", json=register_payload)
+        r = await http_client.post("/api/v0/auth/register", json=register_payload)
         assert r.status_code == 201, r.text
 
         email = register_payload["email"]
@@ -189,7 +189,7 @@ class TestResendVerification:
 
         # ======== RESEND ========
         resend_response = await http_client.post(
-            "/api/v1/auth/resend-verification",
+            "/api/v0/auth/resend-verification",
             json={"email": email},
         )
         assert resend_response.status_code == 200, resend_response.text

@@ -35,7 +35,7 @@ from backend.application.dto.case import (
 )
 
 # ========== Router ==========
-router = APIRouter(prefix='/api/v1', tags=['cases'])
+router = APIRouter(prefix='/api/v0', tags=['cases'])
 
 # ========== CASE ENDPOINTS ==========
 
