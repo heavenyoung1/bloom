@@ -60,12 +60,12 @@ async def session(SessionLocal):
     Все изменения будут откатываться после выполнения теста.
     '''
     async with SessionLocal() as sess:
-        logger.info(f'SessionLocal() BEGIN')
-        await sess.begin()  # ← начинаем транзакцию
+        logger.debug(f'SessionLocal() BEGIN')
+        await sess.begin()  # начинаем транзакцию
         try:
-            logger.info(f'YIELD SESSION')
+            logger.debug(f'YIELD SESSION')
             yield sess
         finally:
-            logger.info(f'ROLLBACK РАБОТАЕТ??')
+            logger.debug(f'Выполнение Rollback')
             await sess.rollback()  # ← откатываем
             # ← НИКАКОГО close()!

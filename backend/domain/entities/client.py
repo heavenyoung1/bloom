@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from backend.infrastructure.models.client import Messenger
+from backend.domain.entities.auxiliary import Messenger
 from backend.application.commands.client import UpdateClientCommand
 
 

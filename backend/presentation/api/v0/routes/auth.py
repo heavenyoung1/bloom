@@ -36,7 +36,7 @@ from backend.application.dto.attorney import (
 from backend.core.logger import logger
 
 
-router = APIRouter(prefix='/api/v1/auth', tags=['auth'])
+router = APIRouter(prefix='/api/v0/auth', tags=['auth'])
 
 # ========== REGISTRATION ==========
 

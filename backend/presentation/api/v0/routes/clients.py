@@ -43,7 +43,7 @@ from backend.application.dto.client import (
 
 
 # ========== Router ==========
-router = APIRouter(prefix='/api/v1', tags=['clients'])
+router = APIRouter(prefix='/api/v0', tags=['clients'])
 
 
 # ========== CLIENT ENDPOINTS ==========

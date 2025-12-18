@@ -1,6 +1,6 @@
 import pytest
 from backend.domain.entities.case import Case
-from backend.core import logger
+from backend.core.logger import logger
 from backend.core.exceptions import (
     DatabaseErrorException,
 )

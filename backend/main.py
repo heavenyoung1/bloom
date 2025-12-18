@@ -5,9 +5,11 @@ from contextlib import asynccontextmanager
 from backend.core.logger import logger
 from backend.core.db.database import database
 from backend.infrastructure.redis.client import redis_client
+
 from backend.presentation.api.v0.routes.auth import router as auth_router
 from backend.presentation.api.v0.routes.clients import router as client_router
 from backend.presentation.api.v0.routes.case import router as case_router
+from backend.presentation.api.v0.routes.event import router as event_router
 
 
 @asynccontextmanager
@@ -72,6 +74,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(client_router)
 app.include_router(case_router)
+app.include_router(event_router)
 
 
 # Health check endpoints

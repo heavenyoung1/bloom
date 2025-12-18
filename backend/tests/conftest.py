@@ -4,6 +4,7 @@ from backend.tests.fixtures.fixed_data import *
 from backend.tests.fixtures.repositories import *
 from backend.tests.fixtures.attorneys import *
 from backend.tests.fixtures.cases import *
+from backend.tests.fixtures.events import *
 from backend.tests.fixtures.contacts import *
 from backend.tests.fixtures.clients import *
 from backend.tests.fixtures.documents import *
@@ -14,6 +15,8 @@ from backend.tests.fixtures.services import *
 from backend.tests.fixtures.uow import *
 from backend.tests.fixtures.settings import *
 from backend.tests.fixtures.commands import *
+from backend.tests.fixtures.http_client import *
+from backend.tests.fixtures.redis import *
 
 
 def pytest_configure(config):

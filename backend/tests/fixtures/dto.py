@@ -3,11 +3,21 @@ import pytest
 from backend.application.dto.attorney import (
     RegisterRequest,
     UpdateRequest,
+    VerifyEmailRequest,
     AttorneyResponse,
+    LoginRequest,
 )
 
 from backend.application.dto.client import (
     ClientCreateRequest,
+)
+
+from backend.application.dto.case import (
+    CaseCreateRequest,
+)
+
+from backend.application.dto.event import (
+    EventCreateRequest,
 )
 
 
@@ -21,6 +31,30 @@ async def valid_attorney_dto():
         email='ivan@example.com',
         phone='+79991234567',
         password='SecurePass123!',
+    )
+
+
+@pytest.fixture
+async def valid_login_attorney_dto():
+    return LoginRequest(
+        email='ivan@example.com',
+        password='SecurePass123!',
+    )
+
+
+@pytest.fixture
+async def valid_verification_attorney_dto(code: str):
+    return VerifyEmailRequest(
+        email='ivan@example.com',
+        code=code,
+    )
+
+
+@pytest.fixture
+async def invalid_login_attorney_dto():
+    return LoginRequest(
+        email='ivan666@example.com',
+        password='SecurePass1235!',
     )
 
 
@@ -60,4 +94,27 @@ async def valid_client_dto():
         address='г. Москва, ул. Пушкина, д.1',
         messenger='Telegram',
         messenger_handle='@client123',
+    )
+
+
+@pytest.fixture
+def valid_case_dto():
+    return CaseCreateRequest(
+        name='Спор об имуществе, для теста',
+        attorney_id=1,  # будет переопределен в тестах
+        client_id=1,  # будет переопределен в тестах
+        status='Новое',
+        description='Тестовое описание тестового дела',
+    )
+
+
+@pytest.fixture
+def valid_event_dto(sample_date):
+    return EventCreateRequest(
+        attorney_id=1,
+        case_id=1,
+        description='Рассмотрение дела по существу',
+        event_date=sample_date,
+        event_type='Судебное заседание',
+        name='Заседание суда',
     )
