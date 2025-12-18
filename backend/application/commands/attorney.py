@@ -12,10 +12,14 @@ class RegisterAttorneyCommand:
     license_id: str
     first_name: str
     last_name: str
-    patronymic: Optional[str]
+
     email: str
-    phone: Optional[str]
     password: str  # plaintext, будет захеширован в UseCase
+
+    patronymic: Optional[str] = None
+    telegram_username: Optional[str] = None
+    phone: Optional[str] = None
+
 
 
 @dataclass
@@ -69,6 +73,8 @@ class UpdateAttorneyCommand:
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     patronymic: Optional[str] = None
+    telegram_username: Optional[str] = None
+    email: Optional[str] = None
     phone: Optional[str] = None
     license_id: Optional[str] = None
 

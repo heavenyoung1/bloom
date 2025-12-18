@@ -15,6 +15,7 @@ class RegisterRequest(BaseUserCreate):
     license_id: str = Field(
         ..., min_length=3, max_length=12, description='Номер удостоверения'
     )
+    telegram_username: str = Field(min_length=4, max_length=50, description='Telegram никнейм')
     first_name: str = Field(..., min_length=2, max_length=50, description='Имя')
     last_name: str = Field(..., min_length=3, max_length=50, description='Фамилия')
     patronymic: str = Field(..., min_length=3, max_length=20, description='Отчество')
@@ -38,6 +39,7 @@ class RegisterRequest(BaseUserCreate):
                 'last_name': 'Петров',
                 'patronymic': 'Сергеевич',
                 'email': 'ivan@example.com',
+                'telegram_username': 'advokat1234',
                 'phone': '+79991234567',
                 'password': 'SecurePass123!',
             }
@@ -53,6 +55,7 @@ class AttorneyResponse(BaseUser[int]):
     last_name: str
     patronymic: str
     phone: str
+    telegram_username: Optional[str]
     created_at: Optional[datetime]  # ✅ Не Optional (БД гарантирует значение)
     updated_at: Optional[datetime]  # ✅ Не Optional
 
@@ -62,6 +65,7 @@ class AttorneyResponse(BaseUser[int]):
             'example': {
                 'id': 123,
                 'email': 'ivan@example.com',
+                'telegram_username': 'advokat1234',
                 'license_id': '153/3232',
                 'first_name': 'Иван',
                 'last_name': 'Петров',
@@ -85,6 +89,7 @@ class UpdateRequest(BaseUserUpdate):
     last_name: Optional[str] = Field(default=None, min_length=3, max_length=20)
     patronymic: Optional[str] = Field(default=None, min_length=3, max_length=20)
     email: Optional[EmailStr] = Field(default=None)
+    telegram_username: Optional[str] = Field(default=None)
     phone: Optional[str] = Field(default=None, pattern=r'^\+7\d{10}$')
 
     model_config = ConfigDict(
@@ -95,6 +100,7 @@ class UpdateRequest(BaseUserUpdate):
                 'last_name': 'Петров',
                 'patronymic': 'Сергеевич',
                 'email': 'ivan@example.com',
+                'telegram_username': 'advokat1234',
                 'phone': '+79991234567',
             }
         }
