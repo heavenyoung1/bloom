@@ -27,8 +27,8 @@ class GetEventQuery:
 
 @dataclass
 class UpdateEventCommand:
-    #event_id: int
-    #case_id: int
+    event_id: int
+    # case_id: int
     name: Optional[str] = None
     description: Optional[str] = None
 

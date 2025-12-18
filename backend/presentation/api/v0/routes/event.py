@@ -209,7 +209,7 @@ async def get_events_by_case(
     },
 )
 async def update_event(
-    event_id: int,  # ТУТ ЧЕРЕЗ CMD ИЛИ ПРЯМО ТАК ПЕРЕДАТЬ?
+    event_id: int,
     request: EventUpdateRequest,
     current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
@@ -222,10 +222,9 @@ async def update_event(
     '''
     try:
         cmd = UpdateEventCommand(
-            event_id=event_id,  # ХМ????
+            event_id=event_id,
             name=request.name,
             description=request.description,
-            case_id=request.case_id,
             event_type=request.event_type,
             event_date=request.event_date,
         )

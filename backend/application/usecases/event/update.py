@@ -37,7 +37,5 @@ class UpdateEventUseCase:
                 return EventResponse.model_validate(updated_event)
 
             except Exception as e:
-                logger.error(
-                    f'Ошибка при получении события с ID {cmd.event_id}: {e}'
-                )
+                logger.error(f'Ошибка при получении события с ID {cmd.event_id}: {e}')
                 raise e

@@ -12,4 +12,4 @@ def fixed_now():
 
 @pytest.fixture
 def sample_date():
-    event_date = datetime(2026, 11, 11, 11, 00, tzinfo=MOSCOW)
+    return datetime(2026, 11, 11, 11, 00, tzinfo=MOSCOW)

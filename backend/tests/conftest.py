@@ -4,6 +4,7 @@ from backend.tests.fixtures.fixed_data import *
 from backend.tests.fixtures.repositories import *
 from backend.tests.fixtures.attorneys import *
 from backend.tests.fixtures.cases import *
+from backend.tests.fixtures.events import *
 from backend.tests.fixtures.contacts import *
 from backend.tests.fixtures.clients import *
 from backend.tests.fixtures.documents import *
