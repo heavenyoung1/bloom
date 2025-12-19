@@ -37,11 +37,14 @@ class AttorneyRepository(IAttorneyRepository):
             # 2. Добавление в сессию
             self.session.add(orm_attorney)
 
-            # 3. flush() — отправляем в БД, получаем ID
+            # 3. flush() — отправляем в БД, получаем ID и timestamps
             await self.session.flush()
-
-            # 4. Обновляем ID в доменном объекте
+            
+            # 4. Обновляем ID и timestamps в доменном объекте
+            # (после flush() ORM объект уже имеет установленные created_at и updated_at)
             attorney.id = orm_attorney.id
+            attorney.created_at = orm_attorney.created_at
+            attorney.updated_at = orm_attorney.updated_at
 
             logger.info(f'ЮРИСТ сохранен. ID - {attorney.id}')
             return attorney

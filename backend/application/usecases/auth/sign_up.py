@@ -71,4 +71,19 @@ class SignUpUseCase:
             f'(ID: {attorney.id}). Ожидание верификации...'
         )
 
-        return AttorneyResponse.model_validate(attorney)
+        # Создаем DTO напрямую из доменной сущности (быстрее чем model_validate)
+        return AttorneyResponse(
+            id=attorney.id,
+            email=attorney.email,
+            is_active=attorney.is_active,
+            is_superuser=attorney.is_superuser,
+            is_verified=attorney.is_verified,
+            license_id=attorney.license_id,
+            first_name=attorney.first_name,
+            last_name=attorney.last_name,
+            patronymic=attorney.patronymic,
+            phone=attorney.phone,
+            telegram_username=attorney.telegram_username,
+            created_at=attorney.created_at,
+            updated_at=attorney.updated_at,
+        )
