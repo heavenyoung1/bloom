@@ -5,6 +5,7 @@ from backend.infrastructure.models.client import ClientORM
 from backend.infrastructure.models.contact import ContactORM
 from backend.infrastructure.models.document import DocumentORM
 from backend.infrastructure.models.event import EventORM
+from backend.infrastructure.models.outbox import OutboxORM
 from backend.infrastructure.models.mixins import TimeStampMixin
 
 
@@ -19,6 +20,7 @@ __all__ = [
     'CaseORM',
     'DocumentORM',
     'EventORM',
+    'OutboxORM',
     'TimeStampMixin',
     #    'PaymentORM',
     #    'SubscriptionORM',

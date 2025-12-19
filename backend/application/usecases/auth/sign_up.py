@@ -1,6 +1,9 @@
+from datetime import datetime, timezone
 from backend.infrastructure.repositories.attorney_repo import AttorneyRepository
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.domain.entities.attorney import Attorney
+from backend.domain.events.attorney_registered import AttorneyRegisteredEvent
+from backend.infrastructure.models.outbox import OutboxEventType
 from backend.core.security import SecurityService
 from backend.application.policy.attorney_policy import AttorneyPolicy
 from backend.core.exceptions import ValidationException, EntityNotFoundException
@@ -52,6 +55,24 @@ class SignUpUseCase:
 
                 # 4. Сохранить в БД
                 attorney = await uow.attorney_repo.save(attorney)
+
+                # 5. Создать доменное событие и сохранить в Outbox
+                # (в той же транзакции для гарантии доставки)
+                event = AttorneyRegisteredEvent(
+                    attorney_id=attorney.id,
+                    email=attorney.email,
+                    first_name=attorney.first_name,
+                    occurred_at=datetime.now(timezone.utc),
+                )
+                
+                await uow.outbox_repo.save_event(
+                    event_type=OutboxEventType.ATTORNEY_REGISTERED.value,
+                    payload=event.to_dict(),
+                )
+                
+                logger.info(
+                    f'[OUTBOX] Событие регистрации сохранено для {attorney.email}'
+                )
 
             except (ValidationException, EntityNotFoundException) as e:
                 logger.error(f'Ошибка валидации при регистрации: {e}')

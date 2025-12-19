@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.usecases.auth.sign_in import SignInUseCase
 from backend.application.usecases.auth.sign_up import SignUpUseCase
@@ -14,7 +14,6 @@ from backend.core.dependencies import (
 )
 from backend.application.usecases.auth.sign_in import SignInUseCase
 from backend.application.usecases.auth.sign_out import SignOutUseCase
-from backend.application.services.verification_service import VerificationService
 
 from backend.application.commands.attorney import (
     RegisterAttorneyCommand,
@@ -54,7 +53,6 @@ router = APIRouter(prefix='/api/v0/auth', tags=['auth'])
 )
 async def register(
     request: RegisterRequest,
-    background_tasks: BackgroundTasks,
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     '''
@@ -63,7 +61,9 @@ async def register(
     Flow:
     1. Валидация данных
     2. Создание адвоката
-    3. Отправка кода верификации на email (в фоне)
+    3. Сохранение события в Outbox (для асинхронной отправки email)
+    
+    Отправка email происходит через Outbox воркер (гарантированная доставка).
     '''
     logger.info(f'Попытка регистрации: {request.email}')
 
@@ -79,15 +79,9 @@ async def register(
     )
 
     # 2. Создаем UseCase и выполняем
+    # UseCase сам сохранит событие в Outbox в той же транзакции
     use_case = SignUpUseCase(uow_factory)
     result = await use_case.execute(cmd)
-
-    # 3. Отправляем email в фоне (не блокирует ответ)
-    background_tasks.add_task(
-        VerificationService.send_verification_code,
-        email=request.email,
-        first_name=request.first_name,
-    )
 
     logger.info(f'Адвокат успешно зарегистрирован: {request.email}')
     return result

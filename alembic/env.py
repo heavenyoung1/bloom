@@ -16,6 +16,7 @@ from backend.infrastructure.models.case import CaseORM
 from backend.infrastructure.models.contact import ContactORM
 from backend.infrastructure.models.document import DocumentORM
 from backend.infrastructure.models.event import EventORM
+from backend.infrastructure.models.outbox import OutboxORM
 
 # === Настройка ===
 config = context.config
