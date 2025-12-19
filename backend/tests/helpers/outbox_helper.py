@@ -1,23 +1,32 @@
 """Утилиты для работы с Outbox в тестах."""
 
 import json
-from backend.core.db.database import database
+from typing import Optional
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.infrastructure.models.outbox import OutboxEventType
 from backend.application.services.verification_service import VerificationService
 
 
-async def process_outbox_events():
+async def process_outbox_events(uow_factory: Optional[UnitOfWorkFactory] = None):
     """
     Обработать все pending события из Outbox синхронно.
     
     Используется в тестах для имитации работы воркера.
+    
+    Args:
+        uow_factory: Фабрика UnitOfWork (если None, будет использована из database)
     """
-    uow_factory = UnitOfWorkFactory(database)
+    # Если фабрика не передана, используем из database (для интеграционных тестов)
+    if uow_factory is None:
+        from backend.core.db.database import database
+        uow_factory = UnitOfWorkFactory(database)
     
     async with uow_factory.create() as uow:
         # Получаем все pending события
         events = await uow.outbox_repo.get_pending_events(limit=100)
+        
+        if not events:
+            return
         
         for event in events:
             try:
