@@ -3,9 +3,6 @@ from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.domain.entities.attorney import Attorney
 from backend.core.security import SecurityService
 from backend.application.policy.attorney_policy import AttorneyPolicy
-from backend.application.services.verification_service import VerificationService
-from backend.infrastructure.redis.client import redis_client
-from backend.infrastructure.redis.keys import RedisKeys
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.application.commands.attorney import RegisterAttorneyCommand
 
@@ -32,7 +29,6 @@ class SignUpUseCase:
         2. Захешировать пароль
         3. Создать Entity
         4. Сохранить в БД
-        5. Отправить код верификации
         '''
         async with self.uow_factory.create() as uow:
             try:
@@ -60,11 +56,6 @@ class SignUpUseCase:
             except (ValidationException, EntityNotFoundException) as e:
                 logger.error(f'Ошибка валидации при регистрации: {e}')
                 raise
-
-        # 5. Отправить код верификации (вне транзакции)
-        await VerificationService.send_verification_code(
-            email=cmd.email, first_name=cmd.first_name
-        )
 
         logger.info(
             f'Юрист зарегистрирован: {attorney.email} '
