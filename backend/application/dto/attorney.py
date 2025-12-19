@@ -211,15 +211,43 @@ class ChangePasswordDTO(BaseModel):
         }
     )
 
-
-class ResetPasswordRequestDTO(BaseModel):
-    '''DTO для запроса сброса пароля через email'''
-
-    email: EmailStr
+# class ResetPasswordRequest(BaseModel):
+#     '''DTO для запроса сброса пароля через email'''
+#     email: EmailStr
 
 
 class ResetPasswordConfirmDTO(BaseModel):
     '''DTO для подтверждения сброса пароля'''
-
     token: str = Field(..., description='Токен из письма')
     new_password: str = Field(..., min_length=8, description='Новый пароль')
+
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'email': 'ivan@example.com',
+            }
+        }
+    )
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(min_length=4, max_length=12)
+    new_password: str = Field(min_length=8, max_length=128)
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'email': 'ivan@example.com',
+                'code': '000000',
+                'new_password': 'Sobaka1234%'
+            }
+        }
+    )
+
+class PasswordResetResponse(BaseModel):
+    ok: bool = True

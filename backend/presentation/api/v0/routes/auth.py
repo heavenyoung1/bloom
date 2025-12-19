@@ -6,6 +6,9 @@ from backend.application.usecases.auth.verify_email import VerifyEmailUseCase
 from backend.application.usecases.auth.resend_verification import (
     ResendVerificationUseCase,
 )
+from backend.application.usecases.auth.forgot_password import ForgotPasswordUseCase
+from backend.application.usecases.auth.reset_password import ResetPasswordUseCase
+from backend.application.services.token_management_service import TokenManagementService
 
 from backend.core.dependencies import (
     get_uow_factory,
@@ -20,6 +23,8 @@ from backend.application.commands.attorney import (
     LoginAttorneyCommand,
     VerifyEmailCommand,
     ResendVerificationCommand,
+    ForgotPasswordCommand,
+    ResetPasswordCommand,
 )
 
 # from backend.application.services.auth_service import AuthService
@@ -32,6 +37,9 @@ from backend.application.dto.attorney import (
     TokenResponse,
     VerifyEmailRequest,
     ResendVerificationRequest,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+    PasswordResetResponse,
 )
 from backend.core.logger import logger
 
@@ -244,4 +252,61 @@ async def resend_verification(
     result = await use_case.execute(cmd)
 
     logger.info(f'Код повторно отправлен: {request.email}')
+    return result
+
+@router.post(
+    '/forgot-password',
+    status_code=status.HTTP_200_OK,
+    summary='Отправка кода верификации для сброса пароля ',
+    responses={
+        200: {'description': 'Код отправлен на email'},
+        400: {'description': 'Email не найден'},
+    },
+)
+async def forgot_password(
+    request: ForgotPasswordRequest,
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    logger.info(f'Отправка кода для сброса пароля: {request.email}')
+
+    # 1. Парсим request в Command
+    cmd = ForgotPasswordCommand(email=request.email)
+
+    # 2. Создаем UseCase и выполняем
+    token_service = TokenManagementService()
+    use_case = ForgotPasswordUseCase(uow_factory, token_service)
+    await use_case.execute(cmd)
+
+    logger.info(f'Код отправлен: {request.email}')
+    return {'ok': True}
+
+@router.post(
+    '/reset-password',
+    response_model=PasswordResetResponse,
+    status_code=status.HTTP_200_OK,
+    summary='Сброс пароля по коду верификации',
+    responses={
+        200: {'description': 'Пароль успешно сброшен'},
+        400: {'description': 'Неверный код или email не найден'},
+    },
+)
+async def reset_password(
+    request: ResetPasswordRequest,
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    logger.info(f'Сброс пароля для: {request.email}')
+
+    # 1. Парсим request в Command
+    cmd = ResetPasswordCommand(
+        email=request.email,
+        code=request.code,
+        new_password=request.new_password
+    )
+
+    # 2. Создаем UseCase и выполняем
+    token_service = TokenManagementService()
+    use_case = ResetPasswordUseCase(uow_factory, token_service)
+    result = await use_case.execute(cmd)
+
+    logger.info(f'Пароль сброшен: {request.email}')
     return result

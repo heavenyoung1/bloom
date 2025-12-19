@@ -40,6 +40,8 @@ class ResendVerificationUseCase:
             if attorney.is_verified:
                 raise ValueError('Этот email уже подтвержден')
 
+        # ДЕРЬМО
+        # НУЖНО ВНЕДРИТЬ OUTBOX
         # 3. Отправить новый код (вне транзакции)
         await VerificationService.send_verification_code(
             email=cmd.email, first_name=attorney.first_name

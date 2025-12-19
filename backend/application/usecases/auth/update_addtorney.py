@@ -46,6 +46,8 @@ class UpdateAttorneyUseCase:
                     attorney.license_id = cmd.license_id
 
                 # 4. Сохранить
+                # ВОТ ТУ ВОПРОСИКИ??
+                # ПОЧЕМУ ТУТ SAVE?????????
                 attorney = await uow.attorney_repo.save(attorney)
 
             except (ValidationException, EntityNotFoundException) as e:

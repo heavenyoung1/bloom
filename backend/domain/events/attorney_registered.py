@@ -8,6 +8,7 @@ from datetime import datetime
 class AttorneyRegisteredEvent:
     """
     Доменное событие регистрации адвоката.
+    Используется так же для сброса пароля!
     
     Используется для Outbox Pattern - гарантированной доставки
     уведомлений (email) после успешной регистрации.
@@ -26,4 +27,5 @@ class AttorneyRegisteredEvent:
             'first_name': self.first_name,
             'occurred_at': self.occurred_at.isoformat(),
         }
+    
 
