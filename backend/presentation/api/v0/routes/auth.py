@@ -36,6 +36,7 @@ from backend.core.dependencies import get_current_attorney_id
 from backend.core.dependencies import get_uow_factory
 from backend.application.dto.attorney import (
     AttorneyResponse,
+    AttorneyVerificationResponse,
     RegisterRequest,
     LoginRequest,
     TokenResponse,
@@ -278,7 +279,7 @@ async def change_password(
 
 @router.post(
     '/verify-email',
-    response_model=AttorneyResponse,
+    response_model=AttorneyVerificationResponse,
     status_code=status.HTTP_200_OK,
     summary='Верификация email',
     responses={

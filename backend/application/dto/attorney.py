@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 from fastapi_users.schemas import BaseUser, BaseUserCreate, BaseUserUpdate
 
+
 # ⚠️ Первый аргумент в Field (...) - эллипсис -> поле обязательно
 # ⚠️ Если данные не заполнены, будет ошибка валидации.
 
@@ -196,6 +197,7 @@ class AttorneyVerificationResponse(BaseModel):
     id: int
     email: EmailStr
     is_verified: bool
+    token: str
 
 
 # ============= Дополнительные схемы =============
