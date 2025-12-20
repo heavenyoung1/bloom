@@ -17,6 +17,8 @@ from backend.core.dependencies import (
 )
 from backend.application.usecases.auth.sign_in import SignInUseCase
 from backend.application.usecases.auth.sign_out import SignOutUseCase
+from backend.application.usecases.auth.refresh_token import RefreshTokenUseCase
+from backend.application.usecases.auth.change_password import ChangePasswordUseCase
 
 from backend.application.commands.attorney import (
     RegisterAttorneyCommand,
@@ -25,6 +27,8 @@ from backend.application.commands.attorney import (
     ResendVerificationCommand,
     ForgotPasswordCommand,
     ResetPasswordCommand,
+    RefreshTokenCommand,
+    ChangePasswordCommand,
 )
 
 # from backend.application.services.auth_service import AuthService
@@ -40,6 +44,8 @@ from backend.application.dto.attorney import (
     ForgotPasswordRequest,
     ResetPasswordRequest,
     PasswordResetResponse,
+    RefreshTokenRequest,
+    ChangePasswordDTO,
 )
 from backend.core.logger import logger
 
@@ -174,6 +180,96 @@ async def logout(
     result = await use_case.execute(current_attorney_id, access_token)
 
     logger.info(f'Успешный выход: ID={current_attorney_id}')
+    return result
+
+
+# ========== REFRESH TOKEN ==========
+
+
+@router.post(
+    '/refresh',
+    response_model=TokenResponse,
+    status_code=status.HTTP_200_OK,
+    summary='Обновление access token',
+    responses={
+        200: {'description': 'Access token успешно обновлен'},
+        400: {'description': 'Невалидный или истёкший refresh token'},
+        401: {'description': 'Refresh token не найден'},
+    },
+)
+async def refresh_token(
+    request: RefreshTokenRequest,
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    '''
+    Обновление access token по refresh token.
+
+    Flow:
+    1. Декодирование refresh token
+    2. Проверка типа токена (должен быть 'refresh')
+    3. Проверка что refresh token существует в Redis
+    4. Создание нового access token
+    5. Возврат нового access token (refresh token остается прежним)
+
+    Requires:
+        - refresh_token в теле запроса
+    '''
+    logger.info('Попытка обновления access token')
+
+    # 1. Парсим request в Command
+    cmd = RefreshTokenCommand(refresh_token=request.refresh_token)
+
+    # 2. Создаем UseCase и выполняем
+    use_case = RefreshTokenUseCase(uow_factory)
+    result = await use_case.execute(cmd)
+
+    logger.info('Access token успешно обновлен')
+    return result
+
+
+# ========== CHANGE PASSWORD ==========
+
+
+@router.post(
+    '/change-password',
+    status_code=status.HTTP_200_OK,
+    summary='Изменение пароля',
+    responses={
+        200: {'description': 'Пароль успешно изменен'},
+        400: {'description': 'Неправильный текущий пароль или ошибка валидации'},
+        401: {'description': 'Требуется авторизация'},
+    },
+)
+async def change_password(
+    request: ChangePasswordDTO,
+    current_attorney_id: int = Depends(get_current_attorney_id),
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    '''
+    Изменение пароля адвоката.
+
+    Flow:
+    1. Проверка текущего пароля
+    2. Валидация нового пароля
+    3. Хеширование и сохранение нового пароля
+
+    Requires:
+        - Authorization: Bearer <access_token>
+    '''
+    logger.info(f'Попытка изменения пароля: ID={current_attorney_id}')
+
+    # 1. Парсим request в Command
+    cmd = ChangePasswordCommand(
+        attorney_id=current_attorney_id,
+        old_password=request.current_password,
+        new_password=request.new_password,
+    )
+
+    # 2. Создаем UseCase и выполняем
+    use_case = ChangePasswordUseCase(uow_factory)
+    result = await use_case.execute(cmd)
+
+    logger.info(f'Пароль успешно изменен: ID={current_attorney_id}')
     return result
 
 

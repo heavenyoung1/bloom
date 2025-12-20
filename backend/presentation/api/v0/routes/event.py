@@ -82,7 +82,7 @@ async def create_response(
 
 
 # ====== READ ======
-router.get(
+@router.get(
     '/events/{event_id}',
     response_model=EventResponse,
     status_code=status.HTTP_200_OK,
@@ -127,7 +127,7 @@ async def get_event(
 
 # ====== READ BY ATTORNEY ======
 @router.get(
-    '/attorney/{attorney_id}',
+    '/events/attorney/{attorney_id}',
     response_model=List[EventResponse],
     status_code=status.HTTP_200_OK,
     summary='Получение данных события по ID юриста',
@@ -162,7 +162,7 @@ async def get_events_by_attorney(
 
 # ====== READ BY CASE ======
 @router.get(
-    '/cases/{case_id}',
+    '/events/cases/{case_id}',
     response_model=List[EventResponse],
     status_code=status.HTTP_200_OK,
     summary='Получение данных события по делу',
@@ -197,7 +197,7 @@ async def get_events_by_case(
 
 # ====== UPDATE ======
 @router.put(
-    '/{event_id}',
+    '/events/{event_id}',
     response_model=EventResponse,
     status_code=status.HTTP_200_OK,
     summary='Обновление данных события',
@@ -246,7 +246,7 @@ async def update_event(
 
 # ====== DELETE ======
 @router.delete(
-    '/{event_id}',
+    '/events/{event_id}',
     status_code=status.HTTP_204_NO_CONTENT,
     summary='Удаление события',
     responses={

@@ -162,6 +162,20 @@ class ResendVerificationRequest(BaseModel):
     )
 
 
+class RefreshTokenRequest(BaseModel):
+    '''Запрос на обновление access token'''
+
+    refresh_token: str = Field(..., description='Refresh token для получения нового access token')
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'refresh_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            }
+        }
+    )
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
