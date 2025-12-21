@@ -11,6 +11,7 @@ from backend.presentation.api.v0.routes.clients import router as client_router
 from backend.presentation.api.v0.routes.case import router as case_router
 from backend.presentation.api.v0.routes.event import router as event_router
 from backend.presentation.api.v0.routes.me import router as me_router
+from backend.presentation.api.v0.routes.document import router as document_router
 
 
 @asynccontextmanager
@@ -82,6 +83,7 @@ app.include_router(client_router)
 app.include_router(case_router)
 app.include_router(event_router)
 app.include_router(me_router)
+app.include_router(document_router)
 
 
 # Health check endpoints

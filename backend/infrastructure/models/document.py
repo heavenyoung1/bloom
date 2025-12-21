@@ -18,6 +18,7 @@ class DocumentORM(TimeStampMixin, Base):
     storage_path: Mapped[str] = mapped_column(String(1000), nullable=False)
     file_size: Mapped[str | None] = mapped_column(String(64))
     description: Mapped[str] = mapped_column(String(500))
+    mime_type: Mapped[str | None] = mapped_column(String(100))
 
     case_id: Mapped[int] = mapped_column(
         ForeignKey('cases.id', ondelete='SET NULL'), index=True

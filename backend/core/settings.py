@@ -50,6 +50,17 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str
     SMTP_FROM: str = 'noreply@attorney-crm.com'
 
+    # === File Storage ===
+    FILE_STORAGE_BASE_PATH: str = Field(
+        default='storage/',  # Относительный путь - будет создан в корне проекта
+        description='Базовый путь для хранения файлов (локальное хранилище). '
+                    'Для Windows используйте относительный путь (storage/) или абсолютный (C:\\Projects\\storage\\)',
+    )
+    FILE_STORAGE_TYPE: str = Field(
+        default='local',
+        description='Тип хранилища: local или s3',
+    )
+
     model_config = SettingsConfigDict(
         env_file='.env',
         env_file_encoding='utf-8',

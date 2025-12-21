@@ -1,12 +1,14 @@
 from backend.application.interfaces.repositories.local_storage import IFileStorage
+from pathlib import Path
 import os
+import aiofiles
 
 
 class LocalFileStorage(IFileStorage):
-    '''Хранилище в файловой системе Linux'''
+    '''Хранилище в файловой системе Linux/Windows'''
 
     def __init__(self, base_path: str = '/opt/CRM/storage/'):
-        self.base_path = base_path
+        self.base_path = Path(base_path)
         self.base_path.mkdir(parents=True, exist_ok=True)
 
     async def save_file(self, file_path: str, file_content: bytes) -> str:
@@ -14,8 +16,8 @@ class LocalFileStorage(IFileStorage):
         full_path = self.base_path / file_path
         full_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(full_path, 'wb') as f:
-            f.write(file_content)
+        async with aiofiles.open(full_path, 'wb') as f:
+            await f.write(file_content)
 
         return str(file_path)  # Возвращаем относительный путь для БД
 
@@ -30,5 +32,8 @@ class LocalFileStorage(IFileStorage):
     async def get_file(self, file_path: str) -> bytes:
         '''Читает файл с диска'''
         full_path = self.base_path / file_path
-        with open(full_path, 'rb') as f:
-            return f.read()
+        if not full_path.exists():
+            raise FileNotFoundError(f'Файл не найден: {file_path}')
+        
+        async with aiofiles.open(full_path, 'rb') as f:
+            return await f.read()
