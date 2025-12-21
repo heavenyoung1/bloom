@@ -64,12 +64,12 @@ class SignUpUseCase:
                     first_name=attorney.first_name,
                     occurred_at=datetime.now(timezone.utc),
                 )
-                
+
                 await uow.outbox_repo.save_event(
                     event_type=OutboxEventType.ATTORNEY_REGISTERED.value,
                     payload=event.to_dict(),
                 )
-                
+
                 logger.info(
                     f'[OUTBOX] Событие регистрации сохранено для {attorney.email}'
                 )

@@ -11,13 +11,12 @@ from backend.core.logger import logger
 
 class ResetPasswordUseCase:
     def __init__(
-            self, 
-            uow_factory: UnitOfWorkFactory,
-            token_service: TokenManagementService,
-            ):
+        self,
+        uow_factory: UnitOfWorkFactory,
+        token_service: TokenManagementService,
+    ):
         self.uow_factory = uow_factory
         self.token_service = token_service
-        
 
     async def execute(self, cmd: ResetPasswordCommand):
         try:
@@ -41,7 +40,7 @@ class ResetPasswordUseCase:
                     # Записать попытку
                     await self.token_service.record_failed_attempt(cmd.email)
                     raise ValidationException('Некорректный email')
-                
+
                 # 3. Захешировать пароль
                 hashed_password = SecurityService.hash_password(cmd.new_password)
 
@@ -57,7 +56,3 @@ class ResetPasswordUseCase:
         logger.info(f'Пароль изменен: {cmd.email}')
 
         return PasswordResetResponse(ok=True)
-    
-
-
-

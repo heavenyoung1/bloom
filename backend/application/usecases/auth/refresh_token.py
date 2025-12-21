@@ -11,7 +11,7 @@ from backend.core.logger import logger
 class RefreshTokenUseCase:
     '''
     UseCase для обновления access token по refresh token.
-    
+
     Flow:
     1. Декодировать refresh token
     2. Проверить тип токена (должен быть 'refresh')
@@ -32,7 +32,9 @@ class RefreshTokenUseCase:
 
             # 2. Проверить тип токена
             if not SecurityService.verify_token_type(payload, 'refresh'):
-                raise ValidationException('Неправильный тип токена. Ожидается refresh token')
+                raise ValidationException(
+                    'Неправильный тип токена. Ожидается refresh token'
+                )
 
             # 3. Получить attorney_id из токена
             attorney_id_str = SecurityService.get_subject_from_token(payload)
@@ -71,4 +73,3 @@ class RefreshTokenUseCase:
         except Exception as e:
             logger.error(f'Неожиданная ошибка при обновлении токена: {e}')
             raise ValidationException('Ошибка при обновлении токена')
-

@@ -15,7 +15,7 @@ from backend.infrastructure.repositories import (
     ContactRepository,
     DocumentMetadataRepository,
     EventRepository,
-    OutboxRepository
+    OutboxRepository,
 )
 
 # =============== ОПРЕДЕЛЕНИЯ КЛАССОВ  ===============

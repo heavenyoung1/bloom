@@ -15,7 +15,9 @@ from backend.core.exceptions import (
 
 # ========== USE CASES ==========
 from backend.application.usecases.auth.update_addtorney import UpdateAttorneyUseCase
-from backend.application.usecases.auth.delete_attorney import DeleteAttorneyAccountUseCase
+from backend.application.usecases.auth.delete_attorney import (
+    DeleteAttorneyAccountUseCase,
+)
 
 # ========== COMMANDS & QUERIES ==========
 from backend.application.commands.attorney import (
@@ -149,6 +151,7 @@ async def update_me(
 # ========== DELETE ACCOUNT ==========
 class DeleteAccountRequest(BaseModel):
     '''Запрос на удаление аккаунта'''
+
     password: str = Field(..., min_length=1, description='Пароль для подтверждения')
 
 
@@ -207,4 +210,3 @@ async def delete_me(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Ошибка при удалении аккаунта',
         )
-

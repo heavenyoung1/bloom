@@ -1,11 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
-from passlib.context import CryptContext
+import bcrypt
 import jwt
 from backend.core.settings import settings
 from backend.core.logger import logger
-
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
 class SecurityService:
@@ -16,12 +14,19 @@ class SecurityService:
     @staticmethod
     def hash_password(password: str) -> str:
         '''Захешировать пароль (bcrypt)'''
-        return pwd_context.hash(password)
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+        return hashed.decode('utf-8')
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         '''Проверить пароль'''
-        return pwd_context.verify(plain_password, hashed_password)
+        try:
+            return bcrypt.checkpw(
+                plain_password.encode('utf-8'), hashed_password.encode('utf-8')
+            )
+        except Exception:
+            return False
 
     # ========== JWT TOKEN ==========
 

@@ -11,12 +11,12 @@ from backend.core.logger import logger
 
 class ForgotPasswordUseCase:
     def __init__(
-            self, 
-            uow_factory: UnitOfWorkFactory, 
-            token_service: TokenManagementService,
-            ):
+        self,
+        uow_factory: UnitOfWorkFactory,
+        token_service: TokenManagementService,
+    ):
         self.uow_factory = uow_factory
-        self.token_service = token_service 
+        self.token_service = token_service
 
     async def execute(self, cmd: ForgotPasswordCommand):
 
@@ -32,7 +32,7 @@ class ForgotPasswordUseCase:
                     # Записать попытку
                     await self.token_service.record_failed_attempt(cmd.email)
                     raise ValidationException('Некорректный email или пароль')
-                
+
                 # 5. Создать доменное событие и сохранить в Outbox
                 # (в той же транзакции для гарантии доставки)
                 event = AttorneyRegisteredEvent(
@@ -41,16 +41,16 @@ class ForgotPasswordUseCase:
                     first_name=attorney.first_name,
                     occurred_at=datetime.now(timezone.utc),
                 )
-                
+
                 await uow.outbox_repo.save_event(
                     event_type=OutboxEventType.ATTORNEY_REGISTERED.value,
                     payload=event.to_dict(),
                 )
-                
+
                 logger.info(
                     f'[OUTBOX] Событие сброса пароля сохранено для {attorney.email}'
                 )
-                
+
                 logger.info(
                     f'Код для сброса пароля будет отправлен: {attorney.email} '
                     f'(ID: {attorney.id}). Ожидание сброса пароля...'
@@ -59,4 +59,3 @@ class ForgotPasswordUseCase:
             except (ValidationException, EntityNotFoundException) as e:
                 logger.error(f'Ошибка валидации при сбросе пароля: {e}')
                 raise
-            

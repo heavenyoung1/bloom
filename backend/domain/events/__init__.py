@@ -3,4 +3,3 @@
 from backend.domain.events.attorney_registered import AttorneyRegisteredEvent
 
 __all__ = ['AttorneyRegisteredEvent']
-

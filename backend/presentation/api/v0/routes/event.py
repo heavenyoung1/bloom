@@ -93,8 +93,6 @@ async def create_response(
         404: {'description': 'Событие не найдено'},
     },
 )
-
-
 async def get_event(
     event_id: int,
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),

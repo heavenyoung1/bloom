@@ -46,7 +46,9 @@ class AttorneyORM(AttorneyBase, TimeStampMixin):
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
     patronymic: Mapped[str | None] = mapped_column(String(50))
     telegram_username: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    phone: Mapped[str | None] = mapped_column(String(20), unique=True, index=True, nullable=True)
+    phone: Mapped[str | None] = mapped_column(
+        String(20), unique=True, index=True, nullable=True
+    )
 
     # Relationships
     clients: Mapped[list['ClientORM']] = relationship(

@@ -11,18 +11,18 @@ async def main():
     """Главная функция с инициализацией подключений."""
     try:
         logger.info('[OUTBOX WORKER] Инициализация подключений...')
-        
+
         # Подключиться к БД
         await database.connect()
         logger.info('[OUTBOX WORKER] БД подключена')
-        
+
         # Подключиться к Redis
         await redis_client.connect()
         logger.info('[OUTBOX WORKER] Redis подключен')
-        
+
         # Запустить воркер
         await run_outbox_worker()
-    
+
     except KeyboardInterrupt:
         logger.info('[OUTBOX WORKER] Получен сигнал остановки')
     except Exception as e:
@@ -35,7 +35,7 @@ async def main():
             logger.info('[OUTBOX WORKER] Redis отключен')
         except Exception as e:
             logger.error(f'[OUTBOX WORKER] Ошибка при отключении Redis: {e}')
-        
+
         try:
             await database.dispose()
             logger.info('[OUTBOX WORKER] БД отключена')
@@ -52,4 +52,3 @@ if __name__ == '__main__':
     except Exception as e:
         logger.error(f'[OUTBOX WORKER] Критическая ошибка: {e}', exc_info=True)
         raise
-

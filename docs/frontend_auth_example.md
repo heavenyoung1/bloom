@@ -258,3 +258,4 @@ export function LoginPage() {
 4. **При logout** - вызывайте `/api/v0/auth/logout` чтобы удалить refresh token из Redis
 5. **Храните токены** в localStorage или httpOnly cookies (безопаснее)
 
+

@@ -77,7 +77,7 @@ async def register(
     1. Валидация данных
     2. Создание адвоката
     3. Сохранение события в Outbox (для асинхронной отправки email)
-    
+
     Отправка email происходит через Outbox воркер (гарантированная доставка).
     '''
     logger.info(f'Попытка регистрации: {request.email}')
@@ -351,6 +351,7 @@ async def resend_verification(
     logger.info(f'Код повторно отправлен: {request.email}')
     return result
 
+
 @router.post(
     '/forgot-password',
     status_code=status.HTTP_200_OK,
@@ -377,6 +378,7 @@ async def forgot_password(
     logger.info(f'Код отправлен: {request.email}')
     return {'ok': True}
 
+
 @router.post(
     '/reset-password',
     response_model=PasswordResetResponse,
@@ -395,9 +397,7 @@ async def reset_password(
 
     # 1. Парсим request в Command
     cmd = ResetPasswordCommand(
-        email=request.email,
-        code=request.code,
-        new_password=request.new_password
+        email=request.email, code=request.code, new_password=request.new_password
     )
 
     # 2. Создаем UseCase и выполняем
