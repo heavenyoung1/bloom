@@ -51,6 +51,7 @@ class SignUpUseCase:
                     email=cmd.email,
                     phone=cmd.phone,
                     hashed_password=hashed_password,
+                    telegram_username=cmd.telegram_username,
                 )
 
                 # 4. Сохранить в БД

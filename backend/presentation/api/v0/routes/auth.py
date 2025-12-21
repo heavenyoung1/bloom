@@ -91,6 +91,7 @@ async def register(
         email=request.email,
         phone=request.phone,
         password=request.password,
+        telegram_username=request.telegram_username,
     )
 
     # 2. Создаем UseCase и выполняем
