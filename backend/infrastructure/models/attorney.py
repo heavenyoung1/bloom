@@ -15,6 +15,7 @@ if TYPE_CHECKING:
         DocumentORM,
         CaseORM,
         ClientPaymentORM,
+        PaymentDetailORM,
     )
 
 
@@ -74,4 +75,9 @@ class AttorneyORM(AttorneyBase, TimeStampMixin):
     )
     client_payments: Mapped[list['ClientPaymentORM']] = relationship(
         back_populates='attorney', cascade='all, delete-orphan'
+    )
+    payment_detail: Mapped['PaymentDetailORM | None'] = relationship(
+        back_populates='attorney',
+        uselist=False,
+        cascade='save-update, merge, delete-orphan',
     )

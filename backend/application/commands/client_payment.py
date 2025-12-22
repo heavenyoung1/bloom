@@ -14,9 +14,9 @@ class CreatePaymentCommand:
     paid_str: str
     pade_date: date
     paid_deadline: Optional[datetime]
+    status: PaymentStatus = PaymentStatus.issued  # Дефолтное значение как в ClientPayment.create()
     taxable: bool = False
     condition: Optional[str] = None
-    status: PaymentStatus # В entites назначается дефолтное значение! проверить
 
 @dataclass
 class UpdatePaymentCommand:

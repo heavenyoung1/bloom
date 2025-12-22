@@ -1,0 +1,30 @@
+{
+  "name": "pdf-coordinate-finder",
+  "version": "1.0.0",
+  "description": "Визуальный инструмент для определения координат полей в PDF документах",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8080 -o",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": [
+    "pdf",
+    "coordinates",
+    "template",
+    "form",
+    "tool",
+    "utility"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/pdf-coordinate-finder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/pdf-coordinate-finder/issues"
+  },
+  "homepage": "https://github.com/your-username/pdf-coordinate-finder#readme"
+}
+
+
