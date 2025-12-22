@@ -5,13 +5,14 @@ from backend.domain.entities.payment_detail import PaymentDetail
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.infrastructure.mappers.payment_detail_mapper import PaymentDetailMapper
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 from backend.infrastructure.models.payment_detail import PaymentDetailORM
+from backend.application.interfaces.repositories.payment_detail_repo import IPaymentDetailRepository
 
 from backend.core.logger import logger
 
 
-class PaymentDetailRepository():
+class PaymentDetailRepository(IPaymentDetailRepository):
 
     def __init__(self, session):
         self.session = session
@@ -51,17 +52,37 @@ class PaymentDetailRepository():
             # 2. Проверка существования записи в БД
             if not orm_payment_detail:
                 return None
-                # raise EntityNotFoundException(f'Дело с ID {id} не найдено')
 
             # 3. Преобразование ORM объекта в доменную сущность
             payment_detail = PaymentDetailMapper.to_domain(orm_payment_detail)
 
-            logger.info(f'ПЛАТЕЖ получен. ID - {payment_detail.payment_detail_id}')
+            logger.info(f'Платежная информация получена. ID - {payment_detail.id}')
             return payment_detail
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении платежа ID = {id}: {e}')
-            raise DatabaseErrorException(f'Ошибка при получении платежа: {str(e)}')
+            logger.error(f'Ошибка БД при получении платежной информации ID = {id}: {e}')
+            raise DatabaseErrorException(f'Ошибка при получении платежной информации: {str(e)}')
+
+    async def get_for_attorney(self, attorney_id: int) -> 'PaymentDetail':
+        try:
+            # 1. Получение записи из базы данных по attorney_id
+            stmt = select(PaymentDetailORM).where(PaymentDetailORM.attorney_id == attorney_id)
+            result = await self.session.execute(stmt)
+            orm_payment_detail = result.scalars().first()
+
+            # 2. Проверка существования записи в БД
+            if not orm_payment_detail:
+                return None
+
+            # 3. Преобразование ORM объекта в доменную сущность
+            payment_detail = PaymentDetailMapper.to_domain(orm_payment_detail)
+
+            logger.info(f'Платежная информация получена для юриста. ID - {payment_detail.id}, Attorney ID - {attorney_id}')
+            return payment_detail
+
+        except SQLAlchemyError as e:
+            logger.error(f'Ошибка БД при получении платежной информации для юриста ID = {attorney_id}: {e}')
+            raise DatabaseErrorException(f'Ошибка при получении платежной информации: {str(e)}')
         
     async def update(self, updated_payment_detail: PaymentDetail) -> 'PaymentDetail':
         try:
@@ -74,29 +95,29 @@ class PaymentDetailRepository():
 
             # 2. Проверка наличия записи в БД
             if not orm_payment_detail:
-                logger.error(f'Дело с ID {updated_payment_detail.id} не найдено.')
-                raise EntityNotFoundException(f'Дело с ID {updated_payment_detail.id} не найдено')
+                logger.error(f'Платежная информация с ID {updated_payment_detail.id} не найдена.')
+                raise EntityNotFoundException(f'Платежная информация с ID {updated_payment_detail.id} не найдена')
 
             # 3. Прямое обновление полей ORM-объекта
             orm_payment_detail.inn = updated_payment_detail.inn
             orm_payment_detail.kpp = updated_payment_detail.kpp
             orm_payment_detail.index_address = updated_payment_detail.index_address
             orm_payment_detail.address = updated_payment_detail.address
-            orm_payment_detail.bank_account = updated_payment_detail.inbank_accountn
+            orm_payment_detail.bank_account = updated_payment_detail.bank_account
             orm_payment_detail.correspondent_account = updated_payment_detail.correspondent_account
             orm_payment_detail.bik = updated_payment_detail.bik
             orm_payment_detail.bank_recipient = updated_payment_detail.bank_recipient
 
             # 4. Сохранение в БД
-            await self.session.flush()  # или session.commit() если нужна транзакция
+            await self.session.flush()
 
             # 5. Возврат доменного объекта
-            logger.info(f'Дело обновлено. ID = {updated_payment_detail.id}')
+            logger.info(f'Платежная информация обновлена. ID = {updated_payment_detail.id}')
             return PaymentDetailMapper.to_domain(orm_payment_detail)
         
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при обновлении дела ID = {updated_payment_detail.id}: {e}')
-            raise DatabaseErrorException(f'Ошибка при обновлении данных ДЕЛА: {str(e)}')
+            logger.error(f'Ошибка БД при обновлении платежной информации ID = {updated_payment_detail.id}: {e}')
+            raise DatabaseErrorException(f'Ошибка при обновлении платежной информации: {str(e)}')
         
     async def delete(self, id: int) -> bool:
         try:
@@ -106,15 +127,15 @@ class PaymentDetailRepository():
             orm_payment_detail = result.scalars().first()
 
             if not orm_payment_detail:
-                logger.warning(f'Дело с ID {id} не найдено при удалении.')
-                raise EntityNotFoundException(f'Дело с ID {id} не найдено')
+                logger.warning(f'Платежная информация с ID {id} не найдена при удалении.')
+                raise EntityNotFoundException(f'Платежная информация с ID {id} не найдена')
 
             # 2. Удаление
             await self.session.delete(orm_payment_detail)
             await self.session.flush()
 
-            logger.info(f'Дело с ID {id} успешно удалено.')
+            logger.info(f'Платежная информация с ID {id} успешно удалена.')
             return True
 
         except SQLAlchemyError as e:
-            raise DatabaseErrorException(f'Ошибка при удалении ДЕЛА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при удалении платежной информации: {str(e)}')

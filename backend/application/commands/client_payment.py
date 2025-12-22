@@ -23,14 +23,14 @@ class UpdatePaymentCommand:
     payment_id: int
     name: Optional[str] = None
     client_id: Optional[int] = None
-    attorney_id: int
+    attorney_id: Optional[int] = None
     paid: Optional[float] = None
     paid_str: Optional[str] = None
     pade_date: Optional[date] = None
     paid_deadline: Optional[datetime] = None
-    taxable: bool = False
+    taxable: Optional[bool] = None
     condition: Optional[str] = None
-    status: PaymentStatus = None
+    status: Optional[PaymentStatus] = None
 
 @dataclass
 class DeletePaymentCommand:

@@ -47,4 +47,4 @@ class GetPaymentDelatilByIdQuery:
 @dataclass
 class GetPaymentDetailForAttorneyQuery:
     '''Команда на получение платежных реквизитов для юриста.'''
-    payment_detail_id: int
+    attorney_id: int

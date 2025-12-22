@@ -2,9 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-# from backend.application.dto.details_payment import (
-#     pass
-# )
+from backend.application.commands.payment_detail import UpdatePaymentDetailCommand
+
 
 @dataclass
 class PaymentDetail:
@@ -37,8 +36,6 @@ class PaymentDetail:
         correspondent_account: str,
         bik: str,
         bank_recipient: str,
-        taxable: bool,
-        condition: Optional[str] = None,
     ) -> 'PaymentDetail':
         '''Фабричный метод для создания платежных реквизитов.'''
         return PaymentDetail(
@@ -52,8 +49,6 @@ class PaymentDetail:
             correspondent_account=correspondent_account,
             bik=bik,
             bank_recipient=bank_recipient,
-            taxable=taxable,
-            condition=condition,
         )
 
     def update(self, cmd: UpdatePaymentDetailCommand) -> None:
@@ -74,7 +69,3 @@ class PaymentDetail:
             self.bik = cmd.bik
         if cmd.bank_recipient is not None:
             self.bank_recipient = cmd.bank_recipient
-        if cmd.taxable is not None:
-            self.taxable = cmd.taxable
-        if cmd.condition is not None:
-            self.condition = cmd.condition

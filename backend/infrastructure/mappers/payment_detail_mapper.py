@@ -7,7 +7,7 @@ class PaymentDetailMapper:
     def to_domain(orm: PaymentDetailORM) -> 'PaymentDetail':
         '''Конвертация ORM модели PaymentDetail в доменную сущность.'''
         return PaymentDetail(
-            payment_detail_id=orm.payment_detail_id,
+            id=orm.id,
             attorney_id=orm.attorney_id,
             inn=orm.inn,
             kpp=orm.kpp,
@@ -25,7 +25,7 @@ class PaymentDetailMapper:
     def to_orm(domain: 'PaymentDetail') -> PaymentDetailORM:
         '''Конвертация доменной сущности PaymentDetail в ORM модель.'''
         return PaymentDetailORM(
-            payment_detail_id=domain.payment_detail_id,
+            id=domain.id,
             attorney_id=domain.attorney_id,
             inn=domain.inn,
             kpp=domain.kpp,

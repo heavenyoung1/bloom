@@ -77,8 +77,6 @@ class ClientPayment:
         if cmd.status is not None:
             self.status = cmd.status
 
-    def change_status(self, cmd: UpdatePaymentCommand) -> None:
+    def change_status(self, cmd: ChangePaymentStatusCommand) -> None:
         '''Изменить статус платежа'''
-        # Проверку на None оставим
-        if cmd.status is not None:
-            self.status = cmd.status
+        self.status = cmd.status

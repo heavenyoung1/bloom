@@ -23,12 +23,13 @@ class CreatePaymentUseCase:
         async with self.uow_factory.create() as uow:
             try:
                 # 2. Создание Entity
-                payment = ClientPayment(
+                payment = ClientPayment.create(
                     name=cmd.name,
                     client_id=cmd.client_id,
                     attorney_id=cmd.attorney_id,
                     paid=cmd.paid,
                     paid_str=cmd.paid_str,
+                    pade_date=cmd.pade_date,
                     paid_deadline=cmd.paid_deadline,
                     status=cmd.status,
                     taxable=cmd.taxable,

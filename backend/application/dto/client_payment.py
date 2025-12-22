@@ -32,7 +32,7 @@ class PaymentCreateRequest():
         ...,
         description='Сумма платежа (ПРОПИСЬЮ)',
     )
-    paid_date: date | None = Field(
+    pade_date: date | None = Field(
         ...,
         description='Дата формирования платежа',
     )
@@ -53,7 +53,7 @@ class PaymentCreateRequest():
 
 class PaymentResponse(BaseModel):
     '''DTO для ответа: полная информация о платеже'''
-    payment_id: int
+    id: int
     name: str
     client_id: int
     attorney_id: int
@@ -64,3 +64,5 @@ class PaymentResponse(BaseModel):
     status: PaymentStatus
     taxable: bool = False
     condition: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
