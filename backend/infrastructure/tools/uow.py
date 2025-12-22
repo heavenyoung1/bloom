@@ -12,6 +12,8 @@ from backend.infrastructure.repositories import (
     DocumentMetadataRepository,
     EventRepository,
     OutboxRepository,
+    PaymentRepository,
+    PaymentDetailRepository,
 )
 
 
@@ -40,6 +42,8 @@ class AsyncUnitOfWork:
         self.doc_meta_repo = DocumentMetadataRepository(session)
         self.event_repo = EventRepository(session)
         self.outbox_repo = OutboxRepository(session)
+        self.payment_repo = PaymentRepository(session)
+        self.payment_detail_repo = PaymentDetailRepository(session)
 
     async def __aenter__(self):
         '''Вход в async context manager.'''

@@ -7,7 +7,11 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from backend.infrastructure.models import AttorneyORM, CaseORM
+    from backend.infrastructure.models import (
+        AttorneyORM, 
+        CaseORM, 
+        ClientPaymentORM,
+    )
 
 
 class ClientORM(TimeStampMixin, Base):
@@ -30,5 +34,8 @@ class ClientORM(TimeStampMixin, Base):
     # связи
     owner_attorney: Mapped['AttorneyORM'] = relationship(back_populates='clients')
     cases: Mapped[list['CaseORM']] = relationship(
+        back_populates='client', cascade='all, delete-orphan'
+    )
+    client_payments: Mapped[list['ClientPaymentORM']] = relationship(
         back_populates='client', cascade='all, delete-orphan'
     )

@@ -5,6 +5,8 @@ from .contact_repo import ContactRepository
 from .document_repo import DocumentMetadataRepository
 from .event_repo import EventRepository
 from .outbox_repo import OutboxRepository
+from .payment_repo import PaymentRepository
+from .payment_detail_repo import PaymentDetailRepository
 
 __all__ = [
     'AttorneyRepository',
@@ -14,4 +16,6 @@ __all__ = [
     'DocumentMetadataRepository',
     'EventRepository',
     'OutboxRepository',
+    'PaymentRepository',
+    'PaymentDetailRepository',
 ]
