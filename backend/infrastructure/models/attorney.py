@@ -14,6 +14,8 @@ if TYPE_CHECKING:
         ClientORM,
         DocumentORM,
         CaseORM,
+        ClientPaymentORM,
+        PaymentDetailORM,
     )
 
 
@@ -46,7 +48,9 @@ class AttorneyORM(AttorneyBase, TimeStampMixin):
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
     patronymic: Mapped[str | None] = mapped_column(String(50))
     telegram_username: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    phone: Mapped[str | None] = mapped_column(String(20), unique=True, index=True, nullable=True)
+    phone: Mapped[str | None] = mapped_column(
+        String(20), unique=True, index=True, nullable=True
+    )
 
     # Relationships
     clients: Mapped[list['ClientORM']] = relationship(
@@ -68,4 +72,12 @@ class AttorneyORM(AttorneyBase, TimeStampMixin):
         back_populates='attorney',
         cascade='save-update, merge',
         passive_deletes=True,
+    )
+    client_payments: Mapped[list['ClientPaymentORM']] = relationship(
+        back_populates='attorney', cascade='all, delete-orphan'
+    )
+    payment_detail: Mapped['PaymentDetailORM | None'] = relationship(
+        back_populates='attorney',
+        uselist=False,
+        cascade='save-update, merge, delete, delete-orphan',
     )

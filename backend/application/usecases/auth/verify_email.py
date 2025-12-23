@@ -2,6 +2,7 @@ from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.attorney import VerifyEmailRequest
 from backend.application.services.verification_service import VerificationService
 from backend.application.dto.attorney import AttorneyVerificationResponse
+from backend.core.security import SecurityService
 from backend.core.exceptions import NotFoundException, VerificationError
 from backend.core.logger import logger
 from backend.application.commands.attorney import (
@@ -21,12 +22,13 @@ class VerifyEmailUseCase:
         cmd: VerifyEmailCommand,
     ) -> AttorneyVerificationResponse:
         '''
-        Верифицировать email по коду.
+         Верифицировать email по коду.
 
         Flow:
         1. Проверить валидность кода верификации
         2. Пометить юриста как верифицированного
         3. Очистить код из Redis
+        4. Сгенерировать токен
         '''
         # 1. Проверить код
         is_valid = await VerificationService.verify_code(
@@ -54,6 +56,14 @@ class VerifyEmailUseCase:
         # 3. Очистить код в Redis
         await VerificationService.cleanup_code(cmd.email)
 
+        # 4. Сгенерировать токен
+        access_token = SecurityService.create_access_token(str(attorney.id))
+
         logger.info(f'Email успешно верифицирован: {cmd.email} (ID: {attorney.id})')
 
-        return AttorneyResponse.model_validate(attorney)
+        return AttorneyVerificationResponse(
+            id=attorney.id,
+            email=attorney.email,
+            is_verified=attorney.is_verified,
+            token=access_token,
+        )

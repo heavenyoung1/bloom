@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
+from backend.application.commands.attorney import UpdateAttorneyCommand
+
 
 @dataclass
 class Attorney:
@@ -47,3 +49,20 @@ class Attorney:
             phone=phone,  # Опциональные поля идут после обязательных
             telegram_username=telegram_username,
         )
+
+    def update(self, cmd: UpdateAttorneyCommand) -> None:
+        '''Обновить поля на основе команды, если они не None (PATCH-семантика)'''
+        if cmd.first_name is not None:
+            self.first_name = cmd.first_name
+        if cmd.last_name is not None:
+            self.last_name = cmd.last_name
+        if cmd.patronymic is not None:
+            self.patronymic = cmd.patronymic
+        if cmd.phone is not None:
+            self.phone = cmd.phone
+        if cmd.license_id is not None:
+            self.license_id = cmd.license_id
+        if cmd.telegram_username is not None:
+            self.telegram_username = cmd.telegram_username
+        if cmd.email is not None:
+            self.email = cmd.email

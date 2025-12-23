@@ -70,6 +70,40 @@ class GetEventByAttorneyUseCase:
                 )
                 raise e
 
+class GetNearestEventsByAttorneyUseCase:
+    '''Получить ближайшие события для юриста отсортированные по дате и ограниченные по количеству'''
+
+    def __init__(self, uow_factory: UnitOfWorkFactory):
+        self.uow_factory = uow_factory
+
+    async def execute(
+        self,
+        cmd: GetEventsForAttorneyQuery,
+        events_count: int,
+    ) -> 'EventResponse':
+        async with self.uow_factory.create() as uow:
+            try:
+                events = await uow.event_repo.get_nearest_for_attorney(
+                    attorney_id=cmd.attorney_id,
+                    count=events_count,
+                )
+
+                if not events:
+                    logger.warning(f'События для юриста {cmd.attorney_id} не найдены.')
+                    return []
+
+                logger.info(
+                    f'Получено {len(events)} событий для юриста {cmd.attorney_id}'
+                )
+
+                # ПРЕОБРАЗУЕМ КАЖДЫЙ ЭЛЕМЕНТ СПИСКА ОТДЕЛЬНО!
+                return [EventResponse.model_validate(event) for event in events]
+
+            except Exception as e:
+                logger.error(
+                    f'Ошибка при получении событий юриста {cmd.attorney_id}: {e}'
+                )
+                raise e
 
 class GetEventByCaseUseCase:
     '''Получить все события для конкретного дела'''

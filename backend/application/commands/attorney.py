@@ -21,7 +21,6 @@ class RegisterAttorneyCommand:
     phone: Optional[str] = None
 
 
-
 @dataclass
 class LoginAttorneyCommand:
     '''Вход в систему'''
@@ -107,3 +106,19 @@ class GetAttorneyByIdQuery:
 @dataclass
 class GetAttorneyByEmailQuery:
     email: str
+
+
+@dataclass
+class ForgotPasswordCommand:
+    '''Команда для запроса сброса пароля (отправка кода верификации)'''
+
+    email: str
+
+
+@dataclass
+class ResetPasswordCommand:
+    '''Команда сброса пароля'''
+
+    email: str
+    code: str
+    new_password: str

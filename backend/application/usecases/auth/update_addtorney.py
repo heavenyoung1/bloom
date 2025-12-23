@@ -32,26 +32,21 @@ class UpdateAttorneyUseCase:
 
                 # 2. Получить юриста
                 attorney = await uow.attorney_repo.get(cmd.attorney_id)
+                if not attorney:
+                    raise EntityNotFoundException(
+                        f'Адвокат с ID {cmd.attorney_id} не найден'
+                    )
 
-                # 3. Обновить только переданные поля
-                if cmd.first_name is not None:
-                    attorney.first_name = cmd.first_name
-                if cmd.last_name is not None:
-                    attorney.last_name = cmd.last_name
-                if cmd.patronymic is not None:
-                    attorney.patronymic = cmd.patronymic
-                if cmd.phone is not None:
-                    attorney.phone = cmd.phone
-                if cmd.license_id is not None:
-                    attorney.license_id = cmd.license_id
+                # 3. Обновить только переданные поля через доменный метод
+                attorney.update(cmd)
 
-                # 4. Сохранить
-                attorney = await uow.attorney_repo.save(attorney)
+                # 4. Сохранить изменения (используем update для существующей записи)
+                updated_attorney = await uow.attorney_repo.update(attorney)
+
+                logger.info(f'Профиль обновлен: ID {cmd.attorney_id}')
+
+                return AttorneyResponse.model_validate(updated_attorney)
 
             except (ValidationException, EntityNotFoundException) as e:
                 logger.error(f'Ошибка при обновлении профиля адвоката: {e}')
                 raise
-
-        logger.info(f'Профиль обновлен: ID {cmd.attorney_id}')
-
-        return AttorneyResponse.model_validate(attorney)

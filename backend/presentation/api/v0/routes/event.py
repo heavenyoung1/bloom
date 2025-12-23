@@ -23,6 +23,7 @@ from backend.application.usecases.event.get import (
     GetEventUseCase,
     GetEventByAttorneyUseCase,
     GetEventByCaseUseCase,
+    GetNearestEventsByAttorneyUseCase,
 )
 from backend.application.dto.event import (
     EventCreateRequest,
@@ -82,7 +83,7 @@ async def create_response(
 
 
 # ====== READ ======
-router.get(
+@router.get(
     '/events/{event_id}',
     response_model=EventResponse,
     status_code=status.HTTP_200_OK,
@@ -93,8 +94,6 @@ router.get(
         404: {'description': 'Событие не найдено'},
     },
 )
-
-
 async def get_event(
     event_id: int,
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
@@ -127,7 +126,7 @@ async def get_event(
 
 # ====== READ BY ATTORNEY ======
 @router.get(
-    '/attorney/{attorney_id}',
+    '/events/attorney/{attorney_id}',
     response_model=List[EventResponse],
     status_code=status.HTTP_200_OK,
     summary='Получение данных события по ID юриста',
@@ -158,11 +157,47 @@ async def get_events_by_attorney(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Ошибка при получении события',
         )
+    
+
+# ====== READ NEAREST EVENTS BY ATTORNEY ======
+@router.get(
+    '/nearest-events/attorney/{attorney_id}',
+    response_model=List[EventResponse],
+    status_code=status.HTTP_200_OK,
+    summary='Получение ближайших событий для юриста',
+    responses={
+        200: {'description': 'Данные события'},
+        401: {'description': 'Требуется авторизация'},
+        404: {'description': 'Событие не найдено'},
+    },
+)
+async def get_nearest_events_by_attorney(
+    attorney_id: int,
+    count: int = Query(default=3, ge=1, le=50, description='Количество ближайших событий'),
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    try:
+        cmd = GetEventsForAttorneyQuery(attorney_id=attorney_id)
+
+        use_case = GetNearestEventsByAttorneyUseCase(uow_factory)
+        result = await use_case.execute(cmd, count)
+
+        return result if result else []
+
+    except EntityNotFoundException as e:
+        logger.error(f'Событие не найдено: {e}')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.error(f'Ошибка при получении события: {e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Ошибка при получении события',
+        )
 
 
 # ====== READ BY CASE ======
 @router.get(
-    '/cases/{case_id}',
+    '/events/cases/{case_id}',
     response_model=List[EventResponse],
     status_code=status.HTTP_200_OK,
     summary='Получение данных события по делу',
@@ -197,7 +232,7 @@ async def get_events_by_case(
 
 # ====== UPDATE ======
 @router.put(
-    '/{event_id}',
+    '/events/{event_id}',
     response_model=EventResponse,
     status_code=status.HTTP_200_OK,
     summary='Обновление данных события',
@@ -246,7 +281,7 @@ async def update_event(
 
 # ====== DELETE ======
 @router.delete(
-    '/{event_id}',
+    '/events/{event_id}',
     status_code=status.HTTP_204_NO_CONTENT,
     summary='Удаление события',
     responses={

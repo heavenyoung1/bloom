@@ -10,6 +10,10 @@ from backend.presentation.api.v0.routes.auth import router as auth_router
 from backend.presentation.api.v0.routes.clients import router as client_router
 from backend.presentation.api.v0.routes.case import router as case_router
 from backend.presentation.api.v0.routes.event import router as event_router
+from backend.presentation.api.v0.routes.me import router as me_router
+from backend.presentation.api.v0.routes.document import router as document_router
+from backend.presentation.api.v0.routes.payment_detail import router as payment_detail_router
+from backend.presentation.api.v0.routes.payment_client import router as payment_client_router
 
 
 @asynccontextmanager
@@ -64,7 +68,12 @@ app = FastAPI(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['http://localhost:3000', 'http://localhost:8000'],
+    allow_origins=[
+        'http://localhost:3000',
+        'http://localhost:8000',
+        'http://localhost:5173',
+        'http://localhost:5174',
+    ],
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
@@ -75,6 +84,10 @@ app.include_router(auth_router)
 app.include_router(client_router)
 app.include_router(case_router)
 app.include_router(event_router)
+app.include_router(me_router)
+app.include_router(document_router)
+app.include_router(payment_detail_router)
+app.include_router(payment_client_router)
 
 
 # Health check endpoints

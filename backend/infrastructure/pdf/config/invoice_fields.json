@@ -1,0 +1,107 @@
+{
+  "template_name": "invoice_template",
+  "page_number": 0,
+  "fields": {
+    "static": {
+      "inn": {
+        "x": 46,
+        "y": 753,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      },
+      "kpp": {
+        "x": 216,
+        "y": 753,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      },
+      "index_address": {
+        "x": 69,
+        "y": 799,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      },
+      "address": {
+        "x": 155,
+        "y": 801,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      },
+      "bank_account": {
+        "x": 432,
+        "y": 739,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      },
+      "correspondent_account": {
+        "x": 434,
+        "y": 703,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      },
+      "bik": {
+        "x": 434,
+        "y": 716,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      },
+      "bank_recipient": {
+        "x": 20,
+        "y": 702,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      }
+    },
+    "dynamic": {
+      "paid": {
+        "x": 517,
+        "y": 557,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      },
+      "pade_date": {
+        "x": 348,
+        "y": 671,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      },
+      "taxable": {
+        "x": 47,
+        "y": 461,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      },
+      "condition": {
+        "x": 21,
+        "y": 502,
+        "width": 150,
+        "height": 15,
+        "font_size": 10,
+        "font_name": "Helvetica"
+      }
+    }
+  }
+}
+

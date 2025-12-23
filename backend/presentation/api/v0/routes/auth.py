@@ -6,6 +6,9 @@ from backend.application.usecases.auth.verify_email import VerifyEmailUseCase
 from backend.application.usecases.auth.resend_verification import (
     ResendVerificationUseCase,
 )
+from backend.application.usecases.auth.forgot_password import ForgotPasswordUseCase
+from backend.application.usecases.auth.reset_password import ResetPasswordUseCase
+from backend.application.services.token_management_service import TokenManagementService
 
 from backend.core.dependencies import (
     get_uow_factory,
@@ -14,12 +17,18 @@ from backend.core.dependencies import (
 )
 from backend.application.usecases.auth.sign_in import SignInUseCase
 from backend.application.usecases.auth.sign_out import SignOutUseCase
+from backend.application.usecases.auth.refresh_token import RefreshTokenUseCase
+from backend.application.usecases.auth.change_password import ChangePasswordUseCase
 
 from backend.application.commands.attorney import (
     RegisterAttorneyCommand,
     LoginAttorneyCommand,
     VerifyEmailCommand,
     ResendVerificationCommand,
+    ForgotPasswordCommand,
+    ResetPasswordCommand,
+    RefreshTokenCommand,
+    ChangePasswordCommand,
 )
 
 # from backend.application.services.auth_service import AuthService
@@ -27,11 +36,17 @@ from backend.core.dependencies import get_current_attorney_id
 from backend.core.dependencies import get_uow_factory
 from backend.application.dto.attorney import (
     AttorneyResponse,
+    AttorneyVerificationResponse,
     RegisterRequest,
     LoginRequest,
     TokenResponse,
     VerifyEmailRequest,
     ResendVerificationRequest,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+    PasswordResetResponse,
+    RefreshTokenRequest,
+    ChangePasswordDTO,
 )
 from backend.core.logger import logger
 
@@ -61,7 +76,9 @@ async def register(
     Flow:
     1. Валидация данных
     2. Создание адвоката
-    3. Отправка кода верификации на email
+    3. Сохранение события в Outbox (для асинхронной отправки email)
+
+    Отправка email происходит через Outbox воркер (гарантированная доставка).
     '''
     logger.info(f'Попытка регистрации: {request.email}')
 
@@ -74,9 +91,11 @@ async def register(
         email=request.email,
         phone=request.phone,
         password=request.password,
+        telegram_username=request.telegram_username,
     )
 
     # 2. Создаем UseCase и выполняем
+    # UseCase сам сохранит событие в Outbox в той же транзакции
     use_case = SignUpUseCase(uow_factory)
     result = await use_case.execute(cmd)
 
@@ -166,12 +185,102 @@ async def logout(
     return result
 
 
+# ========== REFRESH TOKEN ==========
+
+
+@router.post(
+    '/refresh',
+    response_model=TokenResponse,
+    status_code=status.HTTP_200_OK,
+    summary='Обновление access token',
+    responses={
+        200: {'description': 'Access token успешно обновлен'},
+        400: {'description': 'Невалидный или истёкший refresh token'},
+        401: {'description': 'Refresh token не найден'},
+    },
+)
+async def refresh_token(
+    request: RefreshTokenRequest,
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    '''
+    Обновление access token по refresh token.
+
+    Flow:
+    1. Декодирование refresh token
+    2. Проверка типа токена (должен быть 'refresh')
+    3. Проверка что refresh token существует в Redis
+    4. Создание нового access token
+    5. Возврат нового access token (refresh token остается прежним)
+
+    Requires:
+        - refresh_token в теле запроса
+    '''
+    logger.info('Попытка обновления access token')
+
+    # 1. Парсим request в Command
+    cmd = RefreshTokenCommand(refresh_token=request.refresh_token)
+
+    # 2. Создаем UseCase и выполняем
+    use_case = RefreshTokenUseCase(uow_factory)
+    result = await use_case.execute(cmd)
+
+    logger.info('Access token успешно обновлен')
+    return result
+
+
+# ========== CHANGE PASSWORD ==========
+
+
+@router.post(
+    '/change-password',
+    status_code=status.HTTP_200_OK,
+    summary='Изменение пароля',
+    responses={
+        200: {'description': 'Пароль успешно изменен'},
+        400: {'description': 'Неправильный текущий пароль или ошибка валидации'},
+        401: {'description': 'Требуется авторизация'},
+    },
+)
+async def change_password(
+    request: ChangePasswordDTO,
+    current_attorney_id: int = Depends(get_current_attorney_id),
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    '''
+    Изменение пароля адвоката.
+
+    Flow:
+    1. Проверка текущего пароля
+    2. Валидация нового пароля
+    3. Хеширование и сохранение нового пароля
+
+    Requires:
+        - Authorization: Bearer <access_token>
+    '''
+    logger.info(f'Попытка изменения пароля: ID={current_attorney_id}')
+
+    # 1. Парсим request в Command
+    cmd = ChangePasswordCommand(
+        attorney_id=current_attorney_id,
+        old_password=request.current_password,
+        new_password=request.new_password,
+    )
+
+    # 2. Создаем UseCase и выполняем
+    use_case = ChangePasswordUseCase(uow_factory)
+    result = await use_case.execute(cmd)
+
+    logger.info(f'Пароль успешно изменен: ID={current_attorney_id}')
+    return result
+
+
 # ========== EMAIL VERIFICATION ==========
 
 
 @router.post(
     '/verify-email',
-    response_model=AttorneyResponse,
+    response_model=AttorneyVerificationResponse,
     status_code=status.HTTP_200_OK,
     summary='Верификация email',
     responses={
@@ -241,4 +350,61 @@ async def resend_verification(
     result = await use_case.execute(cmd)
 
     logger.info(f'Код повторно отправлен: {request.email}')
+    return result
+
+
+@router.post(
+    '/forgot-password',
+    status_code=status.HTTP_200_OK,
+    summary='Отправка кода верификации для сброса пароля ',
+    responses={
+        200: {'description': 'Код отправлен на email'},
+        400: {'description': 'Email не найден'},
+    },
+)
+async def forgot_password(
+    request: ForgotPasswordRequest,
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    logger.info(f'Отправка кода для сброса пароля: {request.email}')
+
+    # 1. Парсим request в Command
+    cmd = ForgotPasswordCommand(email=request.email)
+
+    # 2. Создаем UseCase и выполняем
+    token_service = TokenManagementService()
+    use_case = ForgotPasswordUseCase(uow_factory, token_service)
+    await use_case.execute(cmd)
+
+    logger.info(f'Код отправлен: {request.email}')
+    return {'ok': True}
+
+
+@router.post(
+    '/reset-password',
+    response_model=PasswordResetResponse,
+    status_code=status.HTTP_200_OK,
+    summary='Сброс пароля по коду верификации',
+    responses={
+        200: {'description': 'Пароль успешно сброшен'},
+        400: {'description': 'Неверный код или email не найден'},
+    },
+)
+async def reset_password(
+    request: ResetPasswordRequest,
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    logger.info(f'Сброс пароля для: {request.email}')
+
+    # 1. Парсим request в Command
+    cmd = ResetPasswordCommand(
+        email=request.email, code=request.code, new_password=request.new_password
+    )
+
+    # 2. Создаем UseCase и выполняем
+    token_service = TokenManagementService()
+    use_case = ResetPasswordUseCase(uow_factory, token_service)
+    result = await use_case.execute(cmd)
+
+    logger.info(f'Пароль сброшен: {request.email}')
     return result

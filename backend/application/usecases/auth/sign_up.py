@@ -1,11 +1,11 @@
+from datetime import datetime, timezone
 from backend.infrastructure.repositories.attorney_repo import AttorneyRepository
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.domain.entities.attorney import Attorney
+from backend.domain.events.attorney_registered import AttorneyRegisteredEvent
+from backend.infrastructure.models.outbox import OutboxEventType
 from backend.core.security import SecurityService
 from backend.application.policy.attorney_policy import AttorneyPolicy
-from backend.application.services.verification_service import VerificationService
-from backend.infrastructure.redis.client import redis_client
-from backend.infrastructure.redis.keys import RedisKeys
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.application.commands.attorney import RegisterAttorneyCommand
 
@@ -32,7 +32,6 @@ class SignUpUseCase:
         2. Захешировать пароль
         3. Создать Entity
         4. Сохранить в БД
-        5. Отправить код верификации
         '''
         async with self.uow_factory.create() as uow:
             try:
@@ -52,23 +51,52 @@ class SignUpUseCase:
                     email=cmd.email,
                     phone=cmd.phone,
                     hashed_password=hashed_password,
+                    telegram_username=cmd.telegram_username,
                 )
 
                 # 4. Сохранить в БД
                 attorney = await uow.attorney_repo.save(attorney)
 
+                # 5. Создать доменное событие и сохранить в Outbox
+                # (в той же транзакции для гарантии доставки)
+                event = AttorneyRegisteredEvent(
+                    attorney_id=attorney.id,
+                    email=attorney.email,
+                    first_name=attorney.first_name,
+                    occurred_at=datetime.now(timezone.utc),
+                )
+
+                await uow.outbox_repo.save_event(
+                    event_type=OutboxEventType.ATTORNEY_REGISTERED.value,
+                    payload=event.to_dict(),
+                )
+
+                logger.info(
+                    f'[OUTBOX] Событие регистрации сохранено для {attorney.email}'
+                )
+
             except (ValidationException, EntityNotFoundException) as e:
                 logger.error(f'Ошибка валидации при регистрации: {e}')
                 raise
-
-        # 5. Отправить код верификации (вне транзакции)
-        await VerificationService.send_verification_code(
-            email=cmd.email, first_name=cmd.first_name
-        )
 
         logger.info(
             f'Юрист зарегистрирован: {attorney.email} '
             f'(ID: {attorney.id}). Ожидание верификации...'
         )
 
-        return AttorneyResponse.model_validate(attorney)
+        # Создаем DTO напрямую из доменной сущности (быстрее чем model_validate)
+        return AttorneyResponse(
+            id=attorney.id,
+            email=attorney.email,
+            is_active=attorney.is_active,
+            is_superuser=attorney.is_superuser,
+            is_verified=attorney.is_verified,
+            license_id=attorney.license_id,
+            first_name=attorney.first_name,
+            last_name=attorney.last_name,
+            patronymic=attorney.patronymic,
+            phone=attorney.phone,
+            telegram_username=attorney.telegram_username,
+            created_at=attorney.created_at,
+            updated_at=attorney.updated_at,
+        )

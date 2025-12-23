@@ -17,6 +17,8 @@ from backend.infrastructure.models.attorney import AttorneyORM
 from backend.core.settings import settings
 from backend.core.db.database import database  # Импортируем глобальный экземпляр
 from backend.core.logger import logger
+from backend.application.interfaces.repositories.local_storage import IFileStorage
+from backend.infrastructure.repositories.local_storage import LocalFileStorage
 
 # ========== ASYNC SESSION ==========
 
@@ -122,3 +124,18 @@ async def get_current_access_token(
         access token как строка
     '''
     return credentials.credentials
+
+
+# ========== FILE STORAGE ==========
+
+
+def get_file_storage() -> IFileStorage:
+    '''
+    Получить экземпляр file storage для работы с файлами.
+
+    Returns:
+        IFileStorage - реализация хранилища файлов (локальное или облачное)
+    '''
+    # Можно легко переключиться на S3 или другую реализацию
+    base_path = settings.FILE_STORAGE_BASE_PATH
+    return LocalFileStorage(base_path=base_path)

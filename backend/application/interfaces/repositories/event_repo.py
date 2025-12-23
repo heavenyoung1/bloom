@@ -18,3 +18,6 @@ class IEventRepository(IBaseRepository['Event']):
 
     @abstractmethod
     async def get_all_for_attorney(self, attorney_id: int) -> Sequence['Event']: ...
+
+    @abstractmethod
+    async def get_nearest_for_attorney(self, attorney_id: int, count: int) -> Sequence['Event']: ...

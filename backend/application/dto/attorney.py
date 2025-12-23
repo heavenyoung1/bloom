@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 from fastapi_users.schemas import BaseUser, BaseUserCreate, BaseUserUpdate
 
+
 # ⚠️ Первый аргумент в Field (...) - эллипсис -> поле обязательно
 # ⚠️ Если данные не заполнены, будет ошибка валидации.
 
@@ -15,7 +16,9 @@ class RegisterRequest(BaseUserCreate):
     license_id: str = Field(
         ..., min_length=3, max_length=12, description='Номер удостоверения'
     )
-    telegram_username: str = Field(min_length=4, max_length=50, description='Telegram никнейм')
+    telegram_username: str = Field(
+        min_length=4, max_length=50, description='Telegram никнейм'
+    )
     first_name: str = Field(..., min_length=2, max_length=50, description='Имя')
     last_name: str = Field(..., min_length=3, max_length=50, description='Фамилия')
     patronymic: str = Field(..., min_length=3, max_length=20, description='Отчество')
@@ -162,6 +165,22 @@ class ResendVerificationRequest(BaseModel):
     )
 
 
+class RefreshTokenRequest(BaseModel):
+    '''Запрос на обновление access token'''
+
+    refresh_token: str = Field(
+        ..., description='Refresh token для получения нового access token'
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'refresh_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            }
+        }
+    )
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
@@ -182,6 +201,7 @@ class AttorneyVerificationResponse(BaseModel):
     id: int
     email: EmailStr
     is_verified: bool
+    token: str
 
 
 # ============= Дополнительные схемы =============
@@ -212,10 +232,9 @@ class ChangePasswordDTO(BaseModel):
     )
 
 
-class ResetPasswordRequestDTO(BaseModel):
-    '''DTO для запроса сброса пароля через email'''
-
-    email: EmailStr
+# class ResetPasswordRequest(BaseModel):
+#     '''DTO для запроса сброса пароля через email'''
+#     email: EmailStr
 
 
 class ResetPasswordConfirmDTO(BaseModel):
@@ -223,3 +242,35 @@ class ResetPasswordConfirmDTO(BaseModel):
 
     token: str = Field(..., description='Токен из письма')
     new_password: str = Field(..., min_length=8, description='Новый пароль')
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'email': 'ivan@example.com',
+            }
+        }
+    )
+
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(min_length=4, max_length=12)
+    new_password: str = Field(min_length=8, max_length=128)
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'email': 'ivan@example.com',
+                'code': '000000',
+                'new_password': 'Sobaka1234%',
+            }
+        }
+    )
+
+
+class PasswordResetResponse(BaseModel):
+    ok: bool = True
