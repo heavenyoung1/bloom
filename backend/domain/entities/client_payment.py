@@ -17,7 +17,7 @@ class ClientPayment:
     paid: float
     paid_str: str
     pade_date: date
-    paid_deadline: Optional[datetime]
+    paid_deadline: Optional[date]
     status: PaymentStatus
     taxable: bool = False
     condition: Optional[str] = None

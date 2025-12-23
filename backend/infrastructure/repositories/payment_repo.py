@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy import select
-from backend.domain.entities.payment import ClientPayment
+from backend.domain.entities.client_payment import ClientPayment
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.infrastructure.mappers.payment_mapper import ClientPaymentMapper
@@ -11,7 +11,7 @@ from backend.application.interfaces.repositories.payment_repo import IPaymentRep
 
 from backend.core.logger import logger
 
-class PaymentRepository(IPaymentRepository):
+class ClientPaymentRepository(IPaymentRepository):
 
     def __init__(self, session):
         self.session = session

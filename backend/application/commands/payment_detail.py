@@ -22,6 +22,7 @@ class CreatePaymentDetailtCommand:
 class UpdatePaymentDetailCommand:
     '''Команда на обновление платежных реквизитов.'''
     payment_detail_id: int  # что обновляем (ID записи реквизитов)
+    attorney_id: int
 
     inn: Optional[str] = None
     kpp: Optional[str] = None

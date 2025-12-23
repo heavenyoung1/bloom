@@ -5,17 +5,54 @@ from datetime import datetime
 
 # ====== COMMANDS (write операции) ======
 
-class PaymentCreateRequest(BaseModel):
+class PaymentDetailCreateRequest(BaseModel):
     '''DTO для создания платежной информации юриста'''
-    attorney_id: int
-    inn: str
-    index_address: str
-    address: str
-    bank_account: str
-    correspondent_account: str
-    bik: str
-    bank_recipient: str
-    kpp: Optional[str]  = None
+    attorney_id: int = Field(
+        ...,
+        gt=0,
+        description='ID юриста, ответственного за клиента',
+    )
+    inn: str = Field(..., max_length=12)
+    index_address: str = Field(..., max_length=6)
+    address: str = Field(..., max_length=255)
+    bank_account: str = Field(..., max_length=20)
+    correspondent_account: str = Field(..., max_length=20)
+    bik: str = Field(..., max_length=9)
+    bank_recipient: str = Field(..., max_length=255)
+    kpp: Optional[str]  = Field(None, max_length=9)
+# Как правильно передать KPP
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'inn': '1234567843',
+                'attorney_id': 777,
+                'index_address': '241099',
+                'address': 'г. Санкт-Петербург, ул. Площадь Восстания, д.10, кв. 54',
+                'bank_account': '12345678912345678921',
+                'correspondent_account': '14680414794257063165',
+                'bik': '987654319',
+                'bank_recipient': 'ПАО "Z - банк", лудший банк, филиал в Мухосранске',
+                'kpp': '123456754',
+            }
+        }
+    )
+
+class PaymentDetailUpdateRequest(BaseModel):
+    '''DTO для обновления платежной информации юриста'''
+    attorney_id: int = Field(
+        ...,
+        gt=0,
+        description='ID юриста, ответственного за клиента',
+    )
+    inn: str = Field(None, max_length=12)
+    index_address: str = Field(None, max_length=6)
+    address: str = Field(None, max_length=255)
+    bank_account: str = Field(None, max_length=20)
+    correspondent_account: str = Field(None, max_length=20)
+    bik: str = Field(None, max_length=9)
+    bank_recipient: str = Field(None, max_length=255)
+    kpp: Optional[str]  = Field(None, max_length=9)
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -27,7 +64,7 @@ class PaymentCreateRequest(BaseModel):
                 'bank_account': '12345678912345678912',
                 'correspondent_account': '14680414794257063170',
                 'bik': '987654321',
-                'bank_recipient': 'ПАО "Z - банк", лучший банк, филиал в Мухосранске',
+                'bank_recipient': 'ПАО "O - банк", плохой банк, филиал в Мухосранске',
                 'kpp': '123456789',
             }
         }

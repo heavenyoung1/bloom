@@ -1,13 +1,14 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.commands.client_payment import (
-    CreatePaymentCommand,
+    CreateClientPaymentCommand,
 )
-from backend.domain.entities.payment import ClientPayment
+from backend.domain.entities.client_payment import ClientPayment
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
 from backend.application.dto.client_payment import (
-    PaymentResponse,
+    PaymentClientCreateRequest,
+    PaymentClientResponse,
 )
 
 class CreatePaymentUseCase:
@@ -18,8 +19,8 @@ class CreatePaymentUseCase:
 
     async def execute(
         self,
-        cmd: CreatePaymentCommand,
-    ) -> 'PaymentResponse':
+        cmd: CreateClientPaymentCommand,
+    ) -> 'PaymentClientResponse':
         async with self.uow_factory.create() as uow:
             try:
                 # 2. Создание Entity
@@ -45,7 +46,7 @@ class CreatePaymentUseCase:
                 )
 
                 # 4. Возврат Response
-                return PaymentResponse.model_validate(saved_payment)
+                return PaymentClientResponse.model_validate(saved_payment)
 
             except (ValidationException, EntityNotFoundException) as e:
                 logger.error(f'Ошибка при создании платежа: {e}')

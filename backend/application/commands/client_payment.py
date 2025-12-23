@@ -6,7 +6,7 @@ from backend.domain.entities.auxiliary import PaymentStatus
 
 # ====== COMMANDS (write операции) ======
 @dataclass
-class CreatePaymentCommand:
+class CreateClientPaymentCommand:
     name: str
     client_id: int
     attorney_id: int
@@ -19,11 +19,11 @@ class CreatePaymentCommand:
     condition: Optional[str] = None
 
 @dataclass
-class UpdatePaymentCommand:
+class UpdateСlientPaymentCommand:
     payment_id: int
     name: Optional[str] = None
     client_id: Optional[int] = None
-    attorney_id: Optional[int] = None
+    attorney_id: Optional[int] = None # зачем вот это передавать?
     paid: Optional[float] = None
     paid_str: Optional[str] = None
     pade_date: Optional[date] = None
@@ -33,23 +33,27 @@ class UpdatePaymentCommand:
     status: Optional[PaymentStatus] = None
 
 @dataclass
-class DeletePaymentCommand:
+class DeleteСlientPaymentCommand:
     payment_id: int
 
 @dataclass
-class GetPaymentByIdQuery:
+class GetСlientPaymentByIdQuery:
     payment_id: int
 
 @dataclass
-class GetPaymentsForAttorneyQuery:
+class GetСlientPaymentForAttorneyQuery:
     attorney_id: int
+
+@dataclass
+class GetСlientPaymentForClientQuery:
+    client_id: int
 
 
 # Специфичный метод для быстрого обновления статуса
 # Можно использовать обычный метод Update, но там идет перебор множества
 # условий if, тут обновляется всего лишь одно поле
 @dataclass
-class ChangePaymentStatusCommand:
+class ChangeСlientPaymentStatusCommand:
     payment_id: int
     status: PaymentStatus
 

@@ -4,7 +4,7 @@ from backend.domain.entities.client import Client
 from backend.domain.entities.contact import Contact
 from backend.domain.entities.document import Document
 from backend.domain.entities.event import Event
-from backend.domain.entities.payment import ClientPayment
+from backend.domain.entities.client_payment import ClientPayment
 from backend.domain.entities.subsription import Subscription
 
 __all__ = [

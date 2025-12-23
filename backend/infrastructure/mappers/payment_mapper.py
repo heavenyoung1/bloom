@@ -1,4 +1,4 @@
-from backend.domain.entities.payment import ClientPayment
+from backend.domain.entities.client_payment import ClientPayment
 from backend.infrastructure.models import ClientPaymentORM
 
 

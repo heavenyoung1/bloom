@@ -27,10 +27,10 @@ class PaymentDetailORM(TimeStampMixin, Base):
     index_address: Mapped[str] = mapped_column(String(6), nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    bank_account: Mapped[str] = mapped_column(String(20), nullable=False)         # р/с 20
-    correspondent_account: Mapped[str] = mapped_column(String(20), nullable=False)  # к/с 20
-    bik: Mapped[str] = mapped_column(String(9), nullable=False)                   # БИК 9
+    bank_account: Mapped[str] = mapped_column(String(20), nullable=False)
+    correspondent_account: Mapped[str] = mapped_column(String(20), nullable=False)
+    bik: Mapped[str] = mapped_column(String(9), nullable=False)
     bank_recipient: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # Отношение (в AttorneyORM должен быть back_populates='payment_detail')
+    # Связь
     attorney: Mapped['AttorneyORM'] = relationship(back_populates='payment_detail')

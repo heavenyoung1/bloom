@@ -1,5 +1,5 @@
 from backend.application.dto.client_payment import PaymentResponse
-from backend.domain.entities.payment import ClientPayment
+from backend.domain.entities.client_payment import ClientPayment
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.commands.client_payment import UpdatePaymentCommand
 from backend.core.exceptions import ValidationException, EntityNotFoundException

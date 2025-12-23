@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Sequence
 
 from backend.application.interfaces.repositories.base_repo import IBaseRepository
-from backend.domain.entities.payment import ClientPayment
+from backend.domain.entities.client_payment import ClientPayment
 
 
 class IPaymentRepository(IBaseRepository['ClientPayment']):
