@@ -36,7 +36,7 @@ from backend.core.dependencies import (
 )
 from backend.core.logger import logger
 
-router = APIRouter(prefix='/api/v0/payment-detail', tags=['payment-detail'])
+router = APIRouter(prefix='/api/v0', tags=['payment-detail'])
 
 @router.post(
     '/create-payment-detail',
