@@ -76,6 +76,7 @@ class AttorneyORM(AttorneyBase, TimeStampMixin):
     client_payments: Mapped[list['ClientPaymentORM']] = relationship(
         back_populates='attorney', cascade='all, delete-orphan'
     )
+    # ВОТ ТУТ ГДЕ ТО ОШИБКА, В ЛОГАХ ПОПРАВИТЬ!!!!!
     payment_detail: Mapped['PaymentDetailORM | None'] = relationship(
         back_populates='attorney',
         uselist=False,

@@ -8,6 +8,7 @@ from backend.infrastructure.models.event import EventORM
 from backend.infrastructure.models.outbox import OutboxORM
 from backend.infrastructure.models.mixins import TimeStampMixin
 from backend.infrastructure.models.payment import ClientPaymentORM
+from backend.infrastructure.models.payment_detail import PaymentDetailORM
 
 
 # from backend.infrastructure.models.payment import PaymentORM
@@ -24,6 +25,6 @@ __all__ = [
     'OutboxORM',
     'TimeStampMixin',
     'ClientPaymentORM',
-    #    'PaymentORM',
+    'PaymentDetailORM',
     #    'SubscriptionORM',
 ]

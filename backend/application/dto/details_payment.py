@@ -7,8 +7,8 @@ from datetime import datetime
 
 class PaymentCreateRequest(BaseModel):
     '''DTO для создания платежной информации юриста'''
-    inn: str
     attorney_id: int
+    inn: str
     index_address: str
     address: str
     bank_account: str
@@ -16,6 +16,23 @@ class PaymentCreateRequest(BaseModel):
     bik: str
     bank_recipient: str
     kpp: Optional[str]  = None
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'inn': '1234567890',
+                'attorney_id': 777,
+                'index_address': '241033',
+                'address': 'г. Санкт-Петербург, ул. Площадь Восстания, д.10, кв. 55',
+                'bank_account': '12345678912345678912',
+                'correspondent_account': '14680414794257063170',
+                'bik': '987654321',
+                'bank_recipient': 'ПАО "Z - банк", лучший банк, филиал в Мухосранске',
+                'kpp': '123456789',
+            }
+        }
+    )
+
 
 
 class PaymentDetailResponse(BaseModel):
@@ -32,3 +49,5 @@ class PaymentDetailResponse(BaseModel):
 
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
