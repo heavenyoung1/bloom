@@ -145,3 +145,4 @@ if __name__ == "__main__":
         print("   python scripts/create_coordinate_grid.py templates/payment/invoice_template.pdf")
 
 
+
