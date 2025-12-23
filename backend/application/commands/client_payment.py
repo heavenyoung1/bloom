@@ -13,7 +13,7 @@ class CreateClientPaymentCommand:
     paid: float
     paid_str: str
     pade_date: date
-    paid_deadline: Optional[datetime]
+    paid_deadline: Optional[date]
     status: PaymentStatus = PaymentStatus.issued  # Дефолтное значение как в ClientPayment.create()
     taxable: bool = False
     condition: Optional[str] = None
@@ -27,7 +27,7 @@ class UpdateСlientPaymentCommand:
     paid: Optional[float] = None
     paid_str: Optional[str] = None
     pade_date: Optional[date] = None
-    paid_deadline: Optional[datetime] = None
+    paid_deadline: Optional[date] = None
     taxable: Optional[bool] = None
     condition: Optional[str] = None
     status: Optional[PaymentStatus] = None
@@ -52,6 +52,25 @@ class GetСlientPaymentForClientQuery:
 # Специфичный метод для быстрого обновления статуса
 # Можно использовать обычный метод Update, но там идет перебор множества
 # условий if, тут обновляется всего лишь одно поле
+@dataclass
+class UpdatePaymentCommand:
+    '''Команда для обновления платежа (используется доменной сущностью)'''
+    name: Optional[str] = None
+    client_id: Optional[int] = None
+    attorney_id: Optional[int] = None
+    paid: Optional[float] = None
+    paid_str: Optional[str] = None
+    pade_date: Optional[date] = None
+    paid_deadline: Optional[date] = None
+    taxable: Optional[bool] = None
+    condition: Optional[str] = None
+    status: Optional[PaymentStatus] = None
+
+@dataclass
+class ChangePaymentStatusCommand:
+    '''Команда для изменения статуса платежа (используется доменной сущностью)'''
+    status: PaymentStatus
+
 @dataclass
 class ChangeСlientPaymentStatusCommand:
     payment_id: int

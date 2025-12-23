@@ -43,6 +43,7 @@ class AttorneyRepository(IAttorneyRepository):
             # 4. Обновляем ID и timestamps в доменном объекте
             # (после flush() ORM объект уже имеет установленные created_at и updated_at)
             attorney.id = orm_attorney.id
+            # КАК БУДТО ВРЕМЯ ЗДЕСЬ НЕ БУДЕТ ПРИСВАИВАТЬСЯ!!!
             attorney.created_at = orm_attorney.created_at
             attorney.updated_at = orm_attorney.updated_at
 

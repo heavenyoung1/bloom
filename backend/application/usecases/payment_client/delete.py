@@ -1,6 +1,6 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
-from backend.application.commands.client_payment import DeletePaymentCommand
+from backend.application.commands.client_payment import DeleteСlientPaymentCommand
 from backend.core.logger import logger
 
 
@@ -11,7 +11,7 @@ class DeletePaymentUseCase:
 
     async def execute(
         self,
-        cmd: DeletePaymentCommand,
+        cmd: DeleteСlientPaymentCommand,
     ) -> bool:
         async with self.uow_factory.create() as uow:
             try:

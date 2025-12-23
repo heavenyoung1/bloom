@@ -10,7 +10,7 @@ from backend.application.commands.client_payment import (
 
 @dataclass
 class ClientPayment:
-    id: int
+    id: Optional[int]
     name: str
     client_id: int
     attorney_id: int
@@ -34,14 +34,14 @@ class ClientPayment:
         paid: float,
         paid_str: str,
         pade_date: date,
-        paid_deadline: Optional[datetime],
+        paid_deadline: Optional[date],
         taxable: bool = False,
         condition: Optional[str] = None,
         status: PaymentStatus = PaymentStatus.issued,
     ) -> 'ClientPayment':
         '''Фабричный метод для создания нового платежа.'''
         return ClientPayment(
-        id = None,  # ID будет присвоен после сохранения в базе данных
+        id=None,  # ID будет присвоен после сохранения в базе данных
         name=name,
         client_id=client_id,
         attorney_id=attorney_id,

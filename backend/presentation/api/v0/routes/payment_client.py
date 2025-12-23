@@ -29,7 +29,8 @@ from backend.core.exceptions import (
 from backend.application.dto.client_payment import  (
     PaymentClientCreateRequest,
     PaymentClientUpdateRequest,
-    PaymentClientResponse
+    PaymentClientResponse,
+    FullPaymentResponse
 )
 
 from backend.core.dependencies import (
@@ -44,8 +45,8 @@ router = APIRouter(prefix='/api/v0/client_payment', tags=['client_payment'])
 
 @router.post(
     '/create-client-payment',
-    response_model=PaymentClientResponse, #ТУТ БУДЕТ DTO СУЩНОСТЬ ПОЛНОСТЬЮ ОПИСЫВАЩАЯ ВСЕ ПОЛЯ ИЗ ВОЗВРАТ
-    status_code=status.HTTP_200_OK,
+    response_model=FullPaymentResponse,
+    status_code=status.HTTP_201_CREATED,
     summary='Создание платежа для клиента',
 )
 async def create_client_payment(
@@ -55,17 +56,27 @@ async def create_client_payment(
 ):
     try:
         service = PaymentService(uow_factory)
-        result = service.create_payment(
+        result = await service.create_payment(
             attorney_id=current_attorney_id,
             request=request,
         )
-    except:
-        # КАКАЯ ТУТ ОШИБКА БУДЕТ?
-        pass
+        return FullPaymentResponse(**result)
+    except ValidationException as e:
+        logger.error(f'Ошибка валидации: {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except EntityNotFoundException as e:
+        logger.error(f'Сущность не найдена: {e}')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.error(f'Ошибка при создании платежа: {e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Ошибка при создании платежа'
+        )
 
 @router.get(
     '/get-client-payment/{payment_id}',
-    response_model=PaymentClientResponse, #ТУТ БУДЕТ DTO СУЩНОСТЬ ПОЛНОСТЬЮ ОПИСЫВАЩАЯ ВСЕ ПОЛЯ ИЗ ВОЗВРАТ
+    response_model=PaymentClientResponse,
     status_code=status.HTTP_200_OK,
     summary='Получение платежа',
 )
@@ -73,26 +84,45 @@ async def get_client_payment(
     payment_id: int,
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
-    service = PaymentService(uow_factory)
-    service.get_client_payment(payment_id=payment_id)
+    try:
+        service = PaymentService(uow_factory)
+        result = await service.get_client_payment(payment_id=payment_id)
+        return result
+    except EntityNotFoundException as e:
+        logger.error(f'Платеж не найден: {e}')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.error(f'Ошибка при получении платежа: {e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Ошибка при получении платежа'
+        )
 
 @router.get(
     '/get-client-payment/attorneys/{attorney_id}',
-    response_model=PaymentClientResponse, #ТУТ БУДЕТ DTO СУЩНОСТЬ ПОЛНОСТЬЮ ОПИСЫВАЩАЯ ВСЕ ПОЛЯ ИЗ ВОЗВРАТ
+    response_model=list[PaymentClientResponse],
     status_code=status.HTTP_200_OK,
-    summary='Получение платежа',
+    summary='Получение всех платежей для юриста',
 )
 async def get_all_client_payments_for_attorney(
     attorney_id: int,
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
-    service = PaymentService(uow_factory)
-    service.get_all_payments_for_attorney(attorney_id=attorney_id)
+    try:
+        service = PaymentService(uow_factory)
+        result = await service.get_all_payments_for_attorney(attorney_id=attorney_id)
+        return result
+    except Exception as e:
+        logger.error(f'Ошибка при получении платежей: {e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Ошибка при получении платежей'
+        )
 
 
 @router.put(
     '/update-client-payment/{payment_id}',
-    response_model=PaymentClientResponse, #ТУТ БУДЕТ DTO СУЩНОСТЬ ПОЛНОСТЬЮ ОПИСЫВАЩАЯ ВСЕ ПОЛЯ ИЗ ВОЗВРАТ
+    response_model=PaymentClientResponse,
     status_code=status.HTTP_200_OK,
     summary='Обновление платежа',
 )
@@ -102,5 +132,46 @@ async def update_client_payment(
     current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
-    service = PaymentService(uow_factory)
-    service.update_client_payment(payment_id=payment_id)
+    try:
+        service = PaymentService(uow_factory)
+        result = await service.update_client_payment(
+            attorney_id=current_attorney_id,
+            payment_id=payment_id,
+            request=request,
+        )
+        return result
+    except ValidationException as e:
+        logger.error(f'Ошибка валидации: {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except EntityNotFoundException as e:
+        logger.error(f'Платеж не найден: {e}')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.error(f'Ошибка при обновлении платежа: {e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Ошибка при обновлении платежа'
+        )
+
+@router.delete(
+    '/delete-client-payment/{payment_id}',
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary='Удаление платежа',
+)
+async def delete_client_payment(
+    payment_id: int,
+    current_attorney_id: int = Depends(get_current_attorney_id),
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    try:
+        service = PaymentService(uow_factory)
+        await service.delete_payment(payment_id=payment_id)
+    except EntityNotFoundException as e:
+        logger.error(f'Платеж не найден: {e}')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.error(f'Ошибка при удалении платежа: {e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Ошибка при удалении платежа'
+        )

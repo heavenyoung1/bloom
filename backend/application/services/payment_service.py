@@ -70,11 +70,12 @@ from backend.core.logger import logger
 
 
 class PaymentService:
-    def __init(self, uow_factory: UnitOfWorkFactory):
-        # Инициализириуем нужные UseCases
+    def __init__(self, uow_factory: UnitOfWorkFactory):
+        # Инициализируем нужные UseCases
+        self.uow_factory = uow_factory
         self.get_attorney_payment_data_use_case = GetPaymentDetailForAttorneyUseCase(uow_factory)
         self.create_client_payment_use_case = CreatePaymentUseCase(uow_factory)
-        self.get_client_payment_use_case = GetPaymentByIdUseCase
+        self.get_client_payment_use_case = GetPaymentByIdUseCase(uow_factory)
         self.get_all_payments_for_attorney_use_case = GetAllPaymentsUseCase(uow_factory)
         self.update_client_payment_use_case = UpdatePaymentUseCase(uow_factory)
         self.delete_payment_use_case = DeletePaymentUseCase(uow_factory)
@@ -94,7 +95,7 @@ class PaymentService:
         )
         # Вызываем команду для создания платежа на основании полученных данных
         create_client_payment_cmd = CreateClientPaymentCommand(
-            name=request.attorney_id,
+            name=request.name,
             client_id=request.client_id,
             attorney_id=attorney_id,
             paid=request.paid,
@@ -159,7 +160,7 @@ class PaymentService:
     ):
         update_payment_data_cmd = UpdateСlientPaymentCommand(
             payment_id=payment_id,
-            name=request.attorney_id,
+            name=request.name,
             client_id=request.client_id,
             attorney_id=attorney_id,
             paid=request.paid,
@@ -182,7 +183,6 @@ class PaymentService:
         )
         result = await self.delete_payment_use_case.execute(
             delete_payment_cmd
-            )
-        
-    
+        )
+        return result
 

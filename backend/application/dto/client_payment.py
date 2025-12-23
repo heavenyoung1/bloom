@@ -114,3 +114,30 @@ class PaymentClientResponse(BaseModel):
     condition: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class FullPaymentResponse(BaseModel):
+    '''DTO для полного ответа с данными платежа и платежными реквизитами (18 параметров)'''
+    payment_id: int
+    payment_name: str
+    client_id: int
+    attorney_id: int
+    paid: float
+    paid_str: str
+    pade_date: date
+    paid_deadline: Optional[date]
+    status: PaymentStatus
+    taxable: bool
+    condition: Optional[str]
+    inn: str
+    kpp: Optional[str]
+    index_address: str
+    address: str
+    bank_account: str
+    corr_account: str
+    bik: str
+    bank_recipient: str
+
+    model_config = ConfigDict(from_attributes=True)

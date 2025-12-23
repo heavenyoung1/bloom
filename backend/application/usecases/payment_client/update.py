@@ -1,7 +1,7 @@
-from backend.application.dto.client_payment import PaymentResponse
+from backend.application.dto.client_payment import PaymentClientResponse
 from backend.domain.entities.client_payment import ClientPayment
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.application.commands.client_payment import UpdatePaymentCommand
+from backend.application.commands.client_payment import UpdateСlientPaymentCommand
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
@@ -14,8 +14,8 @@ class UpdatePaymentUseCase:
 
     async def execute(
         self,
-        cmd: UpdatePaymentCommand,
-    ) -> 'PaymentResponse':
+        cmd: UpdateСlientPaymentCommand,
+    ) -> 'PaymentClientResponse':
         async with self.uow_factory.create() as uow:
             try:
                 # 1. Получить платеж
@@ -27,7 +27,21 @@ class UpdatePaymentUseCase:
                     )
 
                 # 2. Применяем изменения через метод update доменной сущности
-                payment.update(cmd)
+                # Преобразуем UpdateСlientPaymentCommand в UpdatePaymentCommand для доменной сущности
+                from backend.application.commands.client_payment import UpdatePaymentCommand
+                update_cmd = UpdatePaymentCommand(
+                    name=cmd.name,
+                    client_id=cmd.client_id,
+                    attorney_id=cmd.attorney_id,
+                    paid=cmd.paid,
+                    paid_str=cmd.paid_str,
+                    pade_date=cmd.pade_date,
+                    paid_deadline=cmd.paid_deadline,  # Уже Optional[date]
+                    taxable=cmd.taxable,
+                    condition=cmd.condition,
+                    status=cmd.status,
+                )
+                payment.update(update_cmd)
 
                 # 3. Сохранение в базе
                 updated_payment = await uow.payment_repo.update(payment)
@@ -39,7 +53,7 @@ class UpdatePaymentUseCase:
                 )
 
                 # 4. Возврат Response
-                return PaymentResponse.model_validate(updated_payment)
+                return PaymentClientResponse.model_validate(updated_payment)
 
             except (ValidationException, EntityNotFoundException) as e:
                 logger.error(f'Ошибка при обновлении платежа: {e}')

@@ -1,12 +1,12 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.commands.client_payment import (
-    GetPaymentsForAttorneyQuery,
+    GetСlientPaymentForAttorneyQuery,
 )
 from backend.core.exceptions import EntityNotFoundException
 from backend.core.logger import logger
 
 from backend.application.dto.client_payment import (
-    PaymentResponse,
+    PaymentClientResponse,
 )
 
 from typing import List
@@ -18,8 +18,8 @@ class GetAllPaymentsUseCase:
 
     async def execute(
         self,
-        cmd: GetPaymentsForAttorneyQuery,
-    ) -> List['PaymentResponse']:
+        cmd: GetСlientPaymentForAttorneyQuery,
+    ) -> List['PaymentClientResponse']:
         async with self.uow_factory.create() as uow:
             try:
                 # 1. Получить все платежи для указанного юриста
@@ -34,7 +34,7 @@ class GetAllPaymentsUseCase:
                 
                 # 2. Возвращаем список платежей в нужном формате
                 payment_responses = [
-                    PaymentResponse.model_validate(payment)
+                    PaymentClientResponse.model_validate(payment)
                     for payment in payments
                 ]
 

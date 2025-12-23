@@ -182,11 +182,11 @@ async def update_payment_detail(
     return result
 
 @router.delete(
-    '/update-payment-detail/{payment_detail_id}',
+    '/delete-payment-detail/{payment_detail_id}',
     status_code=status.HTTP_204_NO_CONTENT,
     summary='Удаление платежной информации',
     responses={
-        204: {'description': 'Платежная информация успешно удален'},
+        204: {'description': 'Платежная информация успешно удалена'},
         401: {'description': 'Требуется авторизация'},
         404: {'description': 'Платежная информация не найдена'},
     },

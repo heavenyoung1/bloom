@@ -1,7 +1,7 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.application.dto.client_payment import PaymentResponse
+from backend.application.dto.client_payment import PaymentClientResponse
 from backend.core.exceptions import EntityNotFoundException
-from backend.application.commands.client_payment import GetPaymentByIdQuery
+from backend.application.commands.client_payment import GetСlientPaymentByIdQuery
 from backend.core.logger import logger
 
 
@@ -12,8 +12,8 @@ class GetPaymentByIdUseCase:
 
     async def execute(
         self,
-        cmd: GetPaymentByIdQuery,
-    ) -> 'PaymentResponse':
+        cmd: GetСlientPaymentByIdQuery,
+    ) -> 'PaymentClientResponse':
         async with self.uow_factory.create() as uow:
             try:
                 # 1. Получить платеж
@@ -24,7 +24,7 @@ class GetPaymentByIdUseCase:
                     raise EntityNotFoundException(f'Платеж не найден.')
 
                 logger.info(f'Платеж получен: ID = {cmd.payment_id}')
-                return PaymentResponse.model_validate(payment)
+                return PaymentClientResponse.model_validate(payment)
             except Exception as e:
                 logger.error(f'Ошибка при получении платежа: {e}')
                 raise e

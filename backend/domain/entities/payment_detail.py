@@ -7,7 +7,7 @@ from backend.application.commands.payment_detail import UpdatePaymentDetailComma
 
 @dataclass
 class PaymentDetail:
-    id: int                     # ID платежной информации, генерируется автоматически
+    id: Optional[int]           # ID платежной информации, генерируется автоматически
     attorney_id: int            # Владелец платежа - юрист
 
     inn: str                    # ИНН получателя
