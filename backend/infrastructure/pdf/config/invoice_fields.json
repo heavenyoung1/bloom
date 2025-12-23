@@ -1,6 +1,5 @@
 {
   "template_name": "invoice_template",
-  "template_path": "templates/payment/invoice_template.pdf",
   "page_number": 0,
   "fields": {
     "static": {

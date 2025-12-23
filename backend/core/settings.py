@@ -60,6 +60,11 @@ class Settings(BaseSettings):
         default='local',
         description='Тип хранилища: local или s3',
     )
+    FILE_STORAGE_TEMPLATE: str = Field(
+        default='',
+        description='Абсолютный путь к PDF шаблону для генерации платежных документов. '
+                    'Пример: C:\\Projects\\bloom\\backend\\infrastructure\\pdf\\template\\check_template.pdf',
+    )
 
     model_config = SettingsConfigDict(
         env_file='.env',

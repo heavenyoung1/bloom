@@ -15,11 +15,21 @@ from io import BytesIO
 
 from backend.core.logger import logger
 from backend.core.exceptions import ValidationException
+from backend.core.settings import settings
 
 
 class PDFGenerator:
     '''
     Генератор PDF документов на основе шаблонов с заполнением по координатам.
+    
+    Шаблон PDF берется из настройки FILE_STORAGE_TEMPLATE в .env файле.
+    Координаты полей берутся из конфига invoice_fields.json.
+    
+    Процесс:
+    1. Копируется шаблон PDF (универсальный для всех юристов)
+    2. Создается overlay PDF с данными по координатам из конфига
+    3. Overlay накладывается на шаблон
+    4. Возвращается готовый PDF документ
     
     Использование:
         generator = PDFGenerator()
@@ -58,13 +68,24 @@ class PDFGenerator:
             raise ValidationException(f'Неверный формат конфиг файла: {e}')
 
     def _get_template_path(self) -> Path:
-        '''Возвращает путь к PDF шаблону.'''
-        template_name = self.config.get('template_path', 'templates/payment/invoice_template.pdf')
-        template_path = self.base_dir / template_name
+        '''Возвращает путь к PDF шаблону из настроек (.env).'''
+        # Берем путь из настроек (FILE_STORAGE_TEMPLATE)
+        template_path_str = settings.FILE_STORAGE_TEMPLATE
+        
+        if not template_path_str:
+            raise ValidationException(
+                'Не указан путь к PDF шаблону. Установите FILE_STORAGE_TEMPLATE в .env файле'
+            )
+        
+        template_path = Path(template_path_str)
         
         if not template_path.exists():
-            raise FileNotFoundError(f'PDF шаблон не найден: {template_path}')
+            raise FileNotFoundError(
+                f'PDF шаблон не найден: {template_path}. '
+                f'Проверьте путь FILE_STORAGE_TEMPLATE в .env файле'
+            )
         
+        logger.info(f'Используется PDF шаблон: {template_path}')
         return template_path
 
     def _format_date(self, date_value: date) -> str:
@@ -76,9 +97,14 @@ class PDFGenerator:
         }
         return f'{date_value.day} {months[date_value.month]} {date_value.year} года'
 
-    def _format_datetime(self, datetime_value: datetime) -> str:
-        '''Форматирует datetime в русский формат.'''
-        return self._format_date(datetime_value.date())
+    def _format_datetime(self, datetime_value: datetime | date) -> str:
+        '''Форматирует datetime или date в русский формат.'''
+        if isinstance(datetime_value, datetime):
+            return self._format_date(datetime_value.date())
+        elif isinstance(datetime_value, date):
+            return self._format_date(datetime_value)
+        else:
+            return str(datetime_value)
 
     def _format_number(self, value: float) -> str:
         '''Форматирует число с пробелами и двумя знаками после запятой.'''
@@ -128,7 +154,13 @@ class PDFGenerator:
         }
         
         if payment.paid_deadline:
-            data['paid_deadline'] = self._format_datetime(payment.paid_deadline)
+            # Обрабатываем как date, так и datetime
+            if isinstance(payment.paid_deadline, datetime):
+                data['paid_deadline'] = self._format_date(payment.paid_deadline.date())
+            elif isinstance(payment.paid_deadline, date):
+                data['paid_deadline'] = self._format_date(payment.paid_deadline)
+            else:
+                data['paid_deadline'] = str(payment.paid_deadline)
         else:
             data['paid_deadline'] = ''
         

@@ -63,6 +63,9 @@ from backend.application.dto.client_payment import  (
     PaymentClientResponse
 )
 
+from backend.infrastructure.pdf.pdf_generator import PDFGenerator
+from backend.application.interfaces.repositories.local_storage import IFileStorage
+from backend.core.settings import settings
 
 from backend.core.logger import logger
 
@@ -70,7 +73,7 @@ from backend.core.logger import logger
 
 
 class PaymentService:
-    def __init__(self, uow_factory: UnitOfWorkFactory):
+    def __init__(self, uow_factory: UnitOfWorkFactory, file_storage: IFileStorage = None):
         # Инициализируем нужные UseCases
         self.uow_factory = uow_factory
         self.get_attorney_payment_data_use_case = GetPaymentDetailForAttorneyUseCase(uow_factory)
@@ -79,6 +82,12 @@ class PaymentService:
         self.get_all_payments_for_attorney_use_case = GetAllPaymentsUseCase(uow_factory)
         self.update_client_payment_use_case = UpdatePaymentUseCase(uow_factory)
         self.delete_payment_use_case = DeletePaymentUseCase(uow_factory)
+        # Инициализируем file_storage
+        if file_storage is None:
+            from backend.infrastructure.repositories.local_storage import LocalFileStorage
+            self.file_storage = LocalFileStorage(base_path=settings.FILE_STORAGE_BASE_PATH)
+        else:
+            self.file_storage = file_storage
         
     async def create_payment(
             self,
@@ -109,6 +118,41 @@ class PaymentService:
         payment_data = await self.create_client_payment_use_case.execute(
             create_client_payment_cmd
         )
+        
+        # Генерация PDF документа
+        pdf_path = None
+        try:
+            # Получаем entity объекты для генерации PDF
+            async with self.uow_factory.create() as uow:
+                # Получаем entity объекты
+                payment_entity = await uow.payment_repo.get(payment_data.id)
+                payment_detail_entity = await uow.payment_detail_repo.get_for_attorney(attorney_id)
+                
+                if payment_entity and payment_detail_entity:
+                    # Создаем генератор PDF
+                    pdf_generator = PDFGenerator()
+                    
+                    # Генерируем PDF
+                    pdf_bytes = pdf_generator.fill_invoice_template(
+                        payment=payment_entity,
+                        payment_detail=payment_detail_entity
+                    )
+                    
+                    # Сохраняем PDF в файловую систему
+                    pdf_file_path = f'payments/{payment_data.id}/invoice_{payment_data.id}.pdf'
+                    pdf_path = await self.file_storage.save_file(
+                        file_path=pdf_file_path,
+                        file_content=pdf_bytes
+                    )
+                    
+                    logger.info(f'PDF документ успешно сохранен: {pdf_path}')
+                else:
+                    logger.warning(f'Не удалось получить entity объекты для генерации PDF. Payment ID: {payment_data.id}')
+        except Exception as e:
+            # Логируем ошибку, но не прерываем создание платежа
+            logger.error(f'Ошибка при генерации PDF документа: {e}')
+            pdf_path = None
+        
         full_payment_data = {
             'payment_id': payment_data.id,
             'payment_name': payment_data.name,
@@ -129,6 +173,7 @@ class PaymentService:
             'corr_account': attorney_payment_data.correspondent_account,
             'bik': attorney_payment_data.bik,
             'bank_recipient': attorney_payment_data.bank_recipient,
+            'pdf_path': pdf_path,
         }
         return full_payment_data
 

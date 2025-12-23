@@ -173,5 +173,9 @@ class FullPaymentResponse(BaseModel):
     corr_account: str
     bik: str
     bank_recipient: str
+    pdf_path: Optional[str] = Field(
+        None,
+        description='Путь к сгенерированному PDF документу'
+    )
 
     model_config = ConfigDict(from_attributes=True)
