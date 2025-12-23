@@ -15,10 +15,10 @@ from backend.core.exceptions import (
 )
 
 from backend.application.commands.payment_detail import (
-    CreatePaymentDetailtCommand,
+    CreatePaymentDetailCommand,
     UpdatePaymentDetailCommand,
     DeletePaymentDetailCommand,
-    GetPaymentDelatilByIdQuery,
+    GetPaymentDetailByIdQuery,
     GetPaymentDetailForAttorneyQuery,
 )
 

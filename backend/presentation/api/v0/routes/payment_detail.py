@@ -16,10 +16,10 @@ from backend.core.exceptions import (
 )
 
 from backend.application.commands.payment_detail import (
-    CreatePaymentDetailtCommand,
+    CreatePaymentDetailCommand,
     UpdatePaymentDetailCommand,
     DeletePaymentDetailCommand,
-    GetPaymentDelatilByIdQuery,
+    GetPaymentDetailByIdQuery,
     GetPaymentDetailForAttorneyQuery,
 )
 
@@ -41,6 +41,7 @@ router = APIRouter(prefix='/api/v0/payment-detail', tags=['payment-detail'])
 @router.post(
     '/create-payment-detail',
     response_model=PaymentDetailResponse,
+    status_code=status.HTTP_201_CREATED,
     summary='Создание платежной информации',
 )
 async def create_payment_detail(
@@ -49,9 +50,9 @@ async def create_payment_detail(
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:
-        cmd = CreatePaymentDetailtCommand(
+        cmd = CreatePaymentDetailCommand(
             attorney_id=current_attorney_id,
-            inn = request.inn,
+            inn=request.inn,
             index_address=request.index_address,
             address=request.address,
             bank_account=request.bank_account,
@@ -70,13 +71,13 @@ async def create_payment_detail(
         logger.error(f'Ошибка валидации: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except EntityNotFoundException as e:
-        logger.error(f'Дело не найдено: {e}')
+        logger.error(f'Платежная информация не найдена: {e}')
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
-        logger.error(f'Ошибка при обновлении дела: {e}')
+        logger.error(f'Ошибка при создании платежной информации: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Ошибка при обновлении дела',
+            detail='Ошибка при создании платежной информации',
         )
 
 @router.get(
@@ -96,7 +97,7 @@ async def get_payment_detail(
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:
-        cmd = GetPaymentDelatilByIdQuery(payment_detail_id=payment_detail_id)
+        cmd = GetPaymentDetailByIdQuery(payment_detail_id=payment_detail_id)
         use_case = GetPaymentDetailByIdUseCase(uow_factory)
         result = await use_case.execute(cmd)
 
@@ -107,13 +108,13 @@ async def get_payment_detail(
         logger.error(f'Ошибка валидации: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except EntityNotFoundException as e:
-        logger.error(f'Дело не найдено: {e}')
+        logger.error(f'Платежная информация не найдена: {e}')
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
-        logger.error(f'Ошибка при обновлении дела: {e}')
+        logger.error(f'Ошибка при получении платежной информации: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Ошибка при обновлении дела',
+            detail='Ошибка при получении платежной информации',
         )
     
 @router.get(
@@ -143,18 +144,19 @@ async def get_payment_detail_for_attorney(
         logger.error(f'Ошибка валидации: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except EntityNotFoundException as e:
-        logger.error(f'Дело не найдено: {e}')
+        logger.error(f'Платежная информация не найдена: {e}')
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
-        logger.error(f'Ошибка при обновлении дела: {e}')
+        logger.error(f'Ошибка при получении платежной информации: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Ошибка при обновлении дела',
+            detail='Ошибка при получении платежной информации',
         )
 
 @router.put(
     '/update-payment-detail/{payment_detail_id}',
     response_model=PaymentDetailResponse,
+    status_code=status.HTTP_200_OK,
     summary='Обновление платежной информации',
 )
 async def update_payment_detail(
@@ -163,23 +165,43 @@ async def update_payment_detail(
     current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
-    cmd = UpdatePaymentDetailCommand(
-        payment_detail_id=payment_detail_id,
-        attorney_id=current_attorney_id,
-        inn = request.inn,
-        index_address=request.index_address,
-        address=request.address,
-        bank_account=request.bank_account,
-        correspondent_account=request.correspondent_account,
-        bik=request.bik,
-        bank_recipient=request.bank_recipient,
-        kpp=request.kpp,
-    )
-    use_case = UpdatePaymentDetailUseCase(uow_factory)
-    result = await use_case.execute(cmd)
+    try:
+        # Проверяем, что attorney_id из запроса совпадает с текущим юристом
+        if request.attorney_id and request.attorney_id != current_attorney_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='Нет прав для обновления платежной информации другого юриста'
+            )
+        
+        cmd = UpdatePaymentDetailCommand(
+            payment_detail_id=payment_detail_id,
+            attorney_id=current_attorney_id,
+            inn=request.inn,
+            index_address=request.index_address,
+            address=request.address,
+            bank_account=request.bank_account,
+            correspondent_account=request.correspondent_account,
+            bik=request.bik,
+            bank_recipient=request.bank_recipient,
+            kpp=request.kpp,
+        )
+        use_case = UpdatePaymentDetailUseCase(uow_factory)
+        result = await use_case.execute(cmd)
 
-    logger.info(f'Платежная информация успешно обновлена: {result.attorney_id}')
-    return result
+        logger.info(f'Платежная информация успешно обновлена: {result.attorney_id}')
+        return result
+    except ValidationException as e:
+        logger.error(f'Ошибка валидации: {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except EntityNotFoundException as e:
+        logger.error(f'Платежная информация не найдена: {e}')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.error(f'Ошибка при обновлении платежной информации: {e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Ошибка при обновлении платежной информации',
+        )
 
 @router.delete(
     '/delete-payment-detail/{payment_detail_id}',
@@ -209,14 +231,14 @@ async def delete_payment_detail(
         use_case = DeletePaymentDetailUseCase(uow_factory)
         await use_case.execute(cmd)
 
-        logger.info(f'платежной информации успешно удален: ID={payment_detail_id}')
+        logger.info(f'Платежная информация успешно удалена: ID={payment_detail_id}')
 
     except EntityNotFoundException as e:
-        logger.error(f'Клиент не найден: {e}')
+        logger.error(f'Платежная информация не найдена: {e}')
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
-        logger.error(f'Ошибка при удалении клиента: {e}')
+        logger.error(f'Ошибка при удалении платежной информации: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Ошибка при удалении клиента',
+            detail='Ошибка при удалении платежной информации',
         )

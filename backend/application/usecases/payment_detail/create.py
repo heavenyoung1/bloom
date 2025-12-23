@@ -1,7 +1,7 @@
 from backend.application.dto.details_payment import PaymentDetailResponse
 from backend.domain.entities.payment_detail import PaymentDetail
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.application.commands.payment_detail import CreatePaymentDetailtCommand
+from backend.application.commands.payment_detail import CreatePaymentDetailCommand
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
@@ -14,7 +14,7 @@ class CreatePaymentDetailUseCase:
 
     async def execute(
         self,
-        cmd: CreatePaymentDetailtCommand,
+        cmd: CreatePaymentDetailCommand,
     ) -> 'PaymentDetailResponse':
         async with self.uow_factory.create() as uow:
             try:

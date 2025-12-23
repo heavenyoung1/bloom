@@ -1,6 +1,6 @@
 from backend.application.dto.details_payment import PaymentDetailResponse
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.application.commands.payment_detail import GetPaymentDelatilByIdQuery
+from backend.application.commands.payment_detail import GetPaymentDetailByIdQuery
 from backend.core.exceptions import EntityNotFoundException
 from backend.core.logger import logger
 
@@ -13,7 +13,7 @@ class GetPaymentDetailByIdUseCase:
 
     async def execute(
         self,
-        cmd: GetPaymentDelatilByIdQuery,
+        cmd: GetPaymentDetailByIdQuery,
     ) -> 'PaymentDetailResponse':
         async with self.uow_factory.create() as uow:
             try:

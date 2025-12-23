@@ -5,7 +5,7 @@ from datetime import datetime
 # ====== COMMANDS (write операции) ======
 
 @dataclass
-class CreatePaymentDetailtCommand:
+class CreatePaymentDetailCommand:
     '''Команда на создание платежных реквизитов юриста.'''
     attorney_id: int
     inn: str
@@ -41,8 +41,8 @@ class DeletePaymentDetailCommand:
     payment_detail_id: int
 
 @dataclass
-class GetPaymentDelatilByIdQuery:
-    '''Команда на получение платежных реквизитов.'''
+class GetPaymentDetailByIdQuery:
+    '''Запрос на получение платежных реквизитов по ID.'''
     payment_detail_id: int
 
 @dataclass

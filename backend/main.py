@@ -13,6 +13,7 @@ from backend.presentation.api.v0.routes.event import router as event_router
 from backend.presentation.api.v0.routes.me import router as me_router
 from backend.presentation.api.v0.routes.document import router as document_router
 from backend.presentation.api.v0.routes.payment_detail import router as payment_detail_router
+from backend.presentation.api.v0.routes.payment_client import router as payment_client_router
 
 
 @asynccontextmanager
@@ -86,6 +87,7 @@ app.include_router(event_router)
 app.include_router(me_router)
 app.include_router(document_router)
 app.include_router(payment_detail_router)
+app.include_router(payment_client_router)
 
 
 # Health check endpoints

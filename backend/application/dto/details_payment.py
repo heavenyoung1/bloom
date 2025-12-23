@@ -7,11 +7,6 @@ from datetime import datetime
 
 class PaymentDetailCreateRequest(BaseModel):
     '''DTO для создания платежной информации юриста'''
-    attorney_id: int = Field(
-        ...,
-        gt=0,
-        description='ID юриста, ответственного за клиента',
-    )
     inn: str = Field(..., max_length=12)
     index_address: str = Field(..., max_length=6)
     address: str = Field(..., max_length=255)
@@ -26,7 +21,6 @@ class PaymentDetailCreateRequest(BaseModel):
         json_schema_extra={
             'example': {
                 'inn': '1234567843',
-                'attorney_id': 777,
                 'index_address': '241099',
                 'address': 'г. Санкт-Петербург, ул. Площадь Восстания, д.10, кв. 54',
                 'bank_account': '12345678912345678921',
