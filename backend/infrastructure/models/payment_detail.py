@@ -21,7 +21,7 @@ class PaymentDetailORM(TimeStampMixin, Base):
         unique=True,
     )
 
-    inn: Mapped[str] = mapped_column(String(12), nullable=False)        
+    inn: Mapped[str] = mapped_column(String(12), nullable=False)
     kpp: Mapped[str | None] = mapped_column(String(9))
 
     index_address: Mapped[str] = mapped_column(String(6), nullable=False)

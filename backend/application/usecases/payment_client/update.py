@@ -28,7 +28,10 @@ class UpdatePaymentUseCase:
 
                 # 2. Применяем изменения через метод update доменной сущности
                 # Преобразуем UpdateСlientPaymentCommand в UpdatePaymentCommand для доменной сущности
-                from backend.application.commands.client_payment import UpdatePaymentCommand
+                from backend.application.commands.client_payment import (
+                    UpdatePaymentCommand,
+                )
+
                 update_cmd = UpdatePaymentCommand(
                     name=cmd.name,
                     client_id=cmd.client_id,
@@ -62,4 +65,3 @@ class UpdatePaymentUseCase:
             except Exception as e:
                 logger.error(f'Неизвестная ошибка при обновлении платежа: {e}')
                 raise Exception('Ошибка при обновлении платежа')
-

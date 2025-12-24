@@ -7,19 +7,19 @@ from backend.application.commands.payment_detail import UpdatePaymentDetailComma
 
 @dataclass
 class PaymentDetail:
-    id: Optional[int]           # ID платежной информации, генерируется автоматически
-    attorney_id: int            # Владелец платежа - юрист
+    id: Optional[int]  # ID платежной информации, генерируется автоматически
+    attorney_id: int  # Владелец платежа - юрист
 
-    inn: str                    # ИНН получателя
-    kpp: Optional[str]          # КПП
+    inn: str  # ИНН получателя
+    kpp: Optional[str]  # КПП
 
-    index_address: str          # Индекс адреса
-    address: str                # Адрес 
+    index_address: str  # Индекс адреса
+    address: str  # Адрес
 
-    bank_account: str           # Номер расчетного счета
+    bank_account: str  # Номер расчетного счета
     correspondent_account: str  # Корреспондентский счет
-    bik: str                    # БИК
-    bank_recipient: str         # Банк-получатель
+    bik: str  # БИК
+    bank_recipient: str  # Банк-получатель
 
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

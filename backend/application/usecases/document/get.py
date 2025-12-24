@@ -22,9 +22,7 @@ class GetDocumentByIdUseCase:
 
                 # 2. Проверяем права доступа (документ должен принадлежать юристу)
                 if document.attorney_id != attorney_id:
-                    raise AccessDeniedException(
-                        'У вас нет доступа к этому документу'
-                    )
+                    raise AccessDeniedException('У вас нет доступа к этому документу')
 
                 logger.info(f'Документ получен: ID={document_id}')
 
@@ -38,4 +36,3 @@ class GetDocumentByIdUseCase:
             except Exception as e:
                 logger.error(f'Неизвестная ошибка при получении документа: {e}')
                 raise Exception('Ошибка при получении документа')
-

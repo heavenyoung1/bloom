@@ -60,4 +60,3 @@ class CreateDocumentDTO(BaseModel):
     attorney_id: int
     description: str = ''
     mime_type: Optional[str] = None
-

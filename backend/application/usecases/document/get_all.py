@@ -10,9 +10,7 @@ class GetDocumentsForCaseUseCase:
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 
-    async def execute(
-        self, case_id: int, attorney_id: int
-    ) -> 'DocumentListResponse':
+    async def execute(self, case_id: int, attorney_id: int) -> 'DocumentListResponse':
         async with self.uow_factory.create() as uow:
             try:
                 # 1. Проверяем, что дело существует и принадлежит юристу
@@ -21,9 +19,7 @@ class GetDocumentsForCaseUseCase:
                     raise EntityNotFoundException(f'Дело с ID {case_id} не найдено')
 
                 if case.attorney_id != attorney_id:
-                    raise AccessDeniedException(
-                        'У вас нет доступа к этому делу'
-                    )
+                    raise AccessDeniedException('У вас нет доступа к этому делу')
 
                 # 2. Получаем все документы для дела
                 documents = await uow.doc_meta_repo.get_all_for_case(case_id)
@@ -49,4 +45,3 @@ class GetDocumentsForCaseUseCase:
             except Exception as e:
                 logger.error(f'Неизвестная ошибка при получении документов: {e}')
                 raise Exception('Ошибка при получении документов')
-

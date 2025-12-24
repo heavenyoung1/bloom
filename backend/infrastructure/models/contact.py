@@ -6,7 +6,7 @@ from backend.infrastructure.models.mixins import TimeStampMixin
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from backend.infrastructure.models import CaseORM
+    from backend.infrastructure.models import CaseORM, AttorneyORM
 
 
 class ContactORM(TimeStampMixin, Base):
@@ -17,8 +17,16 @@ class ContactORM(TimeStampMixin, Base):
     personal_info: Mapped[str] = mapped_column(String(20))
     phone: Mapped[str] = mapped_column(String(20))
     email: Mapped[str | None] = mapped_column(String(50))
+    attorney_id: Mapped[int] = mapped_column(
+        ForeignKey('attorneys.id', ondelete='CASCADE'),
+        nullable=False,
+        index=True,
+    )
+    attorney: Mapped['AttorneyORM'] = relationship(back_populates='contacts')
 
     case_id: Mapped[int] = mapped_column(
-        ForeignKey('cases.id', ondelete='CASCADE'), nullable=False, index=True
+        ForeignKey('cases.id', ondelete='CASCADE'),
+        nullable=False,
+        index=True,
     )
     case: Mapped['CaseORM'] = relationship(back_populates='contacts')

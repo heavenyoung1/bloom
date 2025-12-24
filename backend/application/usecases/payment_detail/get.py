@@ -17,15 +17,20 @@ class GetPaymentDetailByIdUseCase:
     ) -> 'PaymentDetailResponse':
         async with self.uow_factory.create() as uow:
             try:
-                payment_detail = await uow.payment_detail_repo.get(cmd.payment_detail_id)
+                payment_detail = await uow.payment_detail_repo.get(
+                    cmd.payment_detail_id
+                )
 
                 if not payment_detail:
-                    logger.error(f'Платежные реквизиты с ID {cmd.payment_detail_id} не найдены.')
+                    logger.error(
+                        f'Платежные реквизиты с ID {cmd.payment_detail_id} не найдены.'
+                    )
                     raise EntityNotFoundException(f'Платежные реквизиты не найдены.')
 
-                logger.info(f'Платежные реквизиты получены: ID = {cmd.payment_detail_id}')
+                logger.info(
+                    f'Платежные реквизиты получены: ID = {cmd.payment_detail_id}'
+                )
                 return PaymentDetailResponse.model_validate(payment_detail)
             except Exception as e:
                 logger.error(f'Ошибка при получении платежных реквизитов: {e}')
                 raise e
-

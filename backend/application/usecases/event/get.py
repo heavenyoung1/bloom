@@ -70,6 +70,7 @@ class GetEventByAttorneyUseCase:
                 )
                 raise e
 
+
 class GetNearestEventsByAttorneyUseCase:
     '''Получить ближайшие события для юриста отсортированные по дате и ограниченные по количеству'''
 
@@ -104,6 +105,7 @@ class GetNearestEventsByAttorneyUseCase:
                     f'Ошибка при получении событий юриста {cmd.attorney_id}: {e}'
                 )
                 raise e
+
 
 class GetEventByCaseUseCase:
     '''Получить все события для конкретного дела'''

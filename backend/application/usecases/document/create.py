@@ -10,9 +10,7 @@ from backend.core.logger import logger
 class CreateDocumentUseCase:
     '''Сценарий: юрист загружает документ в систему.'''
 
-    def __init__(
-        self, uow_factory: UnitOfWorkFactory, file_storage: IFileStorage
-    ):
+    def __init__(self, uow_factory: UnitOfWorkFactory, file_storage: IFileStorage):
         self.uow_factory = uow_factory
         self.file_storage = file_storage
 
@@ -74,4 +72,3 @@ class CreateDocumentUseCase:
             except Exception as e:
                 logger.error(f'Неизвестная ошибка при создании документа: {e}')
                 raise Exception('Ошибка при создании документа')
-

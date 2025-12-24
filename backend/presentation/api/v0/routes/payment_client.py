@@ -19,7 +19,7 @@ from backend.application.commands.client_payment import (
     DeleteСlientPaymentCommand,
     GetСlientPaymentByIdQuery,
     GetСlientPaymentForAttorneyQuery,
-    GetСlientPaymentForClientQuery
+    GetСlientPaymentForClientQuery,
 )
 
 from backend.core.exceptions import (
@@ -28,11 +28,11 @@ from backend.core.exceptions import (
     AccessDeniedException,
 )
 
-from backend.application.dto.client_payment import  (
+from backend.application.dto.client_payment import (
     PaymentClientCreateRequest,
     PaymentClientUpdateRequest,
     PaymentClientResponse,
-    FullPaymentResponse
+    FullPaymentResponse,
 )
 
 from backend.core.dependencies import (
@@ -45,6 +45,7 @@ from backend.core.dependencies import (
 from backend.core.logger import logger
 
 router = APIRouter(prefix='/api/v0', tags=['client_payment'])
+
 
 @router.post(
     '/create-client-payment',
@@ -75,8 +76,9 @@ async def create_client_payment(
         logger.error(f'Ошибка при создании платежа: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Ошибка при создании платежа'
+            detail='Ошибка при создании платежа',
         )
+
 
 @router.get(
     '/get-client-payment/{payment_id}',
@@ -99,8 +101,9 @@ async def get_client_payment(
         logger.error(f'Ошибка при получении платежа: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Ошибка при получении платежа'
+            detail='Ошибка при получении платежа',
         )
+
 
 @router.get(
     '/get-client-payment/attorneys/{attorney_id}',
@@ -120,7 +123,7 @@ async def get_all_client_payments_for_attorney(
         logger.error(f'Ошибка при получении платежей: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Ошибка при получении платежей'
+            detail='Ошибка при получении платежей',
         )
 
 
@@ -154,8 +157,9 @@ async def update_client_payment(
         logger.error(f'Ошибка при обновлении платежа: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Ошибка при обновлении платежа'
+            detail='Ошибка при обновлении платежа',
         )
+
 
 @router.delete(
     '/delete-client-payment/{payment_id}',
@@ -177,8 +181,9 @@ async def delete_client_payment(
         logger.error(f'Ошибка при удалении платежа: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Ошибка при удалении платежа'
+            detail='Ошибка при удалении платежа',
         )
+
 
 @router.get(
     '/download-payment-pdf/{payment_id}',
@@ -200,64 +205,69 @@ async def download_payment_pdf(
         # Получаем информацию о платеже
         service = PaymentService(uow_factory, file_storage)
         payment = await service.get_client_payment(payment_id)
-        
+
         # Проверяем, что платеж принадлежит текущему юристу
         if payment.attorney_id != current_attorney_id:
             raise AccessDeniedException('Нет доступа к этому платежу')
-        
+
         # Стандартный путь к PDF файлу
         pdf_path = f'payments/{payment_id}/invoice_{payment_id}.pdf'
-        
+
         try:
             # Пытаемся прочитать файл из хранилища
             pdf_bytes = await file_storage.get_file(pdf_path)
         except FileNotFoundError:
             # Если файл не найден, пытаемся сгенерировать его заново
-            logger.info(f'PDF файл не найден, генерируем заново для платежа {payment_id}')
-            
+            logger.info(
+                f'PDF файл не найден, генерируем заново для платежа {payment_id}'
+            )
+
             async with uow_factory.create() as uow:
                 # Получаем entity объекты
                 payment_entity = await uow.payment_repo.get(payment_id)
-                payment_detail_entity = await uow.payment_detail_repo.get_for_attorney(current_attorney_id)
-                
+                payment_detail_entity = await uow.payment_detail_repo.get_for_attorney(
+                    current_attorney_id
+                )
+
                 if not payment_entity or not payment_detail_entity:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
-                        detail='Не удалось получить данные для генерации PDF'
+                        detail='Не удалось получить данные для генерации PDF',
                     )
-                
+
                 # Создаем генератор PDF
                 from backend.infrastructure.pdf.pdf_generator import PDFGenerator
+
                 pdf_generator = PDFGenerator()
-                
+
                 # Генерируем PDF
                 pdf_bytes = pdf_generator.fill_invoice_template(
-                    payment=payment_entity,
-                    payment_detail=payment_detail_entity
+                    payment=payment_entity, payment_detail=payment_detail_entity
                 )
-                
+
                 # Сохраняем PDF
                 pdf_path = await file_storage.save_file(
-                    file_path=pdf_path,
-                    file_content=pdf_bytes
+                    file_path=pdf_path, file_content=pdf_bytes
                 )
-        
+
         # Возвращаем файл
         from pathlib import Path
         import tempfile
-        
+
         # Создаем временный файл
         with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp_file:
             tmp_file.write(pdf_bytes)
             tmp_file_path = tmp_file.name
-        
+
         return FileResponse(
             path=tmp_file_path,
             filename=f'invoice_{payment_id}.pdf',
             media_type='application/pdf',
-            background=lambda: Path(tmp_file_path).unlink()  # Удаляем временный файл после отправки
+            background=lambda: Path(
+                tmp_file_path
+            ).unlink(),  # Удаляем временный файл после отправки
         )
-        
+
     except EntityNotFoundException as e:
         logger.error(f'Платеж не найден: {e}')
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -266,10 +276,12 @@ async def download_payment_pdf(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
     except FileNotFoundError as e:
         logger.error(f'PDF файл не найден: {e}')
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='PDF документ не найден')
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='PDF документ не найден'
+        )
     except Exception as e:
         logger.error(f'Ошибка при скачивании PDF: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Ошибка при скачивании PDF документа'
+            detail='Ошибка при скачивании PDF документа',
         )

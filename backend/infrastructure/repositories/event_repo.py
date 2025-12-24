@@ -97,8 +97,10 @@ class EventRepository(IEventRepository):
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении СОБЫТИЯ. ID = {attorney_id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении СОБЫТИЯ: {str(e)}')
-        
-    async def get_nearest_for_attorney(self, attorney_id: int, count: int) -> List['Event']:
+
+    async def get_nearest_for_attorney(
+        self, attorney_id: int, count: int
+    ) -> List['Event']:
         '''Получить ближайшие события по дате и ограниченные по количеству'''
         try:
             now = datetime.now(timezone.utc)
@@ -108,8 +110,8 @@ class EventRepository(IEventRepository):
                 .where(
                     EventORM.attorney_id == attorney_id,
                     EventORM.event_date >= now,
-                    )  
-                .order_by(EventORM.event_date.asc())  
+                )
+                .order_by(EventORM.event_date.asc())
                 .limit(count)
             )
             result = await self.session.execute(stmt)
@@ -119,8 +121,12 @@ class EventRepository(IEventRepository):
             return [EventMapper.to_domain(orm_event) for orm_event in orm_events]
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении ближайших СОБЫТИЙ. ID = {attorney_id}: {e}')
-            raise DatabaseErrorException(f'Ошибка при получении ближайших СОБЫТИЙ: {str(e)}')
+            logger.error(
+                f'Ошибка БД при получении ближайших СОБЫТИЙ. ID = {attorney_id}: {e}'
+            )
+            raise DatabaseErrorException(
+                f'Ошибка при получении ближайших СОБЫТИЙ: {str(e)}'
+            )
 
     async def update(self, updated_event: Event) -> 'Event':
         try:

@@ -4,7 +4,6 @@ from backend.application.commands.client_payment import DeleteСlientPaymentComm
 from backend.core.logger import logger
 
 
-
 class DeletePaymentUseCase:
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory

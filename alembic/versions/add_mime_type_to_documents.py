@@ -21,10 +21,11 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Add mime_type column to documents table."""
-    op.add_column('documents', sa.Column('mime_type', sa.String(length=100), nullable=True))
+    op.add_column(
+        'documents', sa.Column('mime_type', sa.String(length=100), nullable=True)
+    )
 
 
 def downgrade() -> None:
     """Remove mime_type column from documents table."""
     op.drop_column('documents', 'mime_type')
-

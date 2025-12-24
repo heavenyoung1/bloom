@@ -11,6 +11,7 @@ from backend.application.dto.client_payment import (
     PaymentClientResponse,
 )
 
+
 class CreatePaymentUseCase:
     '''Сценарий: юрист создаёт платежный документ.'''
 

@@ -48,7 +48,7 @@ from backend.application.commands.client_payment import (
     DeleteСlientPaymentCommand,
     GetСlientPaymentByIdQuery,
     GetСlientPaymentForAttorneyQuery,
-    GetСlientPaymentForClientQuery
+    GetСlientPaymentForClientQuery,
 )
 
 from backend.core.exceptions import (
@@ -57,10 +57,10 @@ from backend.core.exceptions import (
     AccessDeniedException,
 )
 
-from backend.application.dto.client_payment import  (
+from backend.application.dto.client_payment import (
     PaymentClientCreateRequest,
     PaymentClientUpdateRequest,
-    PaymentClientResponse
+    PaymentClientResponse,
 )
 
 from backend.infrastructure.pdf.pdf_generator import PDFGenerator
@@ -70,13 +70,15 @@ from backend.core.settings import settings
 from backend.core.logger import logger
 
 
-
-
 class PaymentService:
-    def __init__(self, uow_factory: UnitOfWorkFactory, file_storage: IFileStorage = None):
+    def __init__(
+        self, uow_factory: UnitOfWorkFactory, file_storage: IFileStorage = None
+    ):
         # Инициализируем нужные UseCases
         self.uow_factory = uow_factory
-        self.get_attorney_payment_data_use_case = GetPaymentDetailForAttorneyUseCase(uow_factory)
+        self.get_attorney_payment_data_use_case = GetPaymentDetailForAttorneyUseCase(
+            uow_factory
+        )
         self.create_client_payment_use_case = CreatePaymentUseCase(uow_factory)
         self.get_client_payment_use_case = GetPaymentByIdUseCase(uow_factory)
         self.get_all_payments_for_attorney_use_case = GetAllPaymentsUseCase(uow_factory)
@@ -84,20 +86,23 @@ class PaymentService:
         self.delete_payment_use_case = DeletePaymentUseCase(uow_factory)
         # Инициализируем file_storage
         if file_storage is None:
-            from backend.infrastructure.repositories.local_storage import LocalFileStorage
-            self.file_storage = LocalFileStorage(base_path=settings.FILE_STORAGE_BASE_PATH)
+            from backend.infrastructure.repositories.local_storage import (
+                LocalFileStorage,
+            )
+
+            self.file_storage = LocalFileStorage(
+                base_path=settings.FILE_STORAGE_BASE_PATH
+            )
         else:
             self.file_storage = file_storage
-        
+
     async def create_payment(
-            self,
-            attorney_id: int,
-            request: PaymentClientCreateRequest,
+        self,
+        attorney_id: int,
+        request: PaymentClientCreateRequest,
     ):
         # Вызываем команду для получения платежных данных юриста
-        get_attorney_payment_data_cmd = GetPaymentDetailForAttorneyQuery(
-            attorney_id
-        )
+        get_attorney_payment_data_cmd = GetPaymentDetailForAttorneyQuery(attorney_id)
         # Вызываем UseCase для получения платежных данных юриста
         attorney_payment_data = await self.get_attorney_payment_data_use_case.execute(
             get_attorney_payment_data_cmd
@@ -118,7 +123,7 @@ class PaymentService:
         payment_data = await self.create_client_payment_use_case.execute(
             create_client_payment_cmd
         )
-        
+
         # Генерация PDF документа
         pdf_path = None
         try:
@@ -126,33 +131,37 @@ class PaymentService:
             async with self.uow_factory.create() as uow:
                 # Получаем entity объекты
                 payment_entity = await uow.payment_repo.get(payment_data.id)
-                payment_detail_entity = await uow.payment_detail_repo.get_for_attorney(attorney_id)
-                
+                payment_detail_entity = await uow.payment_detail_repo.get_for_attorney(
+                    attorney_id
+                )
+
                 if payment_entity and payment_detail_entity:
                     # Создаем генератор PDF
                     pdf_generator = PDFGenerator()
-                    
+
                     # Генерируем PDF
                     pdf_bytes = pdf_generator.fill_invoice_template(
-                        payment=payment_entity,
-                        payment_detail=payment_detail_entity
+                        payment=payment_entity, payment_detail=payment_detail_entity
                     )
-                    
+
                     # Сохраняем PDF в файловую систему
-                    pdf_file_path = f'payments/{payment_data.id}/invoice_{payment_data.id}.pdf'
-                    pdf_path = await self.file_storage.save_file(
-                        file_path=pdf_file_path,
-                        file_content=pdf_bytes
+                    pdf_file_path = (
+                        f'payments/{payment_data.id}/invoice_{payment_data.id}.pdf'
                     )
-                    
+                    pdf_path = await self.file_storage.save_file(
+                        file_path=pdf_file_path, file_content=pdf_bytes
+                    )
+
                     logger.info(f'PDF документ успешно сохранен: {pdf_path}')
                 else:
-                    logger.warning(f'Не удалось получить entity объекты для генерации PDF. Payment ID: {payment_data.id}')
+                    logger.warning(
+                        f'Не удалось получить entity объекты для генерации PDF. Payment ID: {payment_data.id}'
+                    )
         except Exception as e:
             # Логируем ошибку, но не прерываем создание платежа
             logger.error(f'Ошибка при генерации PDF документа: {e}')
             pdf_path = None
-        
+
         full_payment_data = {
             'payment_id': payment_data.id,
             'payment_name': payment_data.name,
@@ -178,30 +187,24 @@ class PaymentService:
         return full_payment_data
 
     async def get_client_payment(self, payment_id: int):
-        get_payment_cmd = GetСlientPaymentByIdQuery(
-            payment_id=payment_id
-            )
-        result = await self.get_client_payment_use_case.execute(
-            get_payment_cmd
-            )
+        get_payment_cmd = GetСlientPaymentByIdQuery(payment_id=payment_id)
+        result = await self.get_client_payment_use_case.execute(get_payment_cmd)
         return result
-    
+
     async def get_all_payments_for_attorney(self, attorney_id: int):
         get_all_payments_for_attorney_cmd = GetСlientPaymentForAttorneyQuery(
             attorney_id=attorney_id,
-            )
+        )
         result = await self.get_all_payments_for_attorney_use_case.execute(
             get_all_payments_for_attorney_cmd,
-            )
+        )
         return result
-    
-
 
     async def update_client_payment(
-            self,
-            attorney_id: int,
-            payment_id: int,
-            request: PaymentClientUpdateRequest,
+        self,
+        attorney_id: int,
+        payment_id: int,
+        request: PaymentClientUpdateRequest,
     ):
         update_payment_data_cmd = UpdateСlientPaymentCommand(
             payment_id=payment_id,
@@ -216,9 +219,11 @@ class PaymentService:
             taxable=request.taxable,
             condition=request.condition,
         )
-        result = await self.update_client_payment_use_case.execute(update_payment_data_cmd)
+        result = await self.update_client_payment_use_case.execute(
+            update_payment_data_cmd
+        )
         return result
-    
+
     async def delete_payment(
         self,
         payment_id: int,
@@ -226,8 +231,5 @@ class PaymentService:
         delete_payment_cmd = DeleteСlientPaymentCommand(
             payment_id=payment_id,
         )
-        result = await self.delete_payment_use_case.execute(
-            delete_payment_cmd
-        )
+        result = await self.delete_payment_use_case.execute(delete_payment_cmd)
         return result
-

@@ -30,8 +30,10 @@ class GetAllPaymentsUseCase:
                     logger.warning(f'Нет платежей для юриста с ID {cmd.attorney_id}')
                     return []
 
-                logger.info(f'Получено {len(payments)} платежей для юриста {cmd.attorney_id}')
-                
+                logger.info(
+                    f'Получено {len(payments)} платежей для юриста {cmd.attorney_id}'
+                )
+
                 # 2. Возвращаем список платежей в нужном формате
                 payment_responses = [
                     PaymentClientResponse.model_validate(payment)

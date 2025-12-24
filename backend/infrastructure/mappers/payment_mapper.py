@@ -14,7 +14,7 @@ class ClientPaymentMapper:
                 paid_deadline_date = orm.paid_deadline.date()
             elif isinstance(orm.paid_deadline, date):
                 paid_deadline_date = orm.paid_deadline
-        
+
         return ClientPayment(
             id=orm.id,
             name=orm.name,
@@ -39,10 +39,12 @@ class ClientPaymentMapper:
         if domain.paid_deadline:
             if isinstance(domain.paid_deadline, date):
                 # Преобразуем date в datetime (начало дня)
-                paid_deadline_datetime = datetime.combine(domain.paid_deadline, datetime.min.time())
+                paid_deadline_datetime = datetime.combine(
+                    domain.paid_deadline, datetime.min.time()
+                )
             elif isinstance(domain.paid_deadline, datetime):
                 paid_deadline_datetime = domain.paid_deadline
-        
+
         return ClientPaymentORM(
             id=domain.id,
             name=domain.name,

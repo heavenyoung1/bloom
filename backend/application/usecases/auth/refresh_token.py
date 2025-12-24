@@ -73,4 +73,3 @@ class RefreshTokenUseCase:
         except Exception as e:
             logger.error(f'Неожиданная ошибка при обновлении токена: {e}')
             raise ValidationException('Ошибка при обновлении токена')
-

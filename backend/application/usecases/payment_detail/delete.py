@@ -17,10 +17,11 @@ class DeletePaymentDetailUseCase:
                 # 1. Удалить платежные реквизиты
                 await uow.payment_detail_repo.delete(cmd.payment_detail_id)
 
-                logger.info(f'Платежные реквизиты с ID {cmd.payment_detail_id} удалены.')
+                logger.info(
+                    f'Платежные реквизиты с ID {cmd.payment_detail_id} удалены.'
+                )
                 return True
 
             except Exception as e:
                 logger.error(f'Ошибка при удалении платежных реквизитов: {e}')
                 raise e
-

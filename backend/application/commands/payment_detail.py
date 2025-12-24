@@ -4,9 +4,11 @@ from datetime import datetime
 
 # ====== COMMANDS (write операции) ======
 
+
 @dataclass
 class CreatePaymentDetailCommand:
     '''Команда на создание платежных реквизитов юриста.'''
+
     attorney_id: int
     inn: str
     index_address: str
@@ -15,12 +17,13 @@ class CreatePaymentDetailCommand:
     correspondent_account: str
     bik: str
     bank_recipient: str
-    kpp: Optional[str]  = None
+    kpp: Optional[str] = None
 
 
 @dataclass
 class UpdatePaymentDetailCommand:
     '''Команда на обновление платежных реквизитов.'''
+
     payment_detail_id: int  # что обновляем (ID записи реквизитов)
     attorney_id: int
 
@@ -35,17 +38,23 @@ class UpdatePaymentDetailCommand:
     bik: Optional[str] = None
     bank_recipient: Optional[str] = None
 
+
 @dataclass
 class DeletePaymentDetailCommand:
     '''Команда на удаление платежных реквизитов.'''
+
     payment_detail_id: int
+
 
 @dataclass
 class GetPaymentDetailByIdQuery:
     '''Запрос на получение платежных реквизитов по ID.'''
+
     payment_detail_id: int
+
 
 @dataclass
 class GetPaymentDetailForAttorneyQuery:
     '''Команда на получение платежных реквизитов для юриста.'''
+
     attorney_id: int
