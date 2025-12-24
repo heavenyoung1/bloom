@@ -1,8 +1,11 @@
 from typing import TYPE_CHECKING, List
 
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.infrastructure.models import CaseORM
 
 from backend.core.logger import logger
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
@@ -88,6 +91,41 @@ class CaseRepository(ICaseRepository):
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении всех ДЕЛ: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при получении ДЕЛА: {str(e)}')
+
+# ===============================================================================================
+    async def get_all_for_attorney_with_relations(self, attorney_id: int) -> List['CaseORM']:
+        try:
+            # 1. Создаем базовый запрос с фильтром по адвокату
+            stmt = (
+                select(CaseORM)
+                .where(CaseORM.attorney_id == attorney_id) # Выбор дел для юриста
+                .order_by(CaseORM.created_at.desc())
+            )
+            # 2. Применяем eager loading для связанных объектов (не лучше ли использовать )
+            stmt = stmt.options(
+                selectinload(CaseORM.client),
+                selectinload(CaseORM.contact),
+            )
+            # 3. Выполняем запрос
+            result = await self.session.execute(stmt)
+            orm_cases = result.scalars().all()
+
+            logger.info(
+                f'Получено {len(orm_cases)} дел для адвоката {attorney_id} '
+                f'с загруженными связями (client, contacts)'
+            )
+            
+            # 4. Возвращаем список ORM объектов (БЕЗ маппинга в доменную сущность)
+            return list(orm_cases)
+        
+        except SQLAlchemyError as e:
+            logger.error(
+                f'Ошибка БД при получении дел с связями для адвоката {attorney_id}: {str(e)}'
+            )
+            raise DatabaseErrorException(
+                f'Ошибка при получении дел с связанными данными: {str(e)}'
+            )
+# ===============================================================================================
 
     async def update(self, updated_case: Case) -> 'Case':
         try:
