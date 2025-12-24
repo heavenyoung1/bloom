@@ -1,6 +1,6 @@
 from typing import Optional, TYPE_CHECKING
 
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -43,7 +43,6 @@ class AttorneyRepository(IAttorneyRepository):
             # 4. Обновляем ID и timestamps в доменном объекте
             # (после flush() ORM объект уже имеет установленные created_at и updated_at)
             attorney.id = orm_attorney.id
-            # КАК БУДТО ВРЕМЯ ЗДЕСЬ НЕ БУДЕТ ПРИСВАИВАТЬСЯ!!!
             attorney.created_at = orm_attorney.created_at
             attorney.updated_at = orm_attorney.updated_at
 
@@ -60,18 +59,14 @@ class AttorneyRepository(IAttorneyRepository):
 
     async def get(self, id: int) -> Optional['Attorney']:
         try:
-            # 1. Получение записи из базы данных
             stmt = select(AttorneyORM).where(AttorneyORM.id == id)
             result = await self.session.execute(stmt)
-            orm_attorney = result.scalars().first()
+            orm_attorney = result.scalar_one_or_none()
 
-            # 2. Проверка существования записи в БД
             if not orm_attorney:
                 return None
 
-            # 3. Преобразование ORM объекта в доменную сущность
             attorney = AttorneyMapper.to_domain(orm_attorney)
-
             logger.info(f'ЮРИСТ успешно получен. ID - {attorney.id}')
             return attorney
 
@@ -80,74 +75,17 @@ class AttorneyRepository(IAttorneyRepository):
             raise DatabaseErrorException(f'Ошибка БД при получении ЮРИСТА: {str(e)}')
 
     async def get_by_email(self, email: str) -> Optional['Attorney']:
-        try:
-            # 1. Получение записи из базы данных
-            stmt = select(AttorneyORM).where(AttorneyORM.email == email)
-            result = await self.session.execute(stmt)
-            orm_attorney = result.scalars().first()
-
-            # 2. Проверка существования записи в БД
-            if orm_attorney:
-                attorney = AttorneyMapper.to_domain(orm_attorney)
-                logger.info(
-                    f'ЮРИСТ успешно получен по email. ID - {attorney.id}. Email - {attorney.email}.'
-                )
-                return attorney
-            else:
-                return None
-        except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении ЮРИСТА по email={email}: {e}')
-            raise DatabaseErrorException(
-                f'Ошибка БД при получении ЮРИСТА по email: {str(e)}'
-            )
+        return await self._get_by_field(AttorneyORM.email == email, 'email', email)
 
     async def get_by_license_id(self, license_id: str) -> Optional['Attorney']:
-        try:
-            # 1. Получение записи из базы данных
-            stmt = select(AttorneyORM).where(AttorneyORM.license_id == license_id)
-            result = await self.session.execute(stmt)
-            orm_attorney = result.scalars().first()
-
-            # 2. Проверка существования записи в БД
-            if orm_attorney:
-                attorney = AttorneyMapper.to_domain(orm_attorney)
-                logger.info(
-                    f'ЮРИСТ успешно получен по license_id. ID - {attorney.id}. license_id - {attorney.license_id}.'
-                )
-                return attorney
-            else:
-                return None
-        except SQLAlchemyError as e:
-            logger.error(
-                f'Ошибка БД при получении ЮРИСТА по license_id={license_id}: {e}'
-            )
-            raise DatabaseErrorException(
-                f'Ошибка БД при получении ЮРИСТА по license_id: {str(e)}'
-            )
+        return await self._get_by_field(
+            AttorneyORM.license_id == license_id, 'license_id', license_id
+        )
 
     async def get_by_phone(self, phone_number: str) -> Optional['Attorney']:
-        try:
-            # 1. Получение записи из базы данных
-            stmt = select(AttorneyORM).where(AttorneyORM.phone == phone_number)
-            result = await self.session.execute(stmt)
-            orm_attorney = result.scalars().first()
-
-            # 2. Проверка существования записи в БД
-            if orm_attorney:
-                attorney = AttorneyMapper.to_domain(orm_attorney)
-                logger.info(
-                    f'ЮРИСТ успешно получен по номеру телефона. ID - {attorney.id}. phone_number - {attorney.phone}.'
-                )
-                return attorney
-            else:
-                return None
-        except SQLAlchemyError as e:
-            logger.error(
-                f'Ошибка БД при получении ЮРИСТА по phone_number = {phone_number}: {e}'
-            )
-            raise DatabaseErrorException(
-                f'Ошибка БД при получении ЮРИСТА по license_id: {str(e)}'
-            )
+        return await self._get_by_field(
+            AttorneyORM.phone == phone_number, 'phone_number', phone_number
+        )
 
     async def update(self, updated_attorney: Attorney) -> 'Attorney':
         try:
@@ -163,17 +101,8 @@ class AttorneyRepository(IAttorneyRepository):
                     f'Юрист с ID {updated_attorney.id} не найден.'
                 )
 
-            # 3. Прямое обновление полей ORM-объекта
-            # ПОХОЖЕ НА КУСОК ДЕРЬМА
-            # ПРИДУМАТЬ КАК НЕ ПЕРЕДАВАТЬ ПО ОДНОМУ АРГУМЕНТУ
-            orm_attorney.license_id = updated_attorney.license_id
-            orm_attorney.first_name = updated_attorney.first_name
-            orm_attorney.last_name = updated_attorney.last_name
-            orm_attorney.patronymic = updated_attorney.patronymic
-            orm_attorney.email = updated_attorney.email
-            orm_attorney.telegram_username = updated_attorney.telegram_username
-            orm_attorney.phone = updated_attorney.phone
-            orm_attorney.hashed_password = updated_attorney.hashed_password
+            # 3. Обновление полей ORM-объекта из доменной сущности
+            AttorneyMapper.update_orm(orm_attorney, updated_attorney)
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция
@@ -204,7 +133,7 @@ class AttorneyRepository(IAttorneyRepository):
                 )
 
             # 2. Удаление
-            await self.session.delete(orm_attorney)
+            self.session.delete(orm_attorney)
             await self.session.flush()
 
             logger.info(f'ЮРИСТ с ID {id} успешно удален.')
@@ -215,58 +144,88 @@ class AttorneyRepository(IAttorneyRepository):
 
     async def change_verify(self, attorney_id: int, is_verified: bool) -> 'Attorney':
         '''Изменить статус верификации Юриста по ID.'''
+        return await self._change_field(
+            attorney_id, 'is_verified', is_verified, 'верификации'
+        )
+
+    async def change_is_active(self, attorney_id: int, is_active: bool) -> 'Attorney':
+        '''Изменить статус активности Юриста по ID.'''
+        return await self._change_field(
+            attorney_id, 'is_active', is_active, 'активности'
+        )
+
+    async def _get_by_field(
+        self, condition, field_name: str, field_value: str
+    ) -> Optional['Attorney']:
+        '''
+        Вспомогательный метод для получения юриста по произвольному полю.
+        
+        Args:
+            condition: SQLAlchemy условие для фильтрации
+            field_name: Название поля для логирования
+            field_value: Значение поля для логирования
+            
+        Returns:
+            Optional[Attorney]: Найденный юрист или None
+        '''
         try:
-            # 1. Выполнение запроса на извлечение данных из БД
-            stmt = select(AttorneyORM).where(AttorneyORM.id == attorney_id)
+            stmt = select(AttorneyORM).where(condition)
             result = await self.session.execute(stmt)
             orm_attorney = result.scalar_one_or_none()
 
-            # 2. Проверка наличия записи в БД
             if not orm_attorney:
-                logger.error(f'Юрист с ID {attorney_id} не найден.')
-                raise EntityNotFoundException(f'Юрист с ID {attorney_id} не найден.')
+                return None
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_attorney.is_verified = is_verified
-
-            # 4. Сохранение в БД
-            await self.session.flush()  # или session.commit() если нужна транзакция
-
-            # 5. Возврат доменного объекта
-            logger.info(f'Юрист обновлен. ID = {orm_attorney.id}')
-            return AttorneyMapper.to_domain(orm_attorney)
+            attorney = AttorneyMapper.to_domain(orm_attorney)
+            # Получаем значение из ORM объекта для логирования
+            # Маппинг имен полей: phone_number -> phone
+            orm_field_name = field_name.replace('_number', '')
+            actual_value = getattr(orm_attorney, orm_field_name, field_value)
+            logger.info(
+                f'ЮРИСТ успешно получен по {field_name}. ID - {attorney.id}. {field_name} - {actual_value}.'
+            )
+            return attorney
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при обновлении ЮРИСТА ID={orm_attorney.id}: {e}')
+            logger.error(
+                f'Ошибка БД при получении ЮРИСТА по {field_name}={field_value}: {e}'
+            )
             raise DatabaseErrorException(
-                f'Ошибка при обновлении данных ЮРИСТА: {str(e)}'
+                f'Ошибка БД при получении ЮРИСТА по {field_name}: {str(e)}'
             )
 
-    async def change_is_avtive(self, attorney_id: int, is_active: bool) -> 'Attorney':
-        '''Изменить статус верификации Юриста по ID.'''
+    async def _change_field(
+        self, attorney_id: int, field_name: str, field_value: bool, field_label: str
+    ) -> 'Attorney':
+        '''
+        Вспомогательный метод для изменения булевого поля юриста.
+        
+        Args:
+            attorney_id: ID юриста
+            field_name: Название поля для обновления
+            field_value: Новое значение поля
+            field_label: Название поля для логирования (например, 'верификации')
+            
+        Returns:
+            Attorney: Обновленный юрист
+        '''
         try:
-            # 1. Выполнение запроса на извлечение данных из БД
             stmt = select(AttorneyORM).where(AttorneyORM.id == attorney_id)
             result = await self.session.execute(stmt)
             orm_attorney = result.scalar_one_or_none()
 
-            # 2. Проверка наличия записи в БД
             if not orm_attorney:
                 logger.error(f'Юрист с ID {attorney_id} не найден.')
                 raise EntityNotFoundException(f'Юрист с ID {attorney_id} не найден.')
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_attorney.is_verified = is_active
+            setattr(orm_attorney, field_name, field_value)
+            await self.session.flush()
 
-            # 4. Сохранение в БД
-            await self.session.flush()  # или session.commit() если нужна транзакция
-
-            # 5. Возврат доменного объекта
             logger.info(f'Юрист обновлен. ID = {orm_attorney.id}')
             return AttorneyMapper.to_domain(orm_attorney)
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при обновлении ЮРИСТА ID={orm_attorney.id}: {e}')
+            logger.error(f'Ошибка БД при обновлении ЮРИСТА ID={attorney_id}: {e}')
             raise DatabaseErrorException(
-                f'Ошибка при обновлении данных ЮРИСТА: {str(e)}'
+                f'Ошибка при обновлении {field_label} ЮРИСТА: {str(e)}'
             )

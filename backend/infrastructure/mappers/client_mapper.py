@@ -36,3 +36,18 @@ class ClientMapper:
             created_at=domain.created_at,
             owner_attorney_id=domain.owner_attorney_id,
         )
+
+    @staticmethod
+    def update_orm(orm: ClientORM, domain: 'Client') -> None:
+        '''
+        Обновляет существующий ORM объект значениями из доменной сущности.
+        Не обновляет id, created_at, updated_at, owner_attorney_id (они управляются отдельно).
+        '''
+        orm.name = domain.name
+        orm.type = domain.type
+        orm.email = domain.email
+        orm.phone = domain.phone
+        orm.personal_info = domain.personal_info
+        orm.address = domain.address
+        orm.messenger = domain.messenger
+        orm.messenger_handle = domain.messenger_handle

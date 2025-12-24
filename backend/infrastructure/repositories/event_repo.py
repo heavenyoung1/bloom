@@ -1,8 +1,9 @@
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from typing import List
 from datetime import datetime, timezone
+
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.core.logger import logger
@@ -142,11 +143,8 @@ class EventRepository(IEventRepository):
                     f'СОБЫТИЕ с ID {updated_event.id} не найдено.'
                 )
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_event.name = updated_event.name
-            orm_event.description = updated_event.description
-            orm_event.event_type = updated_event.event_type
-            orm_event.event_date = updated_event.event_date
+            # 3. Обновление полей ORM-объекта из доменной сущности
+            EventMapper.update_orm(orm_event, updated_event)
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция
@@ -177,7 +175,7 @@ class EventRepository(IEventRepository):
                 )
 
             # 2. Удаление
-            await self.session.delete(orm_event)
+            self.session.delete(orm_event)
             await self.session.flush()
 
             logger.info(f'СОБЫТИЕ с ID {id} успешно удалено.')

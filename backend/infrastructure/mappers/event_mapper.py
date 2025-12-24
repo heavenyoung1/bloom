@@ -28,3 +28,14 @@ class EventMapper:
             case_id=domain.case_id,
             attorney_id=domain.attorney_id,
         )
+
+    @staticmethod
+    def update_orm(orm: EventORM, domain: 'Event') -> None:
+        '''
+        Обновляет существующий ORM объект значениями из доменной сущности.
+        Не обновляет id, created_at, updated_at, case_id, attorney_id (они управляются отдельно).
+        '''
+        orm.name = domain.name
+        orm.description = domain.description
+        orm.event_type = domain.event_type
+        orm.event_date = domain.event_date

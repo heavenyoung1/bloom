@@ -1,22 +1,22 @@
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING, List, Optional
 
 from sqlalchemy import select
-from backend.domain.entities.payment_detail import PaymentDetail
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
-from backend.infrastructure.mappers.payment_detail_mapper import PaymentDetailMapper
-from typing import TYPE_CHECKING, List, Optional
-from backend.infrastructure.models.payment_detail import PaymentDetailORM
+from backend.core.logger import logger
+from backend.domain.entities.payment_detail import PaymentDetail
 from backend.application.interfaces.repositories.payment_detail_repo import (
     IPaymentDetailRepository,
 )
-
-from backend.core.logger import logger
+from backend.infrastructure.mappers.payment_detail_mapper import PaymentDetailMapper
+from backend.infrastructure.models.payment_detail import PaymentDetailORM
 
 
 class PaymentDetailRepository(IPaymentDetailRepository):
 
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def save(self, payment_detail: PaymentDetail) -> 'PaymentDetail':
@@ -120,17 +120,8 @@ class PaymentDetailRepository(IPaymentDetailRepository):
                     f'Платежная информация с ID {updated_payment_detail.id} не найдена'
                 )
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_payment_detail.inn = updated_payment_detail.inn
-            orm_payment_detail.kpp = updated_payment_detail.kpp
-            orm_payment_detail.index_address = updated_payment_detail.index_address
-            orm_payment_detail.address = updated_payment_detail.address
-            orm_payment_detail.bank_account = updated_payment_detail.bank_account
-            orm_payment_detail.correspondent_account = (
-                updated_payment_detail.correspondent_account
-            )
-            orm_payment_detail.bik = updated_payment_detail.bik
-            orm_payment_detail.bank_recipient = updated_payment_detail.bank_recipient
+            # 3. Обновление полей ORM-объекта из доменной сущности
+            PaymentDetailMapper.update_orm(orm_payment_detail, updated_payment_detail)
 
             # 4. Сохранение в БД
             await self.session.flush()
@@ -165,7 +156,7 @@ class PaymentDetailRepository(IPaymentDetailRepository):
                 )
 
             # 2. Удаление
-            await self.session.delete(orm_payment_detail)
+            self.session.delete(orm_payment_detail)
             await self.session.flush()
 
             logger.info(f'Платежная информация с ID {id} успешно удалена.')

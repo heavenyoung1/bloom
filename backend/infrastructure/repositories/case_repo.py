@@ -1,11 +1,9 @@
 from typing import TYPE_CHECKING, List
 
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from backend.infrastructure.models import CaseORM
 
 from backend.core.logger import logger
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
@@ -103,10 +101,10 @@ class CaseRepository(ICaseRepository):
                 .where(CaseORM.attorney_id == attorney_id)  # Выбор дел для юриста
                 .order_by(CaseORM.created_at.desc())
             )
-            # 2. Применяем eager loading для связанных объектов (не лучше ли использовать )
+            # 2. Применяем eager loading для связанных объектов
             stmt = stmt.options(
                 selectinload(CaseORM.client),
-                selectinload(CaseORM.contact),
+                selectinload(CaseORM.contacts),
             )
             # 3. Выполняем запрос
             result = await self.session.execute(stmt)
@@ -142,11 +140,8 @@ class CaseRepository(ICaseRepository):
                 logger.error(f'Дело с ID {updated_case.id} не найдено.')
                 raise EntityNotFoundException(f'Дело с ID {updated_case.id} не найдено')
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_case.name = updated_case.name
-            orm_case.client_id = updated_case.client_id
-            orm_case.status = updated_case.status
-            orm_case.description = updated_case.description
+            # 3. Обновление полей ORM-объекта из доменной сущности
+            CaseMapper.update_orm(orm_case, updated_case)
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция
@@ -171,7 +166,7 @@ class CaseRepository(ICaseRepository):
                 raise EntityNotFoundException(f'Дело с ID {id} не найдено')
 
             # 2. Удаление
-            await self.session.delete(orm_case)
+            self.session.delete(orm_case)
             await self.session.flush()
 
             logger.info(f'Дело с ID {id} успешно удалено.')

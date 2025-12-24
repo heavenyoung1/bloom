@@ -65,10 +65,10 @@ class ContactRepository(IContactRepository):
                 return None
 
             # 3. Преобразование ORM объекта в доменную сущность
-            case = ContactMapper.to_domain(orm_contact)
+            contact = ContactMapper.to_domain(orm_contact)
 
-            logger.info(f'СВЯЗАННЫЙ КОНТАКТ получен. ID - {case.id}')
-            return case
+            logger.info(f'СВЯЗАННЫЙ КОНТАКТ получен. ID - {contact.id}')
+            return contact
 
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении СВЯЗАННОГО КОНТАКТА ID = {id}: {e}')
@@ -83,20 +83,20 @@ class ContactRepository(IContactRepository):
             result = await self.session.execute(stmt)
             orm_contacts = result.scalars().all()
 
-            # 2. Проверка существования записи в БД
-            if not orm_contacts:
-                None
-
-            # 3. Преобразование ORM объекта в доменную сущность
+            # 2. Преобразование ORM объектов в доменные сущности
             contacts = [
                 ContactMapper.to_domain(orm_contact) for orm_contact in orm_contacts
             ]
 
-            logger.info(f'СВЯЗАННЫЙ КОНТАКТ получен. ID - {case.id}')
+            logger.info(
+                f'Получено {len(contacts)} СВЯЗАННЫХ КОНТАКТОВ для адвоката {attorney_id}'
+            )
             return contacts
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении СВЯЗАННОГО КОНТАКТА ID = {id}: {e}')
+            logger.error(
+                f'Ошибка БД при получении СВЯЗАННЫХ КОНТАКТОВ для адвоката {attorney_id}: {e}'
+            )
             raise DatabaseErrorException(
                 f'Ошибка при получении СВЯЗАННОГО КОНТАКТА: {str(e)}'
             )
@@ -137,12 +137,8 @@ class ContactRepository(IContactRepository):
                     f'СВЯЗАННЫЙ КОНТАКТ с ID {updated_contact.id} не найден.'
                 )
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_contact.name = updated_contact.name
-            orm_contact.personal_info = updated_contact.personal_info
-            orm_contact.phone = updated_contact.phone
-            orm_contact.email = updated_contact.email
-            orm_contact.case_id = updated_contact.case_id
+            # 3. Обновление полей ORM-объекта из доменной сущности
+            ContactMapper.update_orm(orm_contact, updated_contact)
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция
@@ -173,7 +169,7 @@ class ContactRepository(IContactRepository):
                 )
 
             # 2. Удаление
-            await self.session.delete(orm_contact)
+            self.session.delete(orm_contact)
             await self.session.flush()
 
             logger.info(f'СВЯЗАННЫЙ КОНТАКТ с ID {id} успешно удален.')

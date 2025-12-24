@@ -40,3 +40,15 @@ class DocumentMapper:
         if domain.updated_at is not None:
             orm_doc.updated_at = domain.updated_at
         return orm_doc
+
+    @staticmethod
+    def update_orm(orm: DocumentORM, domain: 'Document') -> None:
+        '''
+        Обновляет существующий ORM объект значениями из доменной сущности.
+        Не обновляет id, created_at, updated_at, case_id, attorney_id (они управляются отдельно).
+        '''
+        orm.file_name = domain.file_name
+        orm.storage_path = domain.storage_path
+        orm.file_size = domain.file_size
+        orm.description = domain.description
+        orm.mime_type = domain.mime_type

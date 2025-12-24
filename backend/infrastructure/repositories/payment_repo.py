@@ -1,20 +1,20 @@
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import select
-from backend.domain.entities.client_payment import ClientPayment
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
-from backend.infrastructure.mappers.payment_mapper import ClientPaymentMapper
-from typing import TYPE_CHECKING, List, Sequence
-from backend.infrastructure.models.payment import ClientPaymentORM
-from backend.application.interfaces.repositories.payment_repo import IPaymentRepository
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.core.logger import logger
+from backend.domain.entities.client_payment import ClientPayment
+from backend.application.interfaces.repositories.payment_repo import IPaymentRepository
+from backend.infrastructure.mappers.payment_mapper import ClientPaymentMapper
+from backend.infrastructure.models.payment import ClientPaymentORM
 
 
 class ClientPaymentRepository(IPaymentRepository):
 
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def save(self, payment: ClientPayment) -> 'ClientPayment':
@@ -35,12 +35,12 @@ class ClientPaymentRepository(IPaymentRepository):
             return payment
 
         except IntegrityError as e:
-            logger.error(f'Ошибка при сохранении ДЕЛА: {str(e)}')
-            raise DatabaseErrorException(f'Ошибка при сохранении ДЕЛА: {str(e)}')
+            logger.error(f'Ошибка при сохранении ПЛАТЕЖА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при сохранении ПЛАТЕЖА: {str(e)}')
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка при сохранении ДЕЛА: {str(e)}')
-            raise DatabaseErrorException(f'Ошибка при сохранении ДЕЛА: {str(e)}')
+            logger.error(f'Ошибка при сохранении ПЛАТЕЖА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при сохранении ПЛАТЕЖА: {str(e)}')
 
     async def get(self, id: int) -> 'ClientPayment':
         try:
@@ -64,7 +64,7 @@ class ClientPaymentRepository(IPaymentRepository):
             logger.error(f'Ошибка БД при получении платежа ID = {id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении платежа: {str(e)}')
 
-    async def get_all_for_attorney(self, id: int) -> Sequence['ClientPayment']:
+    async def get_all_for_attorney(self, id: int) -> List['ClientPayment']:
         try:
             # 1. Получение записей из базы данных
             stmt = (
@@ -103,17 +103,8 @@ class ClientPaymentRepository(IPaymentRepository):
                     f'Платеж с ID {updated_payment.id} не найден'
                 )
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_payment.name = updated_payment.name
-            orm_payment.client_id = updated_payment.client_id
-            orm_payment.attorney_id = updated_payment.attorney_id
-            orm_payment.paid = updated_payment.paid
-            orm_payment.paid_str = updated_payment.paid_str
-            orm_payment.pade_date = updated_payment.pade_date
-            orm_payment.paid_deadline = updated_payment.paid_deadline
-            orm_payment.status = updated_payment.status
-            orm_payment.taxable = updated_payment.taxable
-            orm_payment.condition = updated_payment.condition
+            # 3. Обновление полей ORM-объекта из доменной сущности
+            ClientPaymentMapper.update_orm(orm_payment, updated_payment)
 
             # 4. Сохранение в БД
             await self.session.flush()
@@ -140,7 +131,7 @@ class ClientPaymentRepository(IPaymentRepository):
                 raise EntityNotFoundException(f'Платеж с ID {id} не найден')
 
             # 2. Удаление
-            await self.session.delete(orm_payment)
+            self.session.delete(orm_payment)
             await self.session.flush()
 
             logger.info(f'Платеж с ID {id} успешно удален.')

@@ -35,6 +35,23 @@ class EntityNotFoundException(BaseCustomException):
         self.message = message
         super().__init__(self.message)
 
+    @classmethod
+    def for_entity(cls, entity_name: str, entity_id: int, context: str = '') -> 'EntityNotFoundException':
+        '''
+        Создает исключение для сущности с ID.
+        
+        Args:
+            entity_name: Название сущности (например: "Юрист", "Дело", "Клиент")
+            entity_id: ID сущности
+            context: Опциональный контекст (например: " при удалении", " при обновлении")
+        
+        Example:
+            raise EntityNotFoundException.for_entity("Юрист", 123)
+            raise EntityNotFoundException.for_entity("Дело", 456, " при удалении")
+        '''
+        message = f'{entity_name} с ID {entity_id} не найден{context}.'
+        return cls(message)
+
 
 class DatabaseErrorException(BaseCustomException):
     '''Ошибка базы данных.'''
