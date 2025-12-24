@@ -36,4 +36,4 @@ class GetContactByIdQuery:
 
 @dataclass
 class GetContactsForAttorneyQuery:
-    owner_attorney_id: int
+    attorney_id: int

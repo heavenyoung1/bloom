@@ -7,7 +7,7 @@ from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
 
-class GetCaseByIdUseCase:
+class GetContactByIdUseCase:
     def __init__(self, uow_factory: UnitOfWorkFactory):
         '''Получение клиента по ID'''
         self.uow_factory = uow_factory
