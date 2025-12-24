@@ -1,10 +1,7 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.security import SecurityService
 from backend.application.policy.attorney_policy import AttorneyPolicy
-from backend.application.commands.attorney import (
-    ChangePasswordCommand,
-)
-from backend.application.dto.attorney import AttorneyResponse
+from backend.application.commands.attorney import ChangePasswordCommand
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 

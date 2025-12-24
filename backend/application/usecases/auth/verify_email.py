@@ -1,15 +1,9 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.application.dto.attorney import VerifyEmailRequest
 from backend.application.services.verification_service import VerificationService
 from backend.application.dto.attorney import AttorneyVerificationResponse
 from backend.core.security import SecurityService
-from backend.core.exceptions import VerificationError
 from backend.core.logger import logger
-from backend.application.commands.attorney import (
-    VerifyEmailCommand,
-    ResendVerificationCommand,
-)
-from backend.application.dto.attorney import AttorneyResponse
+from backend.application.commands.attorney import VerifyEmailCommand
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 
 
