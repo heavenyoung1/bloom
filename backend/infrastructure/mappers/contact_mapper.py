@@ -14,6 +14,7 @@ class ContactMapper:
             email=orm.email,
             created_at=orm.created_at,
             case_id=orm.case_id,
+            attorney_id=orm.attorney_id,
         )
 
     @staticmethod
@@ -27,4 +28,5 @@ class ContactMapper:
             email=domain.email,
             created_at=domain.created_at,
             case_id=domain.case_id,
+            attorney_id=domain.attorney_id,
         )

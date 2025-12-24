@@ -18,6 +18,7 @@ from backend.presentation.api.v0.routes.payment_detail import (
 from backend.presentation.api.v0.routes.payment_client import (
     router as payment_client_router,
 )
+from backend.presentation.api.v0.routes.contact import router as contact_router
 
 
 @asynccontextmanager
@@ -87,6 +88,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(client_router)
 app.include_router(case_router)
+app.include_router(contact_router)
 app.include_router(event_router)
 app.include_router(me_router)
 app.include_router(document_router)

@@ -23,7 +23,7 @@ from backend.core.logger import logger
 
 
 from backend.core.exceptions import (
-    NotFoundException,
+    EntityNotFoundException,
     VerificationError,
     AccessDeniedException,
 )

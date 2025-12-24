@@ -92,13 +92,15 @@ class CaseRepository(ICaseRepository):
             logger.error(f'Ошибка БД при получении всех ДЕЛ: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при получении ДЕЛА: {str(e)}')
 
-# ===============================================================================================
-    async def get_all_for_attorney_with_relations(self, attorney_id: int) -> List['CaseORM']:
+    # ===============================================================================================
+    async def get_all_for_attorney_with_relations(
+        self, attorney_id: int
+    ) -> List['CaseORM']:
         try:
             # 1. Создаем базовый запрос с фильтром по адвокату
             stmt = (
                 select(CaseORM)
-                .where(CaseORM.attorney_id == attorney_id) # Выбор дел для юриста
+                .where(CaseORM.attorney_id == attorney_id)  # Выбор дел для юриста
                 .order_by(CaseORM.created_at.desc())
             )
             # 2. Применяем eager loading для связанных объектов (не лучше ли использовать )
@@ -114,10 +116,10 @@ class CaseRepository(ICaseRepository):
                 f'Получено {len(orm_cases)} дел для адвоката {attorney_id} '
                 f'с загруженными связями (client, contacts)'
             )
-            
+
             # 4. Возвращаем список ORM объектов (БЕЗ маппинга в доменную сущность)
             return list(orm_cases)
-        
+
         except SQLAlchemyError as e:
             logger.error(
                 f'Ошибка БД при получении дел с связями для адвоката {attorney_id}: {str(e)}'
@@ -125,7 +127,8 @@ class CaseRepository(ICaseRepository):
             raise DatabaseErrorException(
                 f'Ошибка при получении дел с связанными данными: {str(e)}'
             )
-# ===============================================================================================
+
+    # ===============================================================================================
 
     async def update(self, updated_case: Case) -> 'Case':
         try:

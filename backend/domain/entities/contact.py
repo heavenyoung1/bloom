@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Optional
 from backend.application.commands.contact import UpdateContactCommand
 
+
 @dataclass
 class Contact:
     id: int
@@ -11,7 +12,7 @@ class Contact:
     phone: str
     email: str
 
-    case_id: str
+    case_id: int
     attorney_id: int
 
     # Необязательные атрибуты
@@ -25,10 +26,11 @@ class Contact:
         personal_info: str,
         phone: str,
         email: str,
-        case_id: str,
+        case_id: int,
         attorney_id: int,
     ) -> 'Contact':
         return Contact(
+            id=None,
             name=name,
             personal_info=personal_info,
             phone=phone,
@@ -36,9 +38,11 @@ class Contact:
             case_id=case_id,
             attorney_id=attorney_id,
         )
-    
+
     def update(self, cmd: UpdateContactCommand):
-        '''Обновить поля на основе команды, если они не None'''
+        '''Обновить поля на основе команды, если они не None.
+        Владелец (attorney_id) и дело (case_id) нельзя изменять.
+        '''
         if cmd.name is not None:
             self.name = cmd.name
         if cmd.personal_info is not None:
@@ -47,8 +51,4 @@ class Contact:
             self.phone = cmd.phone
         if cmd.email is not None:
             self.email = cmd.email
-        if cmd.case_id is not None:
-            self.case_id = cmd.case_id
-        if cmd.attorney_id is not None:
-            self.attorney_id = cmd.eattorney_idmail
-        
+        # attorney_id и case_id нельзя изменять

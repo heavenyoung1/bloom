@@ -15,9 +15,9 @@ class GetlAllCasesUseCase:
         self.uow_factory = uow_factory
 
     async def execute(
-            self, 
-            cmd: GetCasesForAttorneyQuery,
-            ) -> List['CaseResponse']:
+        self,
+        cmd: GetCasesForAttorneyQuery,
+    ) -> List['CaseResponse']:
         async with self.uow_factory.create() as uow:
             try:
                 # 1. Получаем ORM объекты с загруженными связями
@@ -31,16 +31,15 @@ class GetlAllCasesUseCase:
                 # 3. Маппим каждый ORM объект в DTO
                 # Pydantic автоматически обработает вложенные client и contacts
                 case_responses = [
-                    CaseResponse.model_validate(orm_case) 
-                    for orm_case in orm_cases
+                    CaseResponse.model_validate(orm_case) for orm_case in orm_cases
                 ]
 
                 logger.info(
                     f'Получено {len(case_responses)} дел для юриста {cmd.attorney_id}'
                 )
-                
+
                 return case_responses
-                
+
             except Exception as e:
                 logger.error(
                     f'Ошибка при получении дел для юриста с ID {cmd.attorney_id}: {e}'

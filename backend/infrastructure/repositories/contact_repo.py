@@ -75,7 +75,7 @@ class ContactRepository(IContactRepository):
             raise DatabaseErrorException(
                 f'Ошибка при получении СВЯЗАННОГО КОНТАКТА: {str(e)}'
             )
-        
+
     async def get_all_for_attorney(self, attorney_id: int) -> List['Contact']:
         try:
             # 1. Получение записи из базы данных
@@ -90,7 +90,7 @@ class ContactRepository(IContactRepository):
             # 3. Преобразование ORM объекта в доменную сущность
             contacts = [
                 ContactMapper.to_domain(orm_contact) for orm_contact in orm_contacts
-                ]
+            ]
 
             logger.info(f'СВЯЗАННЫЙ КОНТАКТ получен. ID - {case.id}')
             return contacts

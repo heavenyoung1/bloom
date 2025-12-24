@@ -10,21 +10,22 @@ class CreateContactCommand:
     phone: str
     email: str
     attorney_id: int
-    case_id: str
+    case_id: int
 
 
+@dataclass
 class UpdateContactCommand:
     contact_id: int
-    attorney_id: int
+    # attorney_id и case_id удалены - нельзя менять владельца и дело
 
     # PATCH — все поля опциональные
     name: Optional[str] = None
     personal_info: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
-    case_id: Optional[int] = None
 
 
+@dataclass
 class DeleteContactCommand:
     contact_id: int
 

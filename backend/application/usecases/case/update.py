@@ -6,7 +6,6 @@ from backend.application.commands.case import UpdateCaseCommand
 from backend.application.policy.case_policy import CasePolicy
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
-from backend.core.exceptions import NotFoundException
 
 
 class UpdateCaseUseCase:

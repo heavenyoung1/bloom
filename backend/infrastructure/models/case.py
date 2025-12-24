@@ -34,7 +34,7 @@ class CaseORM(TimeStampMixin, Base):
     attorney: Mapped['AttorneyORM'] = relationship(back_populates='cases')
     client: Mapped['ClientORM'] = relationship(back_populates='cases')
 
-    contact: Mapped['ContactORM'] = relationship(
+    contacts: Mapped[list['ContactORM']] = relationship(
         back_populates='case', cascade='all, delete-orphan'
     )
     documents: Mapped[list['DocumentORM']] = relationship(

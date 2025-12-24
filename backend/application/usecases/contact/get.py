@@ -22,10 +22,10 @@ class GetContactByIdUseCase:
                 contact = await uow.contact_repo.get(cmd.contact_id)
 
                 if not contact:
-                    logger.error(f'Дело с ID {cmd.case_id} не найдено.')
+                    logger.error(f'Дело с ID {cmd.contact_id} не найдено.')
                     raise EntityNotFoundException(f'Дело не найдено.')
 
-                logger.info(f'Дело получено: ID = {cmd.case_id}')
+                logger.info(f'Дело получено: ID = {cmd.contact_id}')
                 return ContactResponse.model_validate(contact)
             except Exception as e:
                 logger.error(f'Ошибка при получении дела: {e}')

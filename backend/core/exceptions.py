@@ -21,16 +21,18 @@ class AccessDeniedException(BaseCustomException):
 class VerificationError(BaseCustomException):
     '''Ошибка, когда пользователь уже верифицирован.'''
 
-
-class NotFoundException(BaseCustomException):
-    '''Ошибка, когда сущность не найдена.'''
+    pass
 
 
 class EntityNotFoundException(BaseCustomException):
     '''Ошибка, когда сущность не найдена.'''
 
-    def __init__(self, entity: str):
-        self.message = f'{entity} не найден.'
+    def __init__(self, message: str):
+        '''
+        Args:
+            message: Полное сообщение об ошибке (например: "Контакт с ID 123 не найден")
+        '''
+        self.message = message
         super().__init__(self.message)
 
 

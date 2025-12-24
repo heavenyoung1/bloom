@@ -48,8 +48,8 @@ class ContactUpdateRequest(BaseModel):
                 'personal_info': '1515421666',
                 'phone': '+79991234666',
                 'email': 'contactupdate@example.com',
-                'case_id': 2,
-                'attorney_id': 1,
+                # 'case_id': 2,
+                # 'attorney_id': 1,
             }
         }
     )
