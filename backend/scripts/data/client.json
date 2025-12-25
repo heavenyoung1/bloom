@@ -1,0 +1,102 @@
+[
+  {
+    "address": "г. Москва, пр-т Мира, д.10, кв.25",
+    "email": "client1@example.com",
+    "messenger": "Telegram",
+    "messenger_handle": "@client_msk_01",
+    "name": "Петров Пётр Сергеевич",
+    "personal_info": "4501 123456",
+    "phone": "+79990000001",
+    "type": true
+  },
+  {
+    "address": "г. Санкт-Петербург, Невский пр-т, д.15",
+    "email": "client2@example.com",
+    "messenger": "WhatsApp",
+    "messenger_handle": "+79990000002",
+    "name": "Сидорова Анна Викторовна",
+    "personal_info": "4002 654321",
+    "phone": "+79990000002",
+    "type": false
+  },
+  {
+    "address": "г. Казань, ул. Баумана, д.7",
+    "email": "client3@example.com",
+    "messenger": "Telegram",
+    "messenger_handle": "@kazan_client_03",
+    "name": "Кузнецов Дмитрий Андреевич",
+    "personal_info": "9203 778899",
+    "phone": "+79990000003",
+    "type": true
+  },
+  {
+    "address": "г. Новосибирск, ул. Ленина, д.22, офис 5",
+    "email": "client4@example.com",
+    "messenger": "Viber",
+    "messenger_handle": "+79990000004",
+    "name": "Смирнова Елена Павловна",
+    "personal_info": "5404 112233",
+    "phone": "+79990000004",
+    "type": false
+  },
+  {
+    "address": "г. Екатеринбург, ул. Малышева, д.3",
+    "email": "client5@example.com",
+    "messenger": "Telegram",
+    "messenger_handle": "@ekb_client_05",
+    "name": "Орлов Михаил Игоревич",
+    "personal_info": "6605 445566",
+    "phone": "+79990000005",
+    "type": true
+  },
+  {
+    "address": "г. Нижний Новгород, ул. Большая Покровская, д.18",
+    "email": "client6@example.com",
+    "messenger": "WhatsApp",
+    "messenger_handle": "+79990000006",
+    "name": "Васильева Мария Олеговна",
+    "personal_info": "5206 990011",
+    "phone": "+79990000006",
+    "type": false
+  },
+  {
+    "address": "г. Ростов-на-Дону, ул. Большая Садовая, д.40",
+    "email": "client7@example.com",
+    "messenger": "Telegram",
+    "messenger_handle": "@rnd_client_07",
+    "name": "Фёдоров Артём Николаевич",
+    "personal_info": "6107 223344",
+    "phone": "+79990000007",
+    "type": true
+  },
+  {
+    "address": "г. Краснодар, ул. Красная, д.55",
+    "email": "client8@example.com",
+    "messenger": "Viber",
+    "messenger_handle": "+79990000008",
+    "name": "Никитина Ольга Александровна",
+    "personal_info": "2308 556677",
+    "phone": "+79990000008",
+    "type": false
+  },
+  {
+    "address": "г. Самара, ул. Куйбышева, д.12, кв.8",
+    "email": "client9@example.com",
+    "messenger": "Telegram",
+    "messenger_handle": "@samara_client_09",
+    "name": "Громов Сергей Владимирович",
+    "personal_info": "6309 889900",
+    "phone": "+79990000009",
+    "type": true
+  },
+  {
+    "address": "г. Воронеж, ул. Плехановская, д.9",
+    "email": "client10@example.com",
+    "messenger": "WhatsApp",
+    "messenger_handle": "+79990000010",
+    "name": "Морозова Наталья Евгеньевна",
+    "personal_info": "3610 101112",
+    "phone": "+79990000010",
+    "type": false
+  }
+]

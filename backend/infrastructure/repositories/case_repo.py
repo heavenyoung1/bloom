@@ -1,6 +1,6 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Dict, Any
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -174,3 +174,65 @@ class CaseRepository(ICaseRepository):
 
         except SQLAlchemyError as e:
             raise DatabaseErrorException(f'Ошибка при удалении ДЕЛА: {str(e)}')
+
+    async def get_dashboard_data(self, attorney_id: int) -> List[Dict[str, Any]]:
+        '''
+        Получение данных для дашборда по указанному адвокату.
+        Возвращает список словарей с данными о делах, клиентах, контактах, событиях и платежах.
+        '''
+        try:
+            query = text("""
+                SELECT 
+                    c.name AS case_name,
+                    cl.name AS client_name,
+                    cl.phone AS client_phone,
+                    co.name AS contact_name,
+                    co.phone AS contact_phone,
+                    e.name AS event_name,
+                    COUNT(cp.id) AS pending_payments_count
+                FROM cases c
+                INNER JOIN clients cl ON c.client_id = cl.id
+                INNER JOIN contacts co ON co.case_id = c.id
+                INNER JOIN attorneys a ON c.attorney_id = a.id
+                LEFT JOIN events e ON e.case_id = c.id 
+                    AND e.id = (
+                        SELECT id FROM events 
+                        WHERE case_id = c.id 
+                        ORDER BY event_date ASC 
+                        LIMIT 1
+                    )
+                LEFT JOIN client_payments cp ON cp.client_id = cl.id 
+                    AND cp.status = 'pending'
+                WHERE c.attorney_id = :attorney_id
+                GROUP BY c.id, cl.id, co.id, e.id
+                LIMIT 1
+            """)
+
+            result = await self.session.execute(query, {'attorney_id': attorney_id})
+            rows = result.fetchall()
+
+            # Преобразуем результат в список словарей
+            dashboard_data = []
+            for row in rows:
+                dashboard_data.append({
+                    'case_name': row.case_name,
+                    'client_name': row.client_name,
+                    'client_phone': row.client_phone,
+                    'contact_name': row.contact_name,
+                    'contact_phone': row.contact_phone,
+                    'event_name': row.event_name,
+                    'pending_payments_count': row.pending_payments_count,
+                })
+
+            logger.info(
+                f'Получено {len(dashboard_data)} записей для дашборда адвоката {attorney_id}'
+            )
+            return dashboard_data
+
+        except SQLAlchemyError as e:
+            logger.error(
+                f'Ошибка БД при получении данных дашборда для адвоката {attorney_id}: {str(e)}'
+            )
+            raise DatabaseErrorException(
+                f'Ошибка при получении данных дашборда: {str(e)}'
+            )

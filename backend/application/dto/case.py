@@ -143,3 +143,17 @@ class CaseListItemDTO(BaseModel):
     status: CaseStatus
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DashboardResponse(BaseModel):
+    '''DTO для данных дашборда'''
+
+    case_name: str
+    client_name: str
+    client_phone: str
+    contact_name: str
+    contact_phone: str
+    event_name: str | None
+    pending_payments_count: int
+
+    model_config = ConfigDict(from_attributes=True)
