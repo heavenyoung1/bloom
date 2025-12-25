@@ -40,6 +40,38 @@ class TestUnitOfWork:
     async def __aexit__(self, exc_type, exc, tb):
         pass
 
+    async def commit(self):
+        '''
+        Зафиксировать изменения в БД.
+        
+        В тестах это просто флаш (flush), а не реальный commit!
+        Реальный commit будет только когда выходим из session контекста.
+        '''
+        try:
+            # ℹ️ ВАЖНО: Используем flush() вместо commit()
+            # flush() отправляет SQL на БД, но не коммитит транзакцию
+            # Это позволяет избежать проблем с rollback в конце теста
+            await self.session.flush()
+
+            # ======= 🧪🧪🧪🧪🧪🧪🧪 ======= #
+            # РАЗКОММИТИТЬ КОММИТ ДЛЯ ПРОВЕРКИ ЕДИНИЧНЫХ ТЕСТОВ
+            # ВСЕ КОММИТИТСЯ И НЕ ОТКАТЫВАЕТСЯ ПРИ ROLLBACK
+            # await self.session.commit()
+            # ======= 🧪🧪🧪🧪🧪🧪🧪 ======= #
+
+            logger.debug('[TEST UoW] FLUSH выполнен (не commit!)')
+        except Exception as e:
+            logger.error(f'[TEST UoW] Ошибка при FLUSH: {e}')
+            await self.rollback()
+            raise
+
+    async def rollback(self):
+        '''Откатить изменения.'''
+        try:
+            await self.session.rollback()
+            logger.debug('[TEST UoW] ROLLBACK выполнен')
+        except Exception:
+            pass  # Ignore rollback errors
 
 class TestUoWFactory:
     def __init__(self, uow: TestUnitOfWork):
@@ -58,7 +90,10 @@ class TestUoWFactory:
 @pytest.fixture
 async def test_uow(session):
     '''Создаёт директный UnitOfWork с тестовой сессией.'''
-    return TestUnitOfWork(session)
+    uow = TestUnitOfWork(session)
+    yield uow
+    # Cleanup после теста
+    await uow.rollback()
 
 
 @pytest.fixture

@@ -22,7 +22,7 @@ class TestRegisterAttorney:
             json=register_payload,
         )
         # Ожидаем успех или ошибку валидации/дублирования
-        assert register_response.status_code in [201, 400]
+        assert register_response.status_code in [201] # 400 убрал 400
 
         data = register_response.json()
         assert data['id'] is not None
