@@ -131,7 +131,7 @@ class ClientPaymentRepository(IPaymentRepository):
                 raise EntityNotFoundException(f'Платеж с ID {id} не найден')
 
             # 2. Удаление
-            self.session.delete(orm_payment)
+            await self.session.delete(orm_payment)
             await self.session.flush()
 
             logger.info(f'Платеж с ID {id} успешно удален.')

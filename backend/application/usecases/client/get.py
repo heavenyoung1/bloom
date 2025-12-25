@@ -7,6 +7,7 @@ from backend.core.logger import logger
 
 class GetClientByIdUseCase:
     '''Сценарий: юрист получает клиента по его ID.'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

@@ -7,7 +7,7 @@ from backend.domain.entities.contact import (
 
 # Фикстура для дефолтного контакта
 @pytest.fixture
-def sample_contact(persisted_case):
+def sample_contact(persisted_case, persisted_attorney_id):
     '''Фикстура для дефолтного контакта.'''
     return Contact(
         id=None,  # Позволяем БД генерировать ID
@@ -16,12 +16,13 @@ def sample_contact(persisted_case):
         phone='+79991234567',
         email='ivan@example.com',
         case_id=persisted_case,
+        attorney_id=persisted_attorney_id,
     )
 
 
 # Фикстура для контакта, который будет обновляться
 @pytest.fixture
-def sample_update_contact(persisted_case):
+def sample_update_contact(persisted_case, persisted_attorney_id):
     '''Фикстура для обновленного контакта.'''
     return Contact(
         id=None,  # Позволяем БД генерировать ID
@@ -30,12 +31,13 @@ def sample_update_contact(persisted_case):
         phone='+79998887766',
         email='ivanov3232@example.com',
         case_id=persisted_case,
+        attorney_id=persisted_attorney_id,
     )
 
 
 # Фикстура для списка контактов
 @pytest.fixture
-def contacts_list(persisted_case):
+def contacts_list(persisted_case, persisted_attorney_id):
     '''Фикстура: список контактов для тестирования.'''
     return [
         Contact(
@@ -45,6 +47,7 @@ def contacts_list(persisted_case):
             phone='+79991234567',
             email='ivan@example.com',
             case_id=persisted_case,
+            attorney_id=persisted_attorney_id,
         ),
         Contact(
             id=None,
@@ -53,6 +56,7 @@ def contacts_list(persisted_case):
             phone='+79998887766',
             email='alexander@example.com',
             case_id=persisted_case,
+            attorney_id=persisted_attorney_id,
         ),
         Contact(
             id=None,
@@ -61,6 +65,7 @@ def contacts_list(persisted_case):
             phone='+79993332211',
             email='maria@example.com',
             case_id=persisted_case,
+            attorney_id=persisted_attorney_id,
         ),
         Contact(
             id=None,
@@ -69,6 +74,7 @@ def contacts_list(persisted_case):
             phone='+79992223344',
             email='ekaterina@example.com',
             case_id=persisted_case,
+            attorney_id=persisted_attorney_id,
         ),
         Contact(
             id=None,
@@ -77,5 +83,6 @@ def contacts_list(persisted_case):
             phone='+79995556677',
             email='dmitry@example.com',
             case_id=persisted_case,
+            attorney_id=persisted_attorney_id,
         ),
     ]

@@ -43,7 +43,7 @@ class TestUnitOfWork:
     async def commit(self):
         '''
         Зафиксировать изменения в БД.
-        
+
         В тестах это просто флаш (flush), а не реальный commit!
         Реальный commit будет только когда выходим из session контекста.
         '''
@@ -72,6 +72,7 @@ class TestUnitOfWork:
             logger.debug('[TEST UoW] ROLLBACK выполнен')
         except Exception:
             pass  # Ignore rollback errors
+
 
 class TestUoWFactory:
     def __init__(self, uow: TestUnitOfWork):

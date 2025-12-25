@@ -175,7 +175,7 @@ class EventRepository(IEventRepository):
                 )
 
             # 2. Удаление
-            self.session.delete(orm_event)
+            await self.session.delete(orm_event)
             await self.session.flush()
 
             logger.info(f'СОБЫТИЕ с ID {id} успешно удалено.')

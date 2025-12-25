@@ -104,7 +104,9 @@ class ClientRepository(IClientRepository):
 
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении КЛИЕНТА для дела ID={case_id}: {e}')
-            raise DatabaseErrorException(f'Ошибка при получении КЛИЕНТА для дела: {str(e)}')
+            raise DatabaseErrorException(
+                f'Ошибка при получении КЛИЕНТА для дела: {str(e)}'
+            )
 
     async def update(self, updated_client: Client) -> 'Client':
         try:
@@ -189,13 +191,13 @@ class ClientRepository(IClientRepository):
     ) -> 'Client':
         '''
         Вспомогательный метод для получения клиента по произвольному полю для конкретного адвоката.
-        
+
         Args:
             condition: SQLAlchemy условие для фильтрации
             field_name: Название поля для логирования
             field_value: Значение поля для логирования
             owner_id: ID адвоката-владельца
-            
+
         Returns:
             Client | None: Найденный клиент или None
         '''

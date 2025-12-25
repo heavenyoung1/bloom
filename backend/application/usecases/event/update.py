@@ -11,6 +11,7 @@ from backend.core.logger import logger
 
 class UpdateEventUseCase:
     '''Сценарий: обновляе событие.'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

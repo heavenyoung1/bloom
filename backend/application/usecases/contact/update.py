@@ -9,6 +9,7 @@ from backend.core.logger import logger
 
 class UpdateContactUseCase:
     '''Сценарий: юрист обновляет контакт'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 
@@ -32,7 +33,7 @@ class UpdateContactUseCase:
                     current_attorney_id=attorney_id,
                     owner_attorney_id=contact.attorney_id,
                     resource_type='контакт',
-                    resource_id=cmd.contact_id
+                    resource_id=cmd.contact_id,
                 )
 
                 # 3. Обновить контакт

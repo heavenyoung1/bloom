@@ -7,6 +7,7 @@ from backend.core.logger import logger
 
 class GetContactByIdUseCase:
     '''Сценарий: юрист получает информацию о контакте по ID'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

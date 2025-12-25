@@ -17,7 +17,7 @@ class VerificationService:
 
         TODO: Использовать secrets вместо random для большей безопасности
         '''
-        code =  ''.join(random.choices(string.digits, k=length))
+        code = ''.join(random.choices(string.digits, k=length))
         logger.debug(f'[TEST] КОД СГЕНЕРИРОВАН! {code}')
         return code
 

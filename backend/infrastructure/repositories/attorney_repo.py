@@ -133,7 +133,7 @@ class AttorneyRepository(IAttorneyRepository):
                 )
 
             # 2. Удаление
-            self.session.delete(orm_attorney)
+            await self.session.delete(orm_attorney)
             await self.session.flush()
 
             logger.info(f'ЮРИСТ с ID {id} успешно удален.')
@@ -159,12 +159,12 @@ class AttorneyRepository(IAttorneyRepository):
     ) -> Optional['Attorney']:
         '''
         Вспомогательный метод для получения юриста по произвольному полю.
-        
+
         Args:
             condition: SQLAlchemy условие для фильтрации
             field_name: Название поля для логирования
             field_value: Значение поля для логирования
-            
+
         Returns:
             Optional[Attorney]: Найденный юрист или None
         '''
@@ -199,13 +199,13 @@ class AttorneyRepository(IAttorneyRepository):
     ) -> 'Attorney':
         '''
         Вспомогательный метод для изменения булевого поля юриста.
-        
+
         Args:
             attorney_id: ID юриста
             field_name: Название поля для обновления
             field_value: Новое значение поля
             field_label: Название поля для логирования (например, 'верификации')
-            
+
         Returns:
             Attorney: Обновленный юрист
         '''

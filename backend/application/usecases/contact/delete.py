@@ -31,7 +31,7 @@ class DeleteContactUseCase:
                     current_attorney_id=attorney_id,
                     owner_attorney_id=contact.attorney_id,
                     resource_type='контакт',
-                    resource_id=cmd.contact_id
+                    resource_id=cmd.contact_id,
                 )
 
                 # 3. Удалить контакт

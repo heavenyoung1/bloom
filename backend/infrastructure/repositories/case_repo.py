@@ -159,17 +159,17 @@ class CaseRepository(ICaseRepository):
             # 1. Выполнение запроса на извлечение данных из БД
             stmt = select(CaseORM).where(CaseORM.id == id)
             result = await self.session.execute(stmt)
-            orm_case = result.scalars().first()
+            orm_case = result.scalar_one_or_none()
 
             if not orm_case:
                 logger.warning(f'Дело с ID {id} не найдено при удалении.')
                 raise EntityNotFoundException(f'Дело с ID {id} не найдено')
 
             # 2. Удаление
-            self.session.delete(orm_case)
+            await self.session.delete(orm_case)
             await self.session.flush()
 
-            logger.info(f'Дело с ID {id} успешно удалено.')
+            # logger.info(f'Дело с ID {id} успешно удалено.')
             return True
 
         except SQLAlchemyError as e:

@@ -1,6 +1,59 @@
 from backend.domain.entities.attorney import Attorney
-
+from httpx import AsyncClient
+from backend.infrastructure.redis.client import redis_client
+from backend.infrastructure.redis.keys import RedisKeys
 import pytest
+from backend.core.logger import logger
+
+
+# ==========
+@pytest.fixture
+async def signed_attorney(
+    http_client: AsyncClient,
+    valid_attorney_dto,
+    valid_login_attorney_dto,
+    test_uow_factory,  # Фикстура для доступа к UoW в тесте
+):
+    register_payload = valid_attorney_dto.model_dump()
+    register_response = await http_client.post(
+        '/api/v0/auth/register',
+        json=register_payload,
+    )
+    register_data = register_response.json()
+    attorney_id = register_data['id']
+    # ========== КОСТЫЛЬ: Вручную обновляем is_verified в БД ==========
+    async with test_uow_factory.create() as uow:
+        await uow.attorney_repo.change_verify(attorney_id, True)
+        await uow.commit()
+
+        # ========== ЭТАП 6: Логин ==========
+    login_payload = valid_login_attorney_dto.model_dump()
+    login_response = await http_client.post(
+        '/api/v0/auth/login',
+        json=login_payload,
+    )
+    login_data = login_response.json()
+    logger.info(f'SIGN_LOGIN {login_data}')
+    return login_data
+
+
+@pytest.fixture
+async def me_attorney(
+    http_client: AsyncClient,
+    signed_attorney,
+    valid_attorney_dto,
+    valid_login_attorney_dto,
+    test_uow_factory,  # Фикстура для доступа к UoW в тесте
+):
+    response = await http_client.get(
+        '/api/v0/me',
+        headers={'Authorization': f'Bearer {signed_attorney['access_token']}'},
+    )
+    data = response.json()
+    logger.info(
+        f'SIGN_ATTORNEY = {data}' f'SIGN_TOKEN = {signed_attorney['access_token']}'
+    )
+    return data
 
 
 @pytest.fixture

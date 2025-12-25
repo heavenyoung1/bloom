@@ -13,6 +13,7 @@ from typing import List
 
 class GetAllPaymentsUseCase:
     '''Сценарий: юрист получает все свои платежи.'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

@@ -158,7 +158,7 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
                 )
 
             # 2. Удаление
-            self.session.delete(orm_document)
+            await self.session.delete(orm_document)
             await self.session.flush()
 
             logger.info(f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {id} успешно удалены.')

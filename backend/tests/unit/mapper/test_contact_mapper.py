@@ -7,7 +7,7 @@ from backend.infrastructure.models import ContactORM
 class TestContactMapper:
 
     @pytest.fixture
-    def sample_contact_domain(self, persisted_case):
+    def sample_contact_domain(self, persisted_case, persisted_attorney_id):
         return Contact(
             id=None,
             name='Иван Иванович Петров',
@@ -15,10 +15,11 @@ class TestContactMapper:
             phone='+79991234567',
             email='ivan@example.com',
             case_id=persisted_case,
+            attorney_id=persisted_attorney_id,
         )
 
     @pytest.fixture
-    def sample_contact_orm(self, persisted_case):
+    def sample_contact_orm(self, persisted_case, persisted_attorney_id):
         return ContactORM(
             id=None,
             name='Иван Иванович Петров',
@@ -26,6 +27,7 @@ class TestContactMapper:
             phone='+79991234567',
             email='ivan@example.com',
             case_id=persisted_case,
+            attorney_id=persisted_attorney_id,
         )
 
     def test_to_orm(self, sample_contact_domain):

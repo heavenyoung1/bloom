@@ -8,6 +8,7 @@ from typing import List
 
 class GetlAllCasesUseCase:
     '''Сценарий: юрист получает все дела.'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

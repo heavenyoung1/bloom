@@ -28,10 +28,10 @@ def auto_process_outbox(test_uow_factory):
     async def _process():
         '''Обработать все PENDING события из Outbox.'''
         logger.info('[TEST] Начинаем обработку Outbox')
-        
+
         # Используем тестовую фабрику UoW
         await process_outbox_events(test_uow_factory)
-        
+
         logger.info('[TEST] Обработка Outbox завершена')
 
     return _process

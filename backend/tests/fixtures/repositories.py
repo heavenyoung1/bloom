@@ -59,6 +59,7 @@ def event_repo(session):
     '''Репозиторий с тестовой сессией'''
     return EventRepository(session)
 
+
 @pytest.fixture
 def outbox_repo(session):
     '''Репозиторий с тестовой сессией'''

@@ -156,7 +156,7 @@ class PaymentDetailRepository(IPaymentDetailRepository):
                 )
 
             # 2. Удаление
-            self.session.delete(orm_payment_detail)
+            await self.session.delete(orm_payment_detail)
             await self.session.flush()
 
             logger.info(f'Платежная информация с ID {id} успешно удалена.')

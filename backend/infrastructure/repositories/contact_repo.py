@@ -169,7 +169,7 @@ class ContactRepository(IContactRepository):
                 )
 
             # 2. Удаление
-            self.session.delete(orm_contact)
+            await self.session.delete(orm_contact)
             await self.session.flush()
 
             logger.info(f'СВЯЗАННЫЙ КОНТАКТ с ID {id} успешно удален.')

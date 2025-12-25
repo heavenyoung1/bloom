@@ -7,6 +7,7 @@ from backend.tests.fixtures.uow import test_uow_factory
 
 from backend.core.logger import logger
 
+
 async def process_outbox_events(uow_factory: test_uow_factory) -> None:
     '''
     Обработать все pending события из Outbox синхронно.
@@ -33,8 +34,10 @@ async def process_outbox_events(uow_factory: test_uow_factory) -> None:
         # 2. Обрабатываем каждое событие
         for event in events:
             try:
-                logger.info(f'[OUTBOX HELPER] Обрабатываем событие: ID={event.id}, type={event.event_type}')
-                
+                logger.info(
+                    f'[OUTBOX HELPER] Обрабатываем событие: ID={event.id}, type={event.event_type}'
+                )
+
                 # Помечаем как обрабатываемое
                 await uow.outbox_repo.mark_as_processing(event.id)
                 await uow.commit()
@@ -50,11 +53,15 @@ async def process_outbox_events(uow_factory: test_uow_factory) -> None:
                 # Помечаем как успешно обработанное
                 await uow.outbox_repo.mark_as_completed(event.id)
                 await uow.commit()
-                
-                logger.info(f'[OUTBOX HELPER] Событие обработано успешно: ID={event.id}')
+
+                logger.info(
+                    f'[OUTBOX HELPER] Событие обработано успешно: ID={event.id}'
+                )
 
             except Exception as e:
-                logger.error(f'[OUTBOX HELPER] Ошибка при обработке события ID={event.id}: {e}')
+                logger.error(
+                    f'[OUTBOX HELPER] Ошибка при обработке события ID={event.id}: {e}'
+                )
                 # Помечаем как ошибку
                 await uow.outbox_repo.mark_as_failed(event.id, str(e))
                 await uow.commit()
@@ -96,7 +103,7 @@ async def _handle_attorney_registered(event) -> None:
                 return
 
             logger.info(f'[OUTBOX HANDLER] Код верификации отправлен: {email}')
-            
+
         except Exception as e:
             # Если отправка письма упала, но код уже в Redis - это OK
             # Письмо отправится позже (в реальной системе через retry mechanism)
