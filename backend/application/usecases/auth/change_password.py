@@ -49,7 +49,7 @@ class ChangePasswordUseCase:
                 attorney.hashed_password = SecurityService.hash_password(
                     cmd.new_password
                 )
-                await uow.attorney_repo.save(attorney)
+                await uow.attorney_repo.update(attorney)
 
             except (ValidationException, EntityNotFoundException) as e:
                 logger.error(f'Ошибка при изменении пароля: {e}')

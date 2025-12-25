@@ -225,8 +225,8 @@ class ChangePasswordDTO(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             'example': {
-                'current_password': 'OldPass123!',
-                'new_password': 'NewSecurePass456!',
+                'current_password': 'SecurePass123!',
+                'new_password': 'SecurePass456!',
             }
         }
     )

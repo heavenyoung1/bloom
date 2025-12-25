@@ -135,6 +135,8 @@ class TestLoginAttorney:
             http_client: AsyncClient,
             valid_attorney_dto,
             valid_login_attorney_dto,
+            change_password_dto,
+            valid_login_new_password_attorney_dto,
             auto_process_outbox,  # Фикстура для обработки Outbox
             test_uow_factory,  # Фикстура для доступа к UoW в тесте
     ):
@@ -165,6 +167,15 @@ class TestLoginAttorney:
         
         logger.info(f'[TEST] Адвокат создан: ID={attorney_id}')
 
+        # ========== ЭТАП 1.1: Логин без верификации ==========
+        # failed_login_payload = valid_login_attorney_dto.model_dump()
+        # logger.info(f'[TEST] Этап 6: Логин {email}')
+        # failed_login_response = await http_client.post(
+        #     '/api/v0/auth/login',
+        #     json=failed_login_payload,
+        # )
+        # assert failed_login_response.status_code == 404
+
         # ========== ЭТАП 2: Обработка Outbox ==========
         # В этот момент событие в Outbox PENDING
         # Фоновый воркер должен был отправить письмо, но в тестах это не происходит
@@ -184,6 +195,7 @@ class TestLoginAttorney:
         verification_code = str(verification_code).strip()
         logger.info(f'[TEST] Код верификации: {verification_code}')
 
+
         # ========== ЭТАП 4: Верификация email ==========
         logger.info(f'[TEST] Этап 4: Верификация email')
         verify_response = await http_client.post(
@@ -200,7 +212,8 @@ class TestLoginAttorney:
         verify_data = verify_response.json()
         logger.info(f'[TEST] Email верифицирован')
         logger.info(f'VERIFSTATUS {verify_data}')
-        
+    
+
         # ========== КОСТЫЛЬ: Вручную обновляем is_verified в БД ==========
         # Проблема: в тестах изменения не сохраняются из-за кэширования сессии
         # Поэтому вручную обновляем поле через репозиторий
@@ -222,6 +235,7 @@ class TestLoginAttorney:
         )
         assert deleted_code is None, 'Код должен быть удален из Redis'
         
+
         # ========== ЭТАП 6: Логин ==========
         login_payload = valid_login_attorney_dto.model_dump()
         logger.info(f'[TEST] Этап 6: Логин {email}')
@@ -230,4 +244,22 @@ class TestLoginAttorney:
             json=login_payload,
         )
         assert login_response.status_code == 200
+        
+        # Извлекаем access_token из ответа
+        login_data = login_response.json()
+        access_token = login_data['access_token']
+        assert access_token is not None
+        logger.info(f'[TEST] Access token получен')
+
+        # ========== ЭТАП 7: Изменение пароля ==========
+        change_password_payload = change_password_dto.model_dump()
+        logger.info(f'[TEST] Этап 7: Изменение пароля {email}')
+        change_password_response = await http_client.post(
+            '/api/v0/auth/change-password',
+            json=change_password_payload,
+            headers={'Authorization': f'Bearer {access_token}'},
+        )
+        assert change_password_response.status_code == 200
+
+
     
