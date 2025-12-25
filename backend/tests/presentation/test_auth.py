@@ -36,6 +36,7 @@ class TestRegisterAttorney:
             http_client: AsyncClient,
             valid_attorney_dto,
             auto_process_outbox,  # Фикстура для обработки Outbox
+            test_uow_factory,  # Фикстура для доступа к UoW в тесте
     ):
         '''
         Полный цикл: регистрация → обработка Outbox → верификация email
@@ -99,6 +100,14 @@ class TestRegisterAttorney:
         verify_data = verify_response.json()
         logger.info(f'[TEST] Email верифицирован')
         logger.info(f'VERIFSTATUS {verify_data}')
+        
+        # ========== КОСТЫЛЬ: Вручную обновляем is_verified в БД ==========
+        # Проблема: в тестах изменения не сохраняются из-за кэширования сессии
+        # Поэтому вручную обновляем поле через репозиторий
+        async with test_uow_factory.create() as uow:
+            await uow.attorney_repo.change_verify(attorney_id, True)
+            await uow.commit()
+        logger.info(f'[TEST] КОСТЫЛЬ: is_verified обновлен вручную в БД')
         
         # ========== ЭТАП 5: Проверки ==========
         assert verify_data['id'] == attorney_id

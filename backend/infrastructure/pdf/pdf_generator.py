@@ -1,6 +1,6 @@
 '''
 Сервис для заполнения PDF шаблонов по координатам.
-Использует PyPDF2 для работы с PDF файлами.
+Использует pypdf для работы с PDF файлами.
 '''
 
 import json
@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 from datetime import date, datetime
 
-from PyPDF2 import PdfReader, PdfWriter
+from pypdf import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from io import BytesIO
