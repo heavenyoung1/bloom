@@ -1,15 +1,13 @@
 from backend.application.dto.case import CaseResponse
-from backend.domain.entities.case import Case
-from backend.domain.entities.auxiliary import CaseStatus
-from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.commands.case import UpdateCaseCommand
 from backend.application.policy.case_policy import CasePolicy
+from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
 
 class UpdateCaseUseCase:
-    '''Сценарий: юрист создаёт новое дело.'''
+    '''Сценарий: юрист обновляет дело.'''
 
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory

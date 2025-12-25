@@ -8,7 +8,7 @@ from backend.core.logger import logger
 
 
 class UpdateContactUseCase:
-
+    '''Сценарий: юрист обновляет контакт'''
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 
@@ -22,9 +22,9 @@ class UpdateContactUseCase:
                 # 1. Получить контакт
                 contact = await uow.contact_repo.get(cmd.contact_id)
                 if not contact:
-                    logger.warning(f'контакт не найден: ID = {cmd.contact_id}')
+                    logger.warning(f'Контакт не найден: ID = {cmd.contact_id}')
                     raise EntityNotFoundException(
-                        f'контакт не найден: ID = {cmd.contact_id}'
+                        f'Контакт не найден: ID = {cmd.contact_id}'
                     )
 
                 # 2. Проверка прав доступа

@@ -1,7 +1,6 @@
 from backend.application.dto.event import EventResponse
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.core.exceptions import ValidationException, EntityNotFoundException
-from backend.domain.entities.event import Event
+from backend.core.exceptions import EntityNotFoundException
 from backend.application.commands.event import (
     DeleteEventCommand,
 )
@@ -11,6 +10,7 @@ from backend.core.logger import logger
 
 
 class DeleteEventUseCase:
+    '''Сценарий: юрист удаляет событие.'''
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

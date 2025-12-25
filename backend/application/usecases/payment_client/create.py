@@ -7,7 +7,6 @@ from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
 from backend.application.dto.client_payment import (
-    PaymentClientCreateRequest,
     PaymentClientResponse,
 )
 

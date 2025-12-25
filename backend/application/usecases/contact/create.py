@@ -1,8 +1,7 @@
-from backend.application.dto.contact import ContactCreateRequest, ContactResponse
+from backend.application.dto.contact import ContactResponse
 from backend.domain.entities.contact import Contact
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.commands.contact import CreateContactCommand
-from backend.application.policy.case_policy import CasePolicy
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 

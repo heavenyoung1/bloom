@@ -1,5 +1,5 @@
 from backend.application.dto.client_payment import PaymentClientResponse
-from backend.domain.entities.client_payment import ClientPayment
+
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.commands.client_payment import UpdateСlientPaymentCommand
 from backend.core.exceptions import ValidationException, EntityNotFoundException
@@ -7,7 +7,7 @@ from backend.core.logger import logger
 
 
 class UpdatePaymentUseCase:
-    '''Сценарий: обновление платежа.'''
+    '''Сценарий: юрист обновляет платеж.'''
 
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory

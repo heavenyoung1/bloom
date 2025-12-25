@@ -1,6 +1,5 @@
-from backend.application.dto.case import CaseCreateRequest, CaseResponse
+from backend.application.dto.case import CaseResponse
 from backend.domain.entities.case import Case
-from backend.domain.entities.auxiliary import CaseStatus
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.commands.case import CreateCaseCommand
 from backend.application.policy.case_policy import CasePolicy

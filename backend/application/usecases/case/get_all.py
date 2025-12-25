@@ -1,16 +1,13 @@
-from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
-from backend.application.policy.case_policy import CasePolicy
 from backend.application.dto.case import CaseResponse
-from backend.application.commands.case import (
-    DeleteCaseCommand,
-    GetCasesForAttorneyQuery,
-)
-from typing import List
+from backend.application.commands.case import GetCasesForAttorneyQuery
+from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.logger import logger
+
+from typing import List
 
 
 class GetlAllCasesUseCase:
+    '''Сценарий: юрист получает все дела.'''
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

@@ -1,10 +1,11 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
+from backend.core.exceptions import EntityNotFoundException
 from backend.application.commands.client import DeleteClientCommand
 from backend.core.logger import logger
 
 
 class DeleteClientUseCase:
+    '''Сценарий: юрист удаляет клиента.'''
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

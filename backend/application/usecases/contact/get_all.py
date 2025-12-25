@@ -1,14 +1,12 @@
 from backend.application.dto.contact import ContactResponse
-from backend.domain.entities.contact import Contact
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.commands.contact import GetContactsForAttorneyQuery
-from backend.application.policy.case_policy import CasePolicy
-from backend.core.exceptions import ValidationException, EntityNotFoundException
 from typing import List
 from backend.core.logger import logger
 
 
 class GetAllContactsUseCase:
+    '''Сценарий: юрист получает все свои контакты'''
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 
