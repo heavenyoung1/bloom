@@ -19,9 +19,13 @@ class UpdatePaymentDetailUseCase:
         async with self.uow_factory.create() as uow:
             try:
                 # 1. Получить платежные реквизиты
-                payment_detail = await uow.payment_detail_repo.get(cmd.payment_detail_id)
+                payment_detail = await uow.payment_detail_repo.get(
+                    cmd.payment_detail_id
+                )
                 if not payment_detail:
-                    logger.warning(f'Платежные реквизиты не найдены: ID = {cmd.payment_detail_id}')
+                    logger.warning(
+                        f'Платежные реквизиты не найдены: ID = {cmd.payment_detail_id}'
+                    )
                     raise EntityNotFoundException(
                         f'Платежные реквизиты не найдены: ID = {cmd.payment_detail_id}'
                     )
@@ -30,7 +34,9 @@ class UpdatePaymentDetailUseCase:
                 payment_detail.update(cmd)
 
                 # 3. Сохранение в базе
-                updated_payment_detail = await uow.payment_detail_repo.update(payment_detail)
+                updated_payment_detail = await uow.payment_detail_repo.update(
+                    payment_detail
+                )
 
                 logger.info(
                     f'Платежные реквизиты обновлены: ID = {updated_payment_detail.id} '
@@ -45,6 +51,7 @@ class UpdatePaymentDetailUseCase:
                 raise e  # Пробрасываем ошибку дальше
 
             except Exception as e:
-                logger.error(f'Неизвестная ошибка при обновлении платежных реквизитов: {e}')
+                logger.error(
+                    f'Неизвестная ошибка при обновлении платежных реквизитов: {e}'
+                )
                 raise Exception('Ошибка при обновлении платежных реквизитов')
-

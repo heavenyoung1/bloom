@@ -9,5 +9,6 @@ class IPaymentRepository(IBaseRepository['ClientPayment']):
     '''Специфичный интерфейс для ClientPayment'''
 
     @abstractmethod
-    async def get_all_for_attorney(self, attorney_id: int) -> Sequence['ClientPayment']: ...
-
+    async def get_all_for_attorney(
+        self, attorney_id: int
+    ) -> Sequence['ClientPayment']: ...

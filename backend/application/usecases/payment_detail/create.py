@@ -32,7 +32,9 @@ class CreatePaymentDetailUseCase:
                 )
 
                 # 3. Сохранение в базе
-                saved_payment_detail = await uow.payment_detail_repo.save(payment_detail)
+                saved_payment_detail = await uow.payment_detail_repo.save(
+                    payment_detail
+                )
 
                 logger.info(
                     f'Платежные реквизиты созданы: ID = {saved_payment_detail.id} '
@@ -47,5 +49,7 @@ class CreatePaymentDetailUseCase:
                 raise e  # Пробрасываем ошибку дальше
 
             except Exception as e:
-                logger.error(f'Неизвестная ошибка при создании платежных реквизитов: {e}')
+                logger.error(
+                    f'Неизвестная ошибка при создании платежных реквизитов: {e}'
+                )
                 raise Exception('Ошибка при создании платежных реквизитов')

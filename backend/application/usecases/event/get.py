@@ -1,7 +1,6 @@
 from backend.application.dto.event import EventResponse
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.core.exceptions import ValidationException, EntityNotFoundException
-from backend.domain.entities.event import Event
+from backend.core.exceptions import EntityNotFoundException
 from backend.application.commands.event import (
     GetEventQuery,
     GetEventsForAttorneyQuery,
@@ -13,7 +12,7 @@ from backend.core.logger import logger
 
 
 class GetEventUseCase:
-    '''Получить одно событие по ID'''
+    '''Сценарий: юрист получает событие.'''
 
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
@@ -70,6 +69,7 @@ class GetEventByAttorneyUseCase:
                 )
                 raise e
 
+
 class GetNearestEventsByAttorneyUseCase:
     '''Получить ближайшие события для юриста отсортированные по дате и ограниченные по количеству'''
 
@@ -104,6 +104,7 @@ class GetNearestEventsByAttorneyUseCase:
                     f'Ошибка при получении событий юриста {cmd.attorney_id}: {e}'
                 )
                 raise e
+
 
 class GetEventByCaseUseCase:
     '''Получить все события для конкретного дела'''

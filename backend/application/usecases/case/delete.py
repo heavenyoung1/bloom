@@ -1,5 +1,4 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
 from backend.application.policy.case_policy import CasePolicy
 from backend.application.commands.case import DeleteCaseCommand
 from backend.core.logger import logger

@@ -28,3 +28,14 @@ class CaseMapper:
             status=domain.status,
             description=domain.description,
         )
+
+    @staticmethod
+    def update_orm(orm: CaseORM, domain: 'Case') -> None:
+        '''
+        Обновляет существующий ORM объект значениями из доменной сущности.
+        Не обновляет id, created_at, updated_at, attorney_id (они управляются отдельно).
+        '''
+        orm.name = domain.name
+        orm.client_id = domain.client_id
+        orm.status = domain.status
+        orm.description = domain.description

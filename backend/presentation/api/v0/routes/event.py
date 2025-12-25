@@ -157,7 +157,7 @@ async def get_events_by_attorney(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Ошибка при получении события',
         )
-    
+
 
 # ====== READ NEAREST EVENTS BY ATTORNEY ======
 @router.get(
@@ -173,7 +173,9 @@ async def get_events_by_attorney(
 )
 async def get_nearest_events_by_attorney(
     attorney_id: int,
-    count: int = Query(default=3, ge=1, le=50, description='Количество ближайших событий'),
+    count: int = Query(
+        default=3, ge=1, le=50, description='Количество ближайших событий'
+    ),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:

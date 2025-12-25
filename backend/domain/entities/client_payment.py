@@ -41,17 +41,17 @@ class ClientPayment:
     ) -> 'ClientPayment':
         '''Фабричный метод для создания нового платежа.'''
         return ClientPayment(
-        id=None,  # ID будет присвоен после сохранения в базе данных
-        name=name,
-        client_id=client_id,
-        attorney_id=attorney_id,
-        paid=paid,
-        paid_str=paid_str,
-        pade_date=pade_date,
-        paid_deadline=paid_deadline,
-        taxable=taxable,
-        condition=condition,
-        status=status,
+            id=None,  # ID будет присвоен после сохранения в базе данных
+            name=name,
+            client_id=client_id,
+            attorney_id=attorney_id,
+            paid=paid,
+            paid_str=paid_str,
+            pade_date=pade_date,
+            paid_deadline=paid_deadline,
+            taxable=taxable,
+            condition=condition,
+            status=status,
         )
 
     def update(self, cmd: UpdatePaymentCommand) -> None:

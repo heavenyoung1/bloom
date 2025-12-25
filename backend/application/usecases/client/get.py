@@ -1,13 +1,14 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.client import ClientResponse
-from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
+from backend.core.exceptions import EntityNotFoundException
 from backend.application.commands.client import GetClientByIdQuery
 from backend.core.logger import logger
 
 
 class GetClientByIdUseCase:
+    '''Сценарий: юрист получает клиента по его ID.'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
-        '''Получение клиента по ID'''
         self.uow_factory = uow_factory
 
     async def execute(

@@ -3,44 +3,36 @@ from httpx import AsyncClient, ASGITransport
 
 from backend.main import app
 from backend.core.dependencies import get_uow_factory, get_current_attorney_id
+from backend.core.logger import logger
 
 
 @pytest.fixture
-async def http_client():
+async def http_client(session, test_uow_factory):
     '''
-    Асинхронная pytest-фикстура, предоставляющая HTTP-клиент для тестирования ASGI-приложения.
+    HTTP клиент для тестов с переопределением зависимостей.
 
-    Использует httpx.AsyncClient с ASGITransport, чтобы выполнять запросы напрямую к приложению
-    (без запуска реального HTTP-сервера, например, uvicorn). Это обеспечивает быстрые,
-    надёжные и изолированные интеграционные тесты эндпоинтов FastAPI/Starlette.
-
-    Преимущества перед starlette.testclient.TestClient:
-        - Более богатый функционал httpx (таймауты, retry, следование редиректам и т.д.).
-        - Полная совместимость API с реальными HTTP-запросами.
-        - Отличная поддержка асинхронности.
-
-    Пример использования в тесте:
-        async def test_root_endpoint(http_client: AsyncClient):
-            response = await http_client.get("/")
-            assert response.status_code == 200
-            assert response.json() == {"message": "Hello World"}
-
-    Возвращает:
-        httpx.AsyncClient — настроенный асинхронный клиент, готовый к отправке запросов.
-
-    Notes:
-        - base_url='http://test' — произвольная заглушка, позволяет использовать относительные пути
-          в тестах (например, client.get("/users/")).
-        - Клиент автоматически закрывается после завершения теста благодаря async with.
-        - Требует, чтобы тестируемое приложение (app) было ASGI-совместимым
-          (FastAPI, Starlette, Quart и т.д.).
+    ✅ Использует ТОЛЬКО тестовую БД (session фикстура)
+    ✅ Переопределяет get_uow_factory на test_uow_factory
     '''
+
+    # Получаем get_uow_factory из app
+    from backend.core.dependencies import get_uow_factory
+
+    # Переопределяем зависимость
+    app.dependency_overrides[get_uow_factory] = lambda: test_uow_factory
+
+    logger.info('[HTTP CLIENT] Переопределена зависимость get_uow_factory')
+
     transport = ASGITransport(app=app)
     async with AsyncClient(
         transport=transport,
         base_url='http://test',
     ) as async_client:
         yield async_client
+
+    # Убираем переопределение
+    app.dependency_overrides.clear()
+    logger.info('[HTTP CLIENT] Зависимости восстановлены')
 
 
 @pytest.fixture(autouse=True)

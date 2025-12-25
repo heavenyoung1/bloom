@@ -9,11 +9,12 @@ from backend.domain.entities.auxiliary import PaymentStatus
 
 class PaymentClientCreateRequest(BaseModel):
     '''DTO для создания клиентского платежа'''
+
     name: str = Field(
         ...,
-        max_length=255, 
+        max_length=255,
         description='Наименование услуги',
-        )
+    )
     client_id: int = Field(
         ...,
         gt=0,
@@ -55,8 +56,11 @@ class PaymentClientCreateRequest(BaseModel):
             try:
                 return date.fromisoformat(normalized)
             except ValueError:
-                raise ValueError(f'Неверный формат даты: {v}. Используйте YYYY-MM-DD или YYYY.MM.DD')
+                raise ValueError(
+                    f'Неверный формат даты: {v}. Используйте YYYY-MM-DD или YYYY.MM.DD'
+                )
         return v
+
     taxable: bool = Field(
         None,
     )
@@ -81,19 +85,26 @@ class PaymentClientCreateRequest(BaseModel):
                 'taxable': False,
                 'condition': 'Оплата производится в течение пяти дней с момента выставления счета.',
                 'status': 'Выставлен',
-            }   
+            }
         }
     )
 
+
 class PaymentClientUpdateRequest(BaseModel):
     '''DTO для обновления клиентского платежа'''
+
     name: str = Field(None, max_length=255)
     client_id: int = Field(None)
     attorney_id: int = Field(None)
     paid: float = Field(None)
     paid_str: str = Field(None)
-    pade_date: date | None = Field(None, description='Дата формирования платежа (формат: YYYY-MM-DD или YYYY.MM.DD)')
-    paid_deadline: date | None = Field(None, description='Срок оплаты (формат: YYYY-MM-DD или YYYY.MM.DD)')
+    pade_date: date | None = Field(
+        None,
+        description='Дата формирования платежа (формат: YYYY-MM-DD или YYYY.MM.DD)',
+    )
+    paid_deadline: date | None = Field(
+        None, description='Срок оплаты (формат: YYYY-MM-DD или YYYY.MM.DD)'
+    )
     taxable: bool = Field(None)
     condition: Optional[str] = Field(None)
     status: PaymentStatus = Field(PaymentStatus.pending)
@@ -112,7 +123,9 @@ class PaymentClientUpdateRequest(BaseModel):
             try:
                 return date.fromisoformat(normalized)
             except ValueError:
-                raise ValueError(f'Неверный формат даты: {v}. Используйте YYYY-MM-DD или YYYY.MM.DD')
+                raise ValueError(
+                    f'Неверный формат даты: {v}. Используйте YYYY-MM-DD или YYYY.MM.DD'
+                )
         return v
 
     model_config = ConfigDict(
@@ -128,13 +141,14 @@ class PaymentClientUpdateRequest(BaseModel):
                 'taxable': False,
                 'condition': 'Оплата производится в течение пяти дней с момента выставления счета.',
                 'status': 'Выставлен',
-            }   
+            }
         }
     )
 
 
 class PaymentClientResponse(BaseModel):
     '''DTO для ответа: полная информация о платеже'''
+
     id: int
     name: str
     client_id: int
@@ -154,6 +168,7 @@ class PaymentClientResponse(BaseModel):
 
 class FullPaymentResponse(BaseModel):
     '''DTO для полного ответа с данными платежа и платежными реквизитами (18 параметров)'''
+
     payment_id: int
     payment_name: str
     client_id: int
@@ -174,8 +189,7 @@ class FullPaymentResponse(BaseModel):
     bik: str
     bank_recipient: str
     pdf_path: Optional[str] = Field(
-        None,
-        description='Путь к сгенерированному PDF документу'
+        None, description='Путь к сгенерированному PDF документу'
     )
 
     model_config = ConfigDict(from_attributes=True)

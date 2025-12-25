@@ -23,7 +23,7 @@ from backend.application.dto.client import (
 )
 
 from backend.core.exceptions import (
-    NotFoundException,
+    EntityNotFoundException,
     VerificationError,
     AccessDeniedException,
 )

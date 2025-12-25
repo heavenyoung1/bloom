@@ -12,8 +12,13 @@ from backend.presentation.api.v0.routes.case import router as case_router
 from backend.presentation.api.v0.routes.event import router as event_router
 from backend.presentation.api.v0.routes.me import router as me_router
 from backend.presentation.api.v0.routes.document import router as document_router
-from backend.presentation.api.v0.routes.payment_detail import router as payment_detail_router
-from backend.presentation.api.v0.routes.payment_client import router as payment_client_router
+from backend.presentation.api.v0.routes.payment_detail import (
+    router as payment_detail_router,
+)
+from backend.presentation.api.v0.routes.payment_client import (
+    router as payment_client_router,
+)
+from backend.presentation.api.v0.routes.contact import router as contact_router
 
 
 @asynccontextmanager
@@ -83,6 +88,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(client_router)
 app.include_router(case_router)
+app.include_router(contact_router)
 app.include_router(event_router)
 app.include_router(me_router)
 app.include_router(document_router)

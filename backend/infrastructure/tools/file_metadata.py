@@ -2,6 +2,7 @@
 Сервис для извлечения метаданных из файлов.
 Определяет MIME тип, размер файла и другую полезную информацию.
 """
+
 import mimetypes
 from typing import Optional
 
@@ -75,9 +76,7 @@ class FileMetadataExtractor:
         return f'{size_bytes:.2f} TB'
 
     @staticmethod
-    def extract_all_metadata(
-        file_content: bytes, file_name: str
-    ) -> dict[str, str]:
+    def extract_all_metadata(file_content: bytes, file_name: str) -> dict[str, str]:
         '''
         Извлекает все метаданные файла.
 
@@ -89,9 +88,6 @@ class FileMetadataExtractor:
             Словарь с метаданными: mime_type, file_size
         '''
         return {
-            'mime_type': FileMetadataExtractor.get_mime_type(
-                file_content, file_name
-            ),
+            'mime_type': FileMetadataExtractor.get_mime_type(file_content, file_name),
             'file_size': FileMetadataExtractor.get_file_size(file_content),
         }
-

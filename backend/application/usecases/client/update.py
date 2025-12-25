@@ -1,12 +1,14 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
-from backend.application.dto.client import ClientUpdateRequest, ClientResponse
-from backend.core.exceptions import EntityNotFoundException, AccessDeniedException
+from backend.application.dto.client import ClientResponse
+from backend.core.exceptions import EntityNotFoundException
 from backend.application.policy.client_policy import ClientPolicy
 from backend.application.commands.client import UpdateClientCommand
 from backend.core.logger import logger
 
 
 class UpdateClientUseCase:
+    '''Сценарий: юрист обновляет клиента.'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

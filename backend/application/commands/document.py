@@ -37,4 +37,3 @@ class GetDocumentsForCaseQuery:
 
     case_id: int
     attorney_id: int  # для проверки прав доступа
-

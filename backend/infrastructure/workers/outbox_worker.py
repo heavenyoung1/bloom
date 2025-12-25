@@ -1,4 +1,4 @@
-"""Воркер для обработки событий из Outbox."""
+'''Воркер для обработки событий из Outbox.'''
 
 import asyncio
 import json
@@ -13,12 +13,12 @@ from backend.application.services.verification_service import VerificationServic
 
 
 class OutboxWorker:
-    """
+    '''
     Воркер для обработки событий из Outbox.
 
     Читает события со статусом PENDING, обрабатывает их и обновляет статусы.
     Работает в бесконечном цикле с интервалом между проверками.
-    """
+    '''
 
     def __init__(
         self,
@@ -27,13 +27,13 @@ class OutboxWorker:
         poll_interval: float = 5.0,
         max_retries: int = 3,
     ):
-        """
+        '''
         Args:
             uow_factory: Фабрика для создания UnitOfWork
             batch_size: Количество событий для обработки за раз
             poll_interval: Интервал между проверками (в секундах)
             max_retries: Максимальное количество попыток обработки
-        """
+        '''
         self.uow_factory = uow_factory
         self.batch_size = batch_size
         self.poll_interval = poll_interval
@@ -41,7 +41,7 @@ class OutboxWorker:
         self._running = False
 
     async def start(self) -> None:
-        """Запустить воркер."""
+        '''Запустить воркер.'''
         self._running = True
         logger.info('[OUTBOX WORKER] Воркер запущен')
 
@@ -54,12 +54,12 @@ class OutboxWorker:
             await asyncio.sleep(self.poll_interval)
 
     async def stop(self) -> None:
-        """Остановить воркер."""
+        '''Остановить воркер.'''
         self._running = False
         logger.info('[OUTBOX WORKER] Воркер остановлен')
 
     async def _process_batch(self) -> None:
-        """Обработать батч событий."""
+        '''Обработать батч событий.'''
         async with self.uow_factory.create() as uow:
             # Получаем события для обработки
             events = await uow.outbox_repo.get_pending_events(limit=self.batch_size)
@@ -79,7 +79,7 @@ class OutboxWorker:
                     )
 
     async def _process_event(self, uow, event) -> None:
-        """Обработать одно событие."""
+        '''Обработать одно событие.'''
         # Помечаем как обрабатываемое
         await uow.outbox_repo.mark_as_processing(event.id)
         await uow.commit()
@@ -133,7 +133,7 @@ class OutboxWorker:
             await uow.commit()
 
     async def _handle_attorney_registered(self, event) -> None:
-        """Обработать событие регистрации адвоката."""
+        '''Обработать событие регистрации адвоката.'''
         try:
             payload = json.loads(event.payload)
             email = payload['email']
@@ -156,7 +156,7 @@ class OutboxWorker:
 
 
 async def run_outbox_worker() -> None:
-    """Запустить Outbox воркер (для использования в отдельном процессе)."""
+    '''Запустить Outbox воркер (для использования в отдельном процессе).'''
     uow_factory = UnitOfWorkFactory(database)
     worker = OutboxWorker(uow_factory)
 

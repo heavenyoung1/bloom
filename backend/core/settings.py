@@ -54,7 +54,7 @@ class Settings(BaseSettings):
     FILE_STORAGE_BASE_PATH: str = Field(
         default='storage/',  # Относительный путь - будет создан в корне проекта
         description='Базовый путь для хранения файлов (локальное хранилище). '
-                    'Для Windows используйте относительный путь (storage/) или абсолютный (C:\\Projects\\storage\\)',
+        'Для Windows используйте относительный путь (storage/) или абсолютный (C:\\Projects\\storage\\)',
     )
     FILE_STORAGE_TYPE: str = Field(
         default='local',
@@ -63,7 +63,7 @@ class Settings(BaseSettings):
     FILE_STORAGE_TEMPLATE: str = Field(
         default='',
         description='Абсолютный путь к PDF шаблону для генерации платежных документов. '
-                    'Пример: C:\\Projects\\bloom\\backend\\infrastructure\\pdf\\template\\check_template.pdf',
+        'Пример: C:\\Projects\\bloom\\backend\\infrastructure\\pdf\\template\\check_template.pdf',
     )
 
     model_config = SettingsConfigDict(

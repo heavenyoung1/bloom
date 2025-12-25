@@ -36,7 +36,8 @@ from backend.core.dependencies import (
 )
 from backend.core.logger import logger
 
-router = APIRouter(prefix='/api/v0/payment-detail', tags=['payment-detail'])
+router = APIRouter(prefix='/api/v0', tags=['payment-detail'])
+
 
 @router.post(
     '/create-payment-detail',
@@ -80,6 +81,7 @@ async def create_payment_detail(
             detail='Ошибка при создании платежной информации',
         )
 
+
 @router.get(
     '/payment-detail/{payment_detail_id}',
     response_model=PaymentDetailResponse,
@@ -93,7 +95,7 @@ async def create_payment_detail(
 )
 async def get_payment_detail(
     payment_detail_id: int,
-    #current_attorney_id: int = Depends(get_current_attorney_id),
+    # current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:
@@ -116,7 +118,8 @@ async def get_payment_detail(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Ошибка при получении платежной информации',
         )
-    
+
+
 @router.get(
     '/payment-detail/attorneys/{attorney_id}',
     response_model=PaymentDetailResponse,
@@ -137,7 +140,9 @@ async def get_payment_detail_for_attorney(
         use_case = GetPaymentDetailForAttorneyUseCase(uow_factory)
         result = await use_case.execute(cmd)
 
-        logger.info(f'Платежная информация для юриста успешно получена: {result.attorney_id}')
+        logger.info(
+            f'Платежная информация для юриста успешно получена: {result.attorney_id}'
+        )
         return result
 
     except ValidationException as e:
@@ -152,6 +157,7 @@ async def get_payment_detail_for_attorney(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Ошибка при получении платежной информации',
         )
+
 
 @router.put(
     '/update-payment-detail/{payment_detail_id}',
@@ -170,9 +176,9 @@ async def update_payment_detail(
         if request.attorney_id and request.attorney_id != current_attorney_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail='Нет прав для обновления платежной информации другого юриста'
+                detail='Нет прав для обновления платежной информации другого юриста',
             )
-        
+
         cmd = UpdatePaymentDetailCommand(
             payment_detail_id=payment_detail_id,
             attorney_id=current_attorney_id,
@@ -202,6 +208,7 @@ async def update_payment_detail(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Ошибка при обновлении платежной информации',
         )
+
 
 @router.delete(
     '/delete-payment-detail/{payment_detail_id}',

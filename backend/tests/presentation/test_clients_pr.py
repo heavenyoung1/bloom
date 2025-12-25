@@ -12,30 +12,12 @@ class TestCreateClient:
         http_client: AsyncClient,
         valid_attorney_dto,
         valid_client_dto,
+        signed_attorney,
+        me_attorney,
     ):
         '''Успешное создание клиента авторизованным адвокатом'''
-        # ======== ПОДГОТОВКА ========
-        # Регистрируем и логиним адвоката
-        register_payload = valid_attorney_dto.model_dump()
-        await http_client.post('/api/v0/auth/register', json=register_payload)
-
-        from backend.infrastructure.redis.client import redis_client
-        from backend.infrastructure.redis.keys import RedisKeys
-
-        email = register_payload['email']
-        code = await redis_client._client.get(RedisKeys.email_verification_code(email))
-
-        await http_client.post(
-            '/api/v0/auth/verify-email',
-            json={'email': email, 'code': code},
-        )
-
-        login_response = await http_client.post(
-            '/api/v0/auth/login',
-            json={'email': email, 'password': register_payload['password']},
-        )
-
-        access_token = login_response.json()['access_token']
+        access_token = signed_attorney['access_token']
+        attorney_id = me_attorney['id']
 
         # ======== СОЗДАНИЕ КЛИЕНТА ========
         client_payload = valid_client_dto.model_dump()
@@ -75,29 +57,12 @@ class TestCreateClient:
         http_client: AsyncClient,
         valid_attorney_dto,
         valid_client_dto,
+        signed_attorney,
+        me_attorney,
     ):
         '''Создание клиента с невалидным email'''
-        # ======== SETUP ATTORNEY ========
-        register_payload = valid_attorney_dto.model_dump()
-        await http_client.post('/api/v0/auth/register', json=register_payload)
-
-        from backend.infrastructure.redis.client import redis_client
-        from backend.infrastructure.redis.keys import RedisKeys
-
-        email = register_payload['email']
-        code = await redis_client._client.get(RedisKeys.email_verification_code(email))
-
-        await http_client.post(
-            '/api/v0/auth/verify-email',
-            json={'email': email, 'code': code},
-        )
-
-        login_response = await http_client.post(
-            '/api/v0/auth/login',
-            json={'email': email, 'password': register_payload['password']},
-        )
-
-        access_token = login_response.json()['access_token']
+        access_token = signed_attorney['access_token']
+        attorney_id = me_attorney['id']
 
         # ======== INVALID CLIENT EMAIL ========
         client_payload = valid_client_dto.model_dump()
@@ -117,29 +82,12 @@ class TestCreateClient:
         http_client: AsyncClient,
         valid_attorney_dto,
         valid_client_dto,
+        signed_attorney,
+        me_attorney,
     ):
         '''Создание клиента с duplicate email'''
-        # ======== SETUP ATTORNEY ========
-        register_payload = valid_attorney_dto.model_dump()
-        await http_client.post('/api/v0/auth/register', json=register_payload)
-
-        from backend.infrastructure.redis.client import redis_client
-        from backend.infrastructure.redis.keys import RedisKeys
-
-        email = register_payload['email']
-        code = await redis_client._client.get(RedisKeys.email_verification_code(email))
-
-        await http_client.post(
-            '/api/v0/auth/verify-email',
-            json={'email': email, 'code': code},
-        )
-
-        login_response = await http_client.post(
-            '/api/v0/auth/login',
-            json={'email': email, 'password': register_payload['password']},
-        )
-
-        access_token = login_response.json()['access_token']
+        access_token = signed_attorney['access_token']
+        attorney_id = me_attorney['id']
 
         # ======== CREATE FIRST CLIENT ========
         client_payload = valid_client_dto.model_dump()

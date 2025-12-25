@@ -14,6 +14,7 @@ class ContactMapper:
             email=orm.email,
             created_at=orm.created_at,
             case_id=orm.case_id,
+            attorney_id=orm.attorney_id,
         )
 
     @staticmethod
@@ -27,4 +28,17 @@ class ContactMapper:
             email=domain.email,
             created_at=domain.created_at,
             case_id=domain.case_id,
+            attorney_id=domain.attorney_id,
         )
+
+    @staticmethod
+    def update_orm(orm: ContactORM, domain: 'Contact') -> None:
+        '''
+        Обновляет существующий ORM объект значениями из доменной сущности.
+        Не обновляет id, created_at, updated_at, attorney_id (они управляются отдельно).
+        '''
+        orm.name = domain.name
+        orm.personal_info = domain.personal_info
+        orm.phone = domain.phone
+        orm.email = domain.email
+        orm.case_id = domain.case_id

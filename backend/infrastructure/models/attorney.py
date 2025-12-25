@@ -16,6 +16,7 @@ if TYPE_CHECKING:
         CaseORM,
         ClientPaymentORM,
         PaymentDetailORM,
+        ContactORM,
     )
 
 
@@ -80,4 +81,9 @@ class AttorneyORM(AttorneyBase, TimeStampMixin):
         back_populates='attorney',
         uselist=False,
         cascade='save-update, merge, delete, delete-orphan',
+    )
+    contacts: Mapped[list['ContactORM']] = relationship(
+        back_populates='attorney',
+        cascade='save-update, merge',
+        passive_deletes=True,
     )

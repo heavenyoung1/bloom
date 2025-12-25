@@ -1,12 +1,13 @@
-
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 from typing import Optional
 from datetime import datetime
 
 # ====== COMMANDS (write операции) ======
 
+
 class PaymentDetailCreateRequest(BaseModel):
     '''DTO для создания платежной информации юриста'''
+
     inn: str = Field(..., max_length=12)
     index_address: str = Field(..., max_length=6)
     address: str = Field(..., max_length=255)
@@ -14,8 +15,8 @@ class PaymentDetailCreateRequest(BaseModel):
     correspondent_account: str = Field(..., max_length=20)
     bik: str = Field(..., max_length=9)
     bank_recipient: str = Field(..., max_length=255)
-    kpp: Optional[str]  = Field(None, max_length=9)
-# Как правильно передать KPP
+    kpp: Optional[str] = Field(None, max_length=9)
+    # Как правильно передать KPP
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -32,8 +33,10 @@ class PaymentDetailCreateRequest(BaseModel):
         }
     )
 
+
 class PaymentDetailUpdateRequest(BaseModel):
     '''DTO для обновления платежной информации юриста'''
+
     attorney_id: int = Field(
         ...,
         gt=0,
@@ -46,7 +49,7 @@ class PaymentDetailUpdateRequest(BaseModel):
     correspondent_account: str = Field(None, max_length=20)
     bik: str = Field(None, max_length=9)
     bank_recipient: str = Field(None, max_length=255)
-    kpp: Optional[str]  = Field(None, max_length=9)
+    kpp: Optional[str] = Field(None, max_length=9)
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -65,18 +68,17 @@ class PaymentDetailUpdateRequest(BaseModel):
     )
 
 
-
 class PaymentDetailResponse(BaseModel):
-    id: int                         # ID платежной информации
-    attorney_id: int                # Владелец платежа - юрист
-    inn: str                        # ИНН получателя
-    kpp: Optional[str]              # КПП
-    index_address: str              # Индекс адреса
-    address: str                    # Адрес 
-    bank_account: str               # Номер расчетного счета
-    correspondent_account: str      # Корреспондентский счет
-    bik: str                        # БИК
-    bank_recipient: str             # Банк-получатель
+    id: int  # ID платежной информации
+    attorney_id: int  # Владелец платежа - юрист
+    inn: str  # ИНН получателя
+    kpp: Optional[str]  # КПП
+    index_address: str  # Индекс адреса
+    address: str  # Адрес
+    bank_account: str  # Номер расчетного счета
+    correspondent_account: str  # Корреспондентский счет
+    bik: str  # БИК
+    bank_recipient: str  # Банк-получатель
 
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

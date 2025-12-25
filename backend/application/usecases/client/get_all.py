@@ -1,12 +1,14 @@
-from typing import List
-
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.application.dto.client import ClientResponse
 from backend.application.commands.client import GetClientsForAttorneyQuery
 from backend.core.logger import logger
 
+from typing import List
+
 
 class GetClientsForAttorneyUseCase:
+    '''Сценарий: юрист получает всех своих клиентов.'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
         self.uow_factory = uow_factory
 

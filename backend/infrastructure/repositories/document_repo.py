@@ -71,10 +71,10 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
                 return None
 
             # 3. Преобразование ORM объекта в доменную сущность
-            case = DocumentMapper.to_domain(orm_document)
+            document = DocumentMapper.to_domain(orm_document)
 
-            logger.info(f'МЕТАДАННЫЕ ДОКУМЕНТА получены. ID - {case.id}')
-            return case
+            logger.info(f'МЕТАДАННЫЕ ДОКУМЕНТА получены. ID - {document.id}')
+            return document
 
         except SQLAlchemyError as e:
             logger.error(
@@ -97,7 +97,7 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
 
             # 2. Списковый генератор для всех записей из базы данных
             return [
-                DocumentMapper.to_domain(orm_contact) for orm_contact in orm_documents
+                DocumentMapper.to_domain(orm_document) for orm_document in orm_documents
             ]
 
         except SQLAlchemyError as e:
@@ -111,7 +111,7 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
     async def update(self, updated_document: Document) -> 'Document':
         try:
             # 1. Выполнение запроса на извлечение данных из БД
-            stmt = select(DocumentORM).where(DocumentORM.id == DocumentORM.id)
+            stmt = select(DocumentORM).where(DocumentORM.id == updated_document.id)
             result = await self.session.execute(stmt)
             orm_document = result.scalars().first()
 
@@ -124,11 +124,8 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
                     f'МЕТАДАННЫЕ ДОКУМЕНТА с ID {updated_document.id} не найдены.'
                 )
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_document.file_name = updated_document.file_name
-            orm_document.storage_path = updated_document.storage_path
-            orm_document.file_size = updated_document.file_size
-            orm_document.description = updated_document.description
+            # 3. Обновление полей ORM-объекта из доменной сущности
+            DocumentMapper.update_orm(orm_document, updated_document)
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция
@@ -169,5 +166,5 @@ class DocumentMetadataRepository(IDocumentMetadataRepository):
 
         except SQLAlchemyError as e:
             raise DatabaseErrorException(
-                f'Ошибка при удалении МЕТАДАННЫЕ ДОКУМЕНТА: {str(e)}'
+                f'Ошибка при удалении МЕТАДАННЫХ ДОКУМЕНТА: {str(e)}'
             )

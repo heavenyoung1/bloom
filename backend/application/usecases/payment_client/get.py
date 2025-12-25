@@ -6,8 +6,9 @@ from backend.core.logger import logger
 
 
 class GetPaymentByIdUseCase:
+    '''Сценарий: юрист получает информацию о платеже по ID.'''
+
     def __init__(self, uow_factory: UnitOfWorkFactory):
-        '''Получение платежа по ID'''
         self.uow_factory = uow_factory
 
     async def execute(

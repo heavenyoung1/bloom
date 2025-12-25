@@ -1,19 +1,20 @@
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import select
-from backend.domain.entities.client_payment import ClientPayment
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
-from backend.infrastructure.mappers.payment_mapper import ClientPaymentMapper
-from typing import TYPE_CHECKING, List, Sequence
-from backend.infrastructure.models.payment import ClientPaymentORM
-from backend.application.interfaces.repositories.payment_repo import IPaymentRepository
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.core.logger import logger
+from backend.domain.entities.client_payment import ClientPayment
+from backend.application.interfaces.repositories.payment_repo import IPaymentRepository
+from backend.infrastructure.mappers.payment_mapper import ClientPaymentMapper
+from backend.infrastructure.models.payment import ClientPaymentORM
+
 
 class ClientPaymentRepository(IPaymentRepository):
 
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def save(self, payment: ClientPayment) -> 'ClientPayment':
@@ -23,7 +24,7 @@ class ClientPaymentRepository(IPaymentRepository):
 
             # 2. Добавление в сессию
             self.session.add(orm_payment)
-            
+
             # 3. flush() — отправляем в БД, получаем ID
             await self.session.flush()
 
@@ -34,13 +35,13 @@ class ClientPaymentRepository(IPaymentRepository):
             return payment
 
         except IntegrityError as e:
-            logger.error(f'Ошибка при сохранении ДЕЛА: {str(e)}')
-            raise DatabaseErrorException(f'Ошибка при сохранении ДЕЛА: {str(e)}')
+            logger.error(f'Ошибка при сохранении ПЛАТЕЖА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при сохранении ПЛАТЕЖА: {str(e)}')
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка при сохранении ДЕЛА: {str(e)}')
-            raise DatabaseErrorException(f'Ошибка при сохранении ДЕЛА: {str(e)}')
-        
+            logger.error(f'Ошибка при сохранении ПЛАТЕЖА: {str(e)}')
+            raise DatabaseErrorException(f'Ошибка при сохранении ПЛАТЕЖА: {str(e)}')
+
     async def get(self, id: int) -> 'ClientPayment':
         try:
             # 1. Получение записи из базы данных
@@ -63,20 +64,24 @@ class ClientPaymentRepository(IPaymentRepository):
             logger.error(f'Ошибка БД при получении платежа ID = {id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении платежа: {str(e)}')
 
-
-    async def get_all_for_attorney(self, id: int) -> Sequence['ClientPayment']:
+    async def get_all_for_attorney(self, id: int) -> List['ClientPayment']:
         try:
             # 1. Получение записей из базы данных
             stmt = (
                 select(ClientPaymentORM)
                 .where(ClientPaymentORM.attorney_id == id)  # Фильтрация по адвокату
-                .order_by(ClientPaymentORM.created_at.desc())  # Например, сортировка по дате
+                .order_by(
+                    ClientPaymentORM.created_at.desc()
+                )  # Например, сортировка по дате
             )
             result = await self.session.execute(stmt)
             orm_payments = result.scalars().all()
 
             # 2. Списковый генератор для всех записей из базы данных
-            return [ClientPaymentMapper.to_domain(orm_payment) for orm_payment in orm_payments]
+            return [
+                ClientPaymentMapper.to_domain(orm_payment)
+                for orm_payment in orm_payments
+            ]
 
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении всех ПЛАТЕЖЕЙ: {str(e)}')
@@ -85,26 +90,21 @@ class ClientPaymentRepository(IPaymentRepository):
     async def update(self, updated_payment: ClientPayment) -> 'ClientPayment':
         try:
             # 1. Выполнение запроса на извлечение данных из БД
-            stmt = select(ClientPaymentORM).where(ClientPaymentORM.id == updated_payment.id)
+            stmt = select(ClientPaymentORM).where(
+                ClientPaymentORM.id == updated_payment.id
+            )
             result = await self.session.execute(stmt)
             orm_payment = result.scalars().first()
 
             # 2. Проверка наличия записи в БД
             if not orm_payment:
                 logger.error(f'Платеж с ID {updated_payment.id} не найден.')
-                raise EntityNotFoundException(f'Платеж с ID {updated_payment.id} не найден')
+                raise EntityNotFoundException(
+                    f'Платеж с ID {updated_payment.id} не найден'
+                )
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_payment.name = updated_payment.name
-            orm_payment.client_id = updated_payment.client_id
-            orm_payment.attorney_id = updated_payment.attorney_id
-            orm_payment.paid = updated_payment.paid
-            orm_payment.paid_str = updated_payment.paid_str
-            orm_payment.pade_date = updated_payment.pade_date
-            orm_payment.paid_deadline = updated_payment.paid_deadline
-            orm_payment.status = updated_payment.status
-            orm_payment.taxable = updated_payment.taxable
-            orm_payment.condition = updated_payment.condition
+            # 3. Обновление полей ORM-объекта из доменной сущности
+            ClientPaymentMapper.update_orm(orm_payment, updated_payment)
 
             # 4. Сохранение в БД
             await self.session.flush()
@@ -114,7 +114,9 @@ class ClientPaymentRepository(IPaymentRepository):
             return ClientPaymentMapper.to_domain(orm_payment)
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при обновлении платежа ID = {updated_payment.id}: {e}')
+            logger.error(
+                f'Ошибка БД при обновлении платежа ID = {updated_payment.id}: {e}'
+            )
             raise DatabaseErrorException(f'Ошибка при обновлении платежа: {str(e)}')
 
     async def delete(self, id: int) -> bool:
@@ -137,4 +139,3 @@ class ClientPaymentRepository(IPaymentRepository):
 
         except SQLAlchemyError as e:
             raise DatabaseErrorException(f'Ошибка при удалении платежа: {str(e)}')
-

@@ -8,9 +8,7 @@ from backend.core.logger import logger
 class DownloadDocumentUseCase:
     '''Сценарий: скачивание документа.'''
 
-    def __init__(
-        self, uow_factory: UnitOfWorkFactory, file_storage: IFileStorage
-    ):
+    def __init__(self, uow_factory: UnitOfWorkFactory, file_storage: IFileStorage):
         self.uow_factory = uow_factory
         self.file_storage = file_storage
 
@@ -33,9 +31,7 @@ class DownloadDocumentUseCase:
                     )
 
                 if document.attorney_id != attorney_id:
-                    raise AccessDeniedException(
-                        'У вас нет доступа к этому документу'
-                    )
+                    raise AccessDeniedException('У вас нет доступа к этому документу')
 
                 # 2. Создаем DocumentService для получения файла
                 doc_service = DocumentService(
@@ -57,4 +53,3 @@ class DownloadDocumentUseCase:
             except Exception as e:
                 logger.error(f'Неизвестная ошибка при скачивании документа: {e}')
                 raise Exception('Ошибка при скачивании документа')
-

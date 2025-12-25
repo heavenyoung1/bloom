@@ -40,3 +40,21 @@ class AttorneyMapper:
             is_superuser=domain.is_superuser,
             is_verified=domain.is_verified,
         )
+
+    @staticmethod
+    def update_orm(orm: 'AttorneyORM', domain: 'Attorney') -> None:
+        '''
+        Обновляет существующий ORM объект значениями из доменной сущности.
+        Не обновляет id, created_at, updated_at (они управляются отдельно).
+        '''
+        orm.license_id = domain.license_id
+        orm.first_name = domain.first_name
+        orm.last_name = domain.last_name
+        orm.patronymic = domain.patronymic
+        orm.email = domain.email
+        orm.telegram_username = domain.telegram_username
+        orm.phone = domain.phone
+        orm.hashed_password = domain.hashed_password
+        orm.is_active = domain.is_active
+        orm.is_superuser = domain.is_superuser
+        orm.is_verified = domain.is_verified

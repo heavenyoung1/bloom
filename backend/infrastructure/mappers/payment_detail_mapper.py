@@ -36,3 +36,18 @@ class PaymentDetailMapper:
             bik=domain.bik,
             bank_recipient=domain.bank_recipient,
         )
+
+    @staticmethod
+    def update_orm(orm: PaymentDetailORM, domain: 'PaymentDetail') -> None:
+        '''
+        Обновляет существующий ORM объект значениями из доменной сущности.
+        Не обновляет id, created_at, updated_at, attorney_id (они управляются отдельно).
+        '''
+        orm.inn = domain.inn
+        orm.kpp = domain.kpp
+        orm.index_address = domain.index_address
+        orm.address = domain.address
+        orm.bank_account = domain.bank_account
+        orm.correspondent_account = domain.correspondent_account
+        orm.bik = domain.bik
+        orm.bank_recipient = domain.bank_recipient

@@ -14,7 +14,7 @@ class ClientPaymentMapper:
                 paid_deadline_date = orm.paid_deadline.date()
             elif isinstance(orm.paid_deadline, date):
                 paid_deadline_date = orm.paid_deadline
-        
+
         return ClientPayment(
             id=orm.id,
             name=orm.name,
@@ -39,10 +39,12 @@ class ClientPaymentMapper:
         if domain.paid_deadline:
             if isinstance(domain.paid_deadline, date):
                 # Преобразуем date в datetime (начало дня)
-                paid_deadline_datetime = datetime.combine(domain.paid_deadline, datetime.min.time())
+                paid_deadline_datetime = datetime.combine(
+                    domain.paid_deadline, datetime.min.time()
+                )
             elif isinstance(domain.paid_deadline, datetime):
                 paid_deadline_datetime = domain.paid_deadline
-        
+
         return ClientPaymentORM(
             id=domain.id,
             name=domain.name,
@@ -56,3 +58,29 @@ class ClientPaymentMapper:
             taxable=domain.taxable,
             condition=domain.condition,
         )
+
+    @staticmethod
+    def update_orm(orm: ClientPaymentORM, domain: 'ClientPayment') -> None:
+        '''
+        Обновляет существующий ORM объект значениями из доменной сущности.
+        Не обновляет id, created_at, updated_at, client_id, attorney_id (они управляются отдельно).
+        '''
+        # Преобразуем date в datetime для paid_deadline (если нужно)
+        paid_deadline_datetime = None
+        if domain.paid_deadline:
+            if isinstance(domain.paid_deadline, date):
+                # Преобразуем date в datetime (начало дня)
+                paid_deadline_datetime = datetime.combine(
+                    domain.paid_deadline, datetime.min.time()
+                )
+            elif isinstance(domain.paid_deadline, datetime):
+                paid_deadline_datetime = domain.paid_deadline
+
+        orm.name = domain.name
+        orm.paid = domain.paid
+        orm.paid_str = domain.paid_str
+        orm.pade_date = domain.pade_date
+        orm.paid_deadline = paid_deadline_datetime
+        orm.status = domain.status
+        orm.taxable = domain.taxable
+        orm.condition = domain.condition

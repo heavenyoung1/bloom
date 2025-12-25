@@ -34,6 +34,6 @@ class LocalFileStorage(IFileStorage):
         full_path = self.base_path / file_path
         if not full_path.exists():
             raise FileNotFoundError(f'Файл не найден: {file_path}')
-        
+
         async with aiofiles.open(full_path, 'rb') as f:
             return await f.read()

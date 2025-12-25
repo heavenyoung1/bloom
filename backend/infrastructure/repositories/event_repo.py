@@ -1,8 +1,9 @@
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from typing import List
 from datetime import datetime, timezone
+
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.exceptions import DatabaseErrorException, EntityNotFoundException
 from backend.core.logger import logger
@@ -97,8 +98,10 @@ class EventRepository(IEventRepository):
         except SQLAlchemyError as e:
             logger.error(f'Ошибка БД при получении СОБЫТИЯ. ID = {attorney_id}: {e}')
             raise DatabaseErrorException(f'Ошибка при получении СОБЫТИЯ: {str(e)}')
-        
-    async def get_nearest_for_attorney(self, attorney_id: int, count: int) -> List['Event']:
+
+    async def get_nearest_for_attorney(
+        self, attorney_id: int, count: int
+    ) -> List['Event']:
         '''Получить ближайшие события по дате и ограниченные по количеству'''
         try:
             now = datetime.now(timezone.utc)
@@ -108,8 +111,8 @@ class EventRepository(IEventRepository):
                 .where(
                     EventORM.attorney_id == attorney_id,
                     EventORM.event_date >= now,
-                    )  
-                .order_by(EventORM.event_date.asc())  
+                )
+                .order_by(EventORM.event_date.asc())
                 .limit(count)
             )
             result = await self.session.execute(stmt)
@@ -119,8 +122,12 @@ class EventRepository(IEventRepository):
             return [EventMapper.to_domain(orm_event) for orm_event in orm_events]
 
         except SQLAlchemyError as e:
-            logger.error(f'Ошибка БД при получении ближайших СОБЫТИЙ. ID = {attorney_id}: {e}')
-            raise DatabaseErrorException(f'Ошибка при получении ближайших СОБЫТИЙ: {str(e)}')
+            logger.error(
+                f'Ошибка БД при получении ближайших СОБЫТИЙ. ID = {attorney_id}: {e}'
+            )
+            raise DatabaseErrorException(
+                f'Ошибка при получении ближайших СОБЫТИЙ: {str(e)}'
+            )
 
     async def update(self, updated_event: Event) -> 'Event':
         try:
@@ -136,11 +143,8 @@ class EventRepository(IEventRepository):
                     f'СОБЫТИЕ с ID {updated_event.id} не найдено.'
                 )
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_event.name = updated_event.name
-            orm_event.description = updated_event.description
-            orm_event.event_type = updated_event.event_type
-            orm_event.event_date = updated_event.event_date
+            # 3. Обновление полей ORM-объекта из доменной сущности
+            EventMapper.update_orm(orm_event, updated_event)
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция

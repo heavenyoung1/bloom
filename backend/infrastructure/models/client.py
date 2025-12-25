@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from backend.infrastructure.models import (
-        AttorneyORM, 
-        CaseORM, 
+        AttorneyORM,
+        CaseORM,
         ClientPaymentORM,
     )
 

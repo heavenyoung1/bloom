@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from backend.infrastructure.repositories.attorney_repo import AttorneyRepository
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.domain.entities.attorney import Attorney
 from backend.domain.events.attorney_registered import AttorneyRegisteredEvent
@@ -8,14 +7,7 @@ from backend.core.security import SecurityService
 from backend.application.policy.attorney_policy import AttorneyPolicy
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.application.commands.attorney import RegisterAttorneyCommand
-
-from backend.application.dto.attorney import (
-    AttorneyResponse,
-    RegisterRequest,
-    LoginRequest,
-    UpdateRequest,
-)
-
+from backend.application.dto.attorney import AttorneyResponse
 from backend.core.logger import logger
 
 

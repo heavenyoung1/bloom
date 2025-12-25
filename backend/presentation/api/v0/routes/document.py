@@ -103,14 +103,10 @@ async def upload_document(
 
     except ValidationException as e:
         logger.error(f'Ошибка валидации: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except EntityNotFoundException as e:
         logger.error(f'Сущность не найдена: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except HTTPException:
         raise
     except Exception as e:
@@ -156,14 +152,10 @@ async def get_case_documents(
 
     except EntityNotFoundException as e:
         logger.error(f'Сущность не найдена: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccessDeniedException as e:
         logger.error(f'Доступ запрещен: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
     except Exception as e:
         logger.error(f'Неизвестная ошибка: {e}')
         raise HTTPException(
@@ -206,14 +198,10 @@ async def get_document(
 
     except EntityNotFoundException as e:
         logger.error(f'Документ не найден: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccessDeniedException as e:
         logger.error(f'Доступ запрещен: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
     except Exception as e:
         logger.error(f'Неизвестная ошибка: {e}')
         raise HTTPException(
@@ -264,14 +252,10 @@ async def download_document(
 
     except EntityNotFoundException as e:
         logger.error(f'Документ не найден: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccessDeniedException as e:
         logger.error(f'Доступ запрещен: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
     except Exception as e:
         logger.error(f'Неизвестная ошибка: {e}')
         raise HTTPException(
@@ -303,9 +287,7 @@ async def delete_document(
         - Authorization: Bearer <access_token>
     '''
     try:
-        logger.info(
-            f'Удаление документа {document_id} (адвокат={current_attorney_id})'
-        )
+        logger.info(f'Удаление документа {document_id} (адвокат={current_attorney_id})')
 
         use_case = DeleteDocumentUseCase(uow_factory, file_storage)
         await use_case.execute(document_id, current_attorney_id)
@@ -314,18 +296,13 @@ async def delete_document(
 
     except EntityNotFoundException as e:
         logger.error(f'Документ не найден: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except AccessDeniedException as e:
         logger.error(f'Доступ запрещен: {e}')
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
     except Exception as e:
         logger.error(f'Неизвестная ошибка: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Ошибка при удалении документа',
         )
-

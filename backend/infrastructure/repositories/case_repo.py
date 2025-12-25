@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, List
 
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -89,6 +90,44 @@ class CaseRepository(ICaseRepository):
             logger.error(f'Ошибка БД при получении всех ДЕЛ: {str(e)}')
             raise DatabaseErrorException(f'Ошибка при получении ДЕЛА: {str(e)}')
 
+    # ===============================================================================================
+    async def get_all_for_attorney_with_relations(
+        self, attorney_id: int
+    ) -> List['CaseORM']:
+        try:
+            # 1. Создаем базовый запрос с фильтром по адвокату
+            stmt = (
+                select(CaseORM)
+                .where(CaseORM.attorney_id == attorney_id)  # Выбор дел для юриста
+                .order_by(CaseORM.created_at.desc())
+            )
+            # 2. Применяем eager loading для связанных объектов
+            stmt = stmt.options(
+                selectinload(CaseORM.client),
+                selectinload(CaseORM.contacts),
+            )
+            # 3. Выполняем запрос
+            result = await self.session.execute(stmt)
+            orm_cases = result.scalars().all()
+
+            logger.info(
+                f'Получено {len(orm_cases)} дел для адвоката {attorney_id} '
+                f'с загруженными связями (client, contacts)'
+            )
+
+            # 4. Возвращаем список ORM объектов (БЕЗ маппинга в доменную сущность)
+            return list(orm_cases)
+
+        except SQLAlchemyError as e:
+            logger.error(
+                f'Ошибка БД при получении дел с связями для адвоката {attorney_id}: {str(e)}'
+            )
+            raise DatabaseErrorException(
+                f'Ошибка при получении дел с связанными данными: {str(e)}'
+            )
+
+    # ===============================================================================================
+
     async def update(self, updated_case: Case) -> 'Case':
         try:
             # 1. Выполнение запроса на извлечение данных из БД
@@ -101,11 +140,8 @@ class CaseRepository(ICaseRepository):
                 logger.error(f'Дело с ID {updated_case.id} не найдено.')
                 raise EntityNotFoundException(f'Дело с ID {updated_case.id} не найдено')
 
-            # 3. Прямое обновление полей ORM-объекта
-            orm_case.name = updated_case.name
-            orm_case.client_id = updated_case.client_id
-            orm_case.status = updated_case.status
-            orm_case.description = updated_case.description
+            # 3. Обновление полей ORM-объекта из доменной сущности
+            CaseMapper.update_orm(orm_case, updated_case)
 
             # 4. Сохранение в БД
             await self.session.flush()  # или session.commit() если нужна транзакция
@@ -123,7 +159,7 @@ class CaseRepository(ICaseRepository):
             # 1. Выполнение запроса на извлечение данных из БД
             stmt = select(CaseORM).where(CaseORM.id == id)
             result = await self.session.execute(stmt)
-            orm_case = result.scalars().first()
+            orm_case = result.scalar_one_or_none()
 
             if not orm_case:
                 logger.warning(f'Дело с ID {id} не найдено при удалении.')
@@ -133,7 +169,7 @@ class CaseRepository(ICaseRepository):
             await self.session.delete(orm_case)
             await self.session.flush()
 
-            logger.info(f'Дело с ID {id} успешно удалено.')
+            # logger.info(f'Дело с ID {id} успешно удалено.')
             return True
 
         except SQLAlchemyError as e:

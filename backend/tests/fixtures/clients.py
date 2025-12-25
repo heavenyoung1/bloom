@@ -60,7 +60,7 @@ def sample_client_for_verify(verifiied_persisted_attorney_id):
 
 # Фикстура для клиента, который будет обновляться
 @pytest.fixture
-def sample_update_client(sample_attorney):
+def sample_update_client(persisted_attorney_id):
     '''Фикстура для обновленного клиента.'''
     return Client(
         id=None,  # Позволяем БД генерировать ID
@@ -72,7 +72,7 @@ def sample_update_client(sample_attorney):
         address='Москва, ул. Арбат, 5',
         messenger=Messenger.WA,  # Мессенджер WhatsApp
         messenger_handle='ivanov3232',
-        owner_attorney_id=sample_attorney.id,  # Пример ссылки на адвоката
+        owner_attorney_id=persisted_attorney_id,  # Пример ссылки на адвоката
     )
 
 

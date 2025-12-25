@@ -1,10 +1,7 @@
 from backend.infrastructure.tools.uow_factory import UnitOfWorkFactory
 from backend.core.security import SecurityService
 from backend.application.policy.attorney_policy import AttorneyPolicy
-from backend.application.commands.attorney import (
-    ChangePasswordCommand,
-)
-from backend.application.dto.attorney import AttorneyResponse
+from backend.application.commands.attorney import ChangePasswordCommand
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
@@ -52,7 +49,7 @@ class ChangePasswordUseCase:
                 attorney.hashed_password = SecurityService.hash_password(
                     cmd.new_password
                 )
-                await uow.attorney_repo.save(attorney)
+                await uow.attorney_repo.update(attorney)
 
             except (ValidationException, EntityNotFoundException) as e:
                 logger.error(f'Ошибка при изменении пароля: {e}')

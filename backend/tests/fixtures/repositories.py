@@ -18,6 +18,7 @@ from backend.infrastructure.repositories import (
     ContactRepository,
     DocumentMetadataRepository,
     EventRepository,
+    OutboxRepository,
 )
 
 # =============== ДЛЯ ИНТЕГРАЦИОННЫХ ТЕСТОВ РЕПОЗИТОРИИ С СЕССИЕЙ РЕАЛЬНОЙ БД ===============
@@ -57,6 +58,12 @@ def document_repo(session):
 def event_repo(session):
     '''Репозиторий с тестовой сессией'''
     return EventRepository(session)
+
+
+@pytest.fixture
+def outbox_repo(session):
+    '''Репозиторий с тестовой сессией'''
+    return OutboxRepository(session)
 
 
 # =========================================================================================
