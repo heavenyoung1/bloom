@@ -20,11 +20,6 @@ class PaymentClientCreateRequest(BaseModel):
         gt=0,
         description='ID клиента, которому создать платеж',
     )
-    attorney_id: int = Field(
-        ...,
-        gt=0,
-        description='Владелец платежа',
-    )
     paid: float = Field(
         ...,
         description='Сумма платежа (ЦИФРАМИ)',
@@ -77,7 +72,6 @@ class PaymentClientCreateRequest(BaseModel):
             'example': {
                 'name': 'Оплата юридических услуг по уголовному делу № 151093',
                 'client_id': 777,
-                'attorney_id': 777,
                 'paid': 30000.05,
                 'paid_str': 'Тридцать тысяч рублей, пять копеек',
                 'pade_date': '2026-01-12',  # Поддерживаются форматы: YYYY-MM-DD или YYYY.MM.DD
@@ -89,13 +83,23 @@ class PaymentClientCreateRequest(BaseModel):
         }
     )
 
+class PaymentClientChangeStatusRequest(BaseModel):
+    '''DTO для изменения статуса клиентского платежа'''
+    status: PaymentStatus = Field(PaymentStatus.paid)
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            'example': {
+                'status': 'Оплачен',
+            }
+        }
+    )
 
 class PaymentClientUpdateRequest(BaseModel):
     '''DTO для обновления клиентского платежа'''
 
     name: str = Field(None, max_length=255)
     client_id: int = Field(None)
-    attorney_id: int = Field(None)
     paid: float = Field(None)
     paid_str: str = Field(None)
     pade_date: date | None = Field(
@@ -133,7 +137,6 @@ class PaymentClientUpdateRequest(BaseModel):
             'example': {
                 'name': 'Оплата юридических услуг по уголовному делу № 151093',
                 'client_id': 777,
-                'attorney_id': 777,
                 'paid': 30000.05,
                 'paid_str': 'Тридцать тысяч рублей, пять копеек',
                 'pade_date': '2026-01-12',  # Поддерживаются форматы: YYYY-MM-DD или YYYY.MM.DD

@@ -59,7 +59,7 @@ class EventResponse(BaseModel):
     event_date: datetime
     case_id: int
     attorney_id: int
-    # Необязательные атрибуты
+
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

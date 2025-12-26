@@ -57,6 +57,5 @@ class CreateDocumentDTO(BaseModel):
     storage_path: str
     file_size: Optional[str] = None
     case_id: int
-    attorney_id: int
     description: str = ''
     mime_type: Optional[str] = None
