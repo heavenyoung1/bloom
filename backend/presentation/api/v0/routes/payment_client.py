@@ -121,7 +121,7 @@ async def get_all_client_payments_for_attorney(
 ):
     try:
         service = PaymentService(uow_factory)
-        result = await service.get_all_payments_for_attorney(attorney_id=get_current_attorney_id)
+        result = await service.get_all_payments_for_attorney(attorney_id=current_attorney_id)
         return result
     except Exception as e:
         logger.error(f'Ошибка при получении платежей: {e}')
