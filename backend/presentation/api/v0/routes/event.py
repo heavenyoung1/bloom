@@ -96,6 +96,7 @@ async def create_response(
 )
 async def get_event(
     event_id: int,
+    current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     '''
@@ -137,11 +138,11 @@ async def get_event(
     },
 )
 async def get_events_by_attorney(
-    attorney_id: int,
+    current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:
-        cmd = GetEventsForAttorneyQuery(attorney_id=attorney_id)
+        cmd = GetEventsForAttorneyQuery(attorney_id=current_attorney_id)
 
         use_case = GetEventByAttorneyUseCase(uow_factory)
         result = await use_case.execute(cmd)
@@ -172,14 +173,14 @@ async def get_events_by_attorney(
     },
 )
 async def get_nearest_events_by_attorney(
-    attorney_id: int,
+    current_attorney_id: int = Depends(get_current_attorney_id),
     count: int = Query(
         default=3, ge=1, le=50, description='Количество ближайших событий'
     ),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:
-        cmd = GetEventsForAttorneyQuery(attorney_id=attorney_id)
+        cmd = GetEventsForAttorneyQuery(attorney_id=current_attorney_id)
 
         use_case = GetNearestEventsByAttorneyUseCase(uow_factory)
         result = await use_case.execute(cmd, count)
@@ -211,6 +212,7 @@ async def get_nearest_events_by_attorney(
 )
 async def get_events_by_case(
     case_id: int,
+    current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ) -> List['EventResponse']:
     try:

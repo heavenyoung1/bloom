@@ -3,8 +3,8 @@ from datetime import datetime, date
 from typing import Optional
 from backend.domain.entities.auxiliary import PaymentStatus
 from backend.application.commands.client_payment import (
-    UpdatePaymentCommand,
-    ChangePaymentStatusCommand,
+    UpdateСlientPaymentCommand,
+    ChangeClientPaymentStatusCommand,
 )
 
 
@@ -54,7 +54,7 @@ class ClientPayment:
             status=status,
         )
 
-    def update(self, cmd: UpdatePaymentCommand) -> None:
+    def update(self, cmd: UpdateСlientPaymentCommand) -> None:
         '''Обновить поля на основе команды, если они не None'''
         if cmd.name is not None:
             self.name = cmd.name
@@ -77,6 +77,6 @@ class ClientPayment:
         if cmd.status is not None:
             self.status = cmd.status
 
-    def change_status(self, cmd: ChangePaymentStatusCommand) -> None:
+    def change_status(self, cmd: ChangeClientPaymentStatusCommand) -> None:
         '''Изменить статус платежа'''
         self.status = cmd.status

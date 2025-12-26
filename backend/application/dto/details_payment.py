@@ -55,7 +55,6 @@ class PaymentDetailUpdateRequest(BaseModel):
         json_schema_extra={
             'example': {
                 'inn': '1234567890',
-                'attorney_id': 777,
                 'index_address': '241033',
                 'address': 'г. Санкт-Петербург, ул. Площадь Восстания, д.10, кв. 55',
                 'bank_account': '12345678912345678912',

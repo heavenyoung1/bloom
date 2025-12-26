@@ -121,6 +121,7 @@ async def create_client(
 )
 async def get_client(
     client_id: int,
+    current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     '''

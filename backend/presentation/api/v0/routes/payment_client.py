@@ -9,6 +9,7 @@ from backend.application.usecases.payment_client import (
     CreatePaymentUseCase,
     DeletePaymentUseCase,
     UpdatePaymentUseCase,
+    ChangeStatusPaymentUseCase,
     GetPaymentByIdUseCase,
     GetAllPaymentsUseCase,
 )
@@ -20,6 +21,7 @@ from backend.application.commands.client_payment import (
     GetСlientPaymentByIdQuery,
     GetСlientPaymentForAttorneyQuery,
     GetСlientPaymentForClientQuery,
+    ChangeClientPaymentStatusCommand,
 )
 
 from backend.core.exceptions import (
@@ -33,6 +35,7 @@ from backend.application.dto.client_payment import (
     PaymentClientUpdateRequest,
     PaymentClientResponse,
     FullPaymentResponse,
+    PaymentClientChangeStatusRequest,
 )
 
 from backend.core.dependencies import (
@@ -88,6 +91,7 @@ async def create_client_payment(
 )
 async def get_client_payment(
     payment_id: int,
+    current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:
@@ -112,12 +116,12 @@ async def get_client_payment(
     summary='Получение всех платежей для юриста',
 )
 async def get_all_client_payments_for_attorney(
-    attorney_id: int,
+    current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:
         service = PaymentService(uow_factory)
-        result = await service.get_all_payments_for_attorney(attorney_id=attorney_id)
+        result = await service.get_all_payments_for_attorney(attorney_id=get_current_attorney_id)
         return result
     except Exception as e:
         logger.error(f'Ошибка при получении платежей: {e}')
@@ -160,6 +164,39 @@ async def update_client_payment(
             detail='Ошибка при обновлении платежа',
         )
 
+@router.put(
+    '/change-status-client-payment/{payment_id}',
+    response_model=PaymentClientResponse,
+    status_code=status.HTTP_200_OK,
+    summary='Изменение статуса платежа',
+)
+async def change_status_client_payment(
+    payment_id: int,
+    request: PaymentClientChangeStatusRequest,
+    current_attorney_id: int = Depends(get_current_attorney_id),
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    try:
+        cmd = ChangeClientPaymentStatusCommand(
+            payment_id=payment_id,
+            status=request.status,
+        )
+        use_case = ChangeStatusPaymentUseCase(uow_factory)
+        result = await use_case.execute(cmd)
+        
+        return result
+    except ValidationException as e:
+        logger.error(f'Ошибка валидации: {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except EntityNotFoundException as e:
+        logger.error(f'Платеж не найден: {e}')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.error(f'Ошибка при обновлении платежа: {e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Ошибка при обновлении платежа',
+        )
 
 @router.delete(
     '/delete-client-payment/{payment_id}',

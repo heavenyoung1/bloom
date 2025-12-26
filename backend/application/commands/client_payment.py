@@ -56,34 +56,9 @@ class GetСlientPaymentForAttorneyQuery:
 class GetСlientPaymentForClientQuery:
     client_id: int
 
-
-# Специфичный метод для быстрого обновления статуса
-# Можно использовать обычный метод Update, но там идет перебор множества
-# условий if, тут обновляется всего лишь одно поле
 @dataclass
-class UpdatePaymentCommand:
-    '''Команда для обновления платежа (используется доменной сущностью)'''
-
-    name: Optional[str] = None
-    client_id: Optional[int] = None
-    attorney_id: Optional[int] = None
-    paid: Optional[float] = None
-    paid_str: Optional[str] = None
-    pade_date: Optional[date] = None
-    paid_deadline: Optional[date] = None
-    taxable: Optional[bool] = None
-    condition: Optional[str] = None
-    status: Optional[PaymentStatus] = None
-
-
-@dataclass
-class ChangePaymentStatusCommand:
-    '''Команда для изменения статуса платежа (используется доменной сущностью)'''
-
-    status: PaymentStatus
-
-
-@dataclass
-class ChangeСlientPaymentStatusCommand:
+class ChangeClientPaymentStatusCommand:
+    '''Команда для изменения статуса платежа'''
     payment_id: int
     status: PaymentStatus
+

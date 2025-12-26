@@ -6,7 +6,11 @@ from datetime import datetime
 
 
 class CaseCreateRequest(BaseModel):
-    '''DTO для создания нового дела'''
+    '''DTO для создания нового дела
+    
+    ВАЖНО: owner_attorney_id НЕ включен!
+    Передаётся из JWT токена в API слое.
+    '''
 
     name: str = Field(..., max_length=255, description='Название дела')
     client_id: int = Field(
@@ -14,24 +18,7 @@ class CaseCreateRequest(BaseModel):
         gt=0,
         description='ID клиента, прикрепленного к делу',
     )
-    attorney_id: int = Field(
-        ...,
-        gt=0,
-        description='ID юриста, ответственного за клиента',
-    )
-    status: CaseStatus = Field(
-        ...,
-        description=(
-            'Статус дела. Возможные значения:\n'
-            ' - Новое: дело создано, но не принято в работу\n'
-            ' - В работе: юрист ведёт дело\n'
-            ' - На паузе: временная приостановка\n'
-            ' - Завершено: успешно завершено\n'
-            ' - Закрыто: закрыто без результата\n'
-            ' - Отменено: отменено до начала работы\n'
-            ' - Архивировано: перемещено в архив'
-        ),
-    )
+    status: CaseStatus = Field(...) # См. domain\entities\auxiliary.py <CaseStatus>
     description: str = Field(
         ...,
         max_length=255,  # увеличено для развёрнутого описания
@@ -46,7 +33,6 @@ class CaseCreateRequest(BaseModel):
             'example': {
                 'name': 'Споры по недвижимости',
                 'client_id': 1,
-                'attorney_id': 1,
                 'status': 'Новое',
                 'description': 'Разрешение спора о праве собственности на квартиру',
             }
