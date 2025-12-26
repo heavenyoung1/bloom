@@ -13,7 +13,6 @@ class EventCreateRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=2000)
     case_id: int
-    attorney_id: int
     event_type: EventType
     event_date: datetime
 
@@ -25,7 +24,6 @@ class EventCreateRequest(BaseModel):
                 'event_type': 'Судебное заседание',
                 'event_date': '2024-12-15T10:00:00Z',
                 'case_id': 1,
-                'attorney_id': 1,
             }
         }
     )
@@ -36,19 +34,16 @@ class EventUpdateRequest(BaseModel):
 
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=2000)
-    # case_id: Optional[int] = None
     event_type: Optional[EventType] = None
     event_date: Optional[datetime] = None
 
     model_config = ConfigDict(
         json_schema_extra={
             'example': {
-                #'event_id': 1,
                 'name': 'Заседание суда повторное',
                 'description': 'Рассмотрение дела по существу, или не по существу',
                 'event_type': 'Судебное заседание',
                 'event_date': '2024-12-15T10:00:00Z',
-                #'case_id': 1,
             }
         }
     )

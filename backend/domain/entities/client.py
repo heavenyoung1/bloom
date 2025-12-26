@@ -19,7 +19,6 @@ class Client:
     messenger_handle: str
     owner_attorney_id: int
 
-    # Необязательные атрибуты
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

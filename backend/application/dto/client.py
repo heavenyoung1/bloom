@@ -34,9 +34,6 @@ class ClientCreateRequest(BaseModel):
     address: str = Field(..., max_length=255, description='Почтовый адрес')
     messenger: Messenger
     messenger_handle: str = Field(..., min_length=4, max_length=50)
-    # owner_attorney_id: int = Field(
-    #     ..., description='ID юриста, ответственного за клиента'
-    # )
 
     model_config = ConfigDict(
         json_schema_extra={

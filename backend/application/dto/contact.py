@@ -17,7 +17,6 @@ class ContactCreateRequest(BaseModel):
     phone: Optional[str] = Field(None, max_length=20)
     email: Optional[EmailStr] = None
     case_id: int
-    attorney_id: int
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -27,7 +26,6 @@ class ContactCreateRequest(BaseModel):
                 'phone': '+79991234567',
                 'email': 'contact@example.com',
                 'case_id': 1,
-                'attorney_id': 1,
             }
         }
     )

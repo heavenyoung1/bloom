@@ -95,7 +95,7 @@ async def create_payment_detail(
 )
 async def get_payment_detail(
     payment_detail_id: int,
-    # current_attorney_id: int = Depends(get_current_attorney_id),
+    current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:
@@ -132,16 +132,16 @@ async def get_payment_detail(
     },
 )
 async def get_payment_detail_for_attorney(
-    attorney_id: int = Depends(get_current_attorney_id),
+    current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:
-        cmd = GetPaymentDetailForAttorneyQuery(attorney_id=attorney_id)
+        cmd = GetPaymentDetailForAttorneyQuery(attorney_id=current_attorney_id)
         use_case = GetPaymentDetailForAttorneyUseCase(uow_factory)
         result = await use_case.execute(cmd)
 
         logger.info(
-            f'Платежная информация для юриста успешно получена: {result.attorney_id}'
+            f'Платежная информация для юриста успешно получена: {result.current_attorney_id}'
         )
         return result
 

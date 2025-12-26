@@ -6,7 +6,7 @@ from backend.application.commands.attorney import (
     RegisterAttorneyCommand,
     UpdateAttorneyCommand,
 )
-from backend.application.dto.attorney import RegisterRequest
+
 from backend.core.exceptions import ValidationException, EntityNotFoundException
 from backend.core.logger import logger
 
