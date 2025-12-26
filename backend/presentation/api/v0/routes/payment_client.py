@@ -116,12 +116,12 @@ async def get_client_payment(
     summary='Получение всех платежей для юриста',
 )
 async def get_all_client_payments_for_attorney(
-    attorney_id: int,
+    current_attorney_id: int = Depends(get_current_attorney_id),
     uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
 ):
     try:
         service = PaymentService(uow_factory)
-        result = await service.get_all_payments_for_attorney(attorney_id=attorney_id)
+        result = await service.get_all_payments_for_attorney(attorney_id=get_current_attorney_id)
         return result
     except Exception as e:
         logger.error(f'Ошибка при получении платежей: {e}')
