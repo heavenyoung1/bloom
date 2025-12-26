@@ -122,7 +122,6 @@ async def valid_client_dto():
 def valid_case_dto():
     return CaseCreateRequest(
         name='Спор об имуществе, для теста',
-        attorney_id=1,  # будет переопределен в тестах
         client_id=1,  # будет переопределен в тестах
         status='Новое',
         description='Тестовое описание тестового дела',
@@ -132,7 +131,6 @@ def valid_case_dto():
 @pytest.fixture
 def valid_event_dto(sample_date):
     return EventCreateRequest(
-        attorney_id=1,
         case_id=1,
         description='Рассмотрение дела по существу',
         event_date=sample_date,

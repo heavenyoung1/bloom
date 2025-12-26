@@ -39,7 +39,7 @@ class TestCreateEvent:
         assert client_id is not None
 
         # ======== СОЗДАНИЕ ДЕЛА ========
-        valid_case_dto.attorney_id = attorney_id
+        #valid_case_dto.attorney_id = attorney_id ДРУГАЯ ПРОВЕРКА ДОЛЖНА БЫТЬ!
         valid_case_dto.client_id = client_id
         case_payload = valid_case_dto.model_dump()
         create_case_response = await http_client.post(
@@ -51,7 +51,7 @@ class TestCreateEvent:
         case_id = data['id']
 
         # ======== СОЗДАНИЕ СОБЫТИЯ ========
-        valid_event_dto.attorney_id = attorney_id
+        #valid_event_dto.attorney_id = attorney_id
         valid_event_dto.case_id = case_id
         event_payload = valid_event_dto.model_dump(mode='json')
 
