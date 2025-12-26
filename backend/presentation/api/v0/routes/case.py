@@ -17,6 +17,7 @@ from backend.application.usecases.case.get import GetCaseByIdUseCase
 from backend.application.usecases.case.get_all import GetlAllCasesUseCase
 from backend.application.usecases.case.update import UpdateCaseUseCase
 from backend.application.usecases.case.delete import DeleteCaseUseCase
+from backend.application.usecases.case.get_dashboard import GetDashboardUseCase
 
 # ========== COMMANDS & QUERIES ==========
 from backend.application.commands.case import (
@@ -25,6 +26,7 @@ from backend.application.commands.case import (
     DeleteCaseCommand,
     GetCaseByIdQuery,
     GetCasesForAttorneyQuery,
+    GetDashboardQuery,
 )
 
 # ========== DTOs ==========
@@ -32,6 +34,7 @@ from backend.application.dto.case import (
     CaseCreateRequest,
     CaseUpdateRequest,
     CaseResponse,
+    DashboardResponse,
 )
 
 # ========== Router ==========
@@ -278,4 +281,44 @@ async def delete_case(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Ошибка при удалении дела',
+        )
+
+
+@router.get(
+    '/dashboard',
+    response_model=list[DashboardResponse],
+    status_code=status.HTTP_200_OK,
+    summary='Получение данных дашборда',
+    responses={
+        200: {'description': 'Данные дашборда'},
+        401: {'description': 'Требуется авторизация'},
+    },
+)
+async def get_dashboard(
+    current_attorney_id: int = Depends(get_current_attorney_id),
+    uow_factory: UnitOfWorkFactory = Depends(get_uow_factory),
+):
+    '''
+    Получение данных дашборда для текущего адвоката.
+    
+    Возвращает информацию о делах, клиентах, контактах, событиях и 
+    количестве ожидающих платежей.
+
+    Requires:
+        - Authorization: Bearer <access_token>
+    '''
+    try:
+        logger.info(f'Получение данных дашборда: адвокат={current_attorney_id}')
+
+        cmd = GetDashboardQuery(attorney_id=current_attorney_id)
+        use_case = GetDashboardUseCase(uow_factory)
+        result = await use_case.execute(cmd)
+
+        return result
+
+    except Exception as e:
+        logger.error(f'Ошибка при получении данных дашборда: {e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Ошибка при получении данных дашборда',
         )
